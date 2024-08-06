@@ -1,0 +1,9 @@
+**Heal Bot** 
+-> The only bot you will ever need in your servers, it has a range of features such as:
+- Music
+- Moderation
+- Fun
+- & more
+
+
+To get started, go to https://healbot.lol/support & join the support server! Happy discording 
