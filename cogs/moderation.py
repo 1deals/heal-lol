@@ -182,7 +182,7 @@ class Moderation(commands.Cog):
                 return await ctx.approve(f"Removed the **forced nickname** from {user.mention}!")
         else:
             await self.bot.pool.execute(
-                "INSERT INTO forcenick (guild_id, user_id, name) VALUES ($1, $2, $3)", 
+                "INSERT INTO forcenick (guild_id, user_id, name) VALUES ($1, $2, $3) ON CONFLICT (guild_id, user_id) DO UPDATE SET name = $3", 
                 ctx.guild.id, user.id, name
             )
             await user.edit(nick=name)
