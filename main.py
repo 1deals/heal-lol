@@ -14,4 +14,4 @@ def get_bot_metrics(bot: Heal):
 
 if __name__ == "__main__":
     bot = Heal()
-    bot.run('MTIzMjc3ODUwODQyNjgwOTM2NQ.GOa0ii.YTQG3x22Mc66Q-6tnOqz2A17Y8Ucx_Ykbqn1y0')
+    bot.run('MTIzMjc3ODUwODQyNjgwOTM2NQ.GZClxX.tqhEsOYM7jNDfwEOXMQChAtw9OYYdSkF1zOGuU')
