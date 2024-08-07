@@ -19,10 +19,9 @@ CREATE TABLE IF NOT EXISTS voicemaster.channels (
 );
 
 CREATE TABLE IF NOT EXISTS forcenick (
-    guild_id BIGINT,
-    user_id BIGINT,
-    name TEXT,
-    PRIMARY KEY (guild_id, user_id)
+    guild_id BIGINT, 
+    user_id BIGINT, 
+    name TEXT
 );
 
 CREATE TABLE IF NOT EXISTS welcome (
@@ -40,4 +39,10 @@ CREATE TABLE IF NOT EXISTS afk (
 
 CREATE TABLE IF NOT EXISTS blacklist (
     user_id BIGINT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS afk (
+    user_id BIGINT PRIMARY KEY,
+    status TEXT,
+    time BIGINT
 );

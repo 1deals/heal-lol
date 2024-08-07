@@ -11,6 +11,8 @@ from tools.paginator            import Paginator
 from discord.utils              import format_dt
 from discord.ext                import commands
 from tools.heal                 import Heal
+import asyncio
+from typing import Union
 
 class Moderation(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -197,6 +199,42 @@ class Moderation(commands.Cog):
         check = await self.bot.pool.fetchrow("SELECT name FROM forcenick WHERE user_id = $1 AND guild_id = $2", before.id, before.guild.id)   
         if check: 
             return await before.edit(nick=check['name'])
+
+    @commands.command(
+        name = "purge",
+        description = "Purge messages."
+    )
+    @commands.has_permissions(manage_messages = True)
+    async def purge(self, ctx: Context, *, amount: int):
+        await ctx.message.delete()
+        await ctx.channel.purge(limit=amount)
+        purgemsg = await ctx.approve(f"**Successfully** purged {amount} messages.")
+        await asyncio.sleep(2)
+        await purgemsg.delete()
+
+    @commands.command(name = "role", aliases = ["r"], description = "Adds a role to mentioned user.", usage = "Syntax: role <user> <role> \nExample: role @psutil owner")
+    @commands.has_permissions(manage_roles = True)
+    async def role(self, ctx:Context, member: discord.Member = None, *, role: discord.Role = None):
+        if member is None or role is None:
+            await ctx.send_help(ctx.command)
+            return
+
+        if role in member.roles:
+            await member.remove_roles(role)
+            await ctx.approve(f"**Removed** {role.mention} from **{member.name}**")
+        else:
+            await member.add_roles(role)
+            await ctx.approve(f"**Added** {role.mention} to **{member.name}**")
+    
+    @commands.command(description="Adds an emoji to your server", usage="steal [emoji] <name>", aliases = ["steal"])
+    @commands.has_permissions(manage_expressions = True)
+    async def addemoji(self, ctx: Context, emoji: Union[discord.Emoji, discord.PartialEmoji] = None, *, name: str=None):
+        if not emoji:
+            return await ctx.send_help(ctx.command)
+        if not name: 
+            name = emoji.name
+            emoji = await ctx.guild.create_custom_emoji(image= await emoji.read(), name=name)
+            return await ctx.approve(f"added {emoji} as `{name}`")
 
 
         

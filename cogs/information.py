@@ -12,6 +12,7 @@ from tools.paginator            import Paginator
 from discord.utils              import format_dt
 from discord.ext                import commands
 from tools.heal                 import Heal
+from typing import Union
 
 class Information(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -71,7 +72,65 @@ class Information(commands.Cog):
     @cooldown(1, 5, commands.BucketType.user)
     async def uptime(self, ctx: Context):
         await ctx.neutral(f":alarm_clock: I have been **up** for `{self.bot.uptime}`")
+
+    def get_ordinal(number):
+        if 10 <= number % 100 <= 20:
+            suffix = "th"
+        else:
+            suffixes = {1: "st", 2: "nd", 3: "rd"}
+            suffix = suffixes.get(number % 10, "th")
+
+        return f"{number}{suffix}"
+    
+    @commands.command(
+        name = "userinfo",
+        aliases = ["ui", "whois"],
+        description = "Get info about a user."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def userinfo(self, ctx: Context, *, user: Union[discord.User, discord.Member] = None):
+        user = user or ctx.author
+
+        if isinstance(user, discord.User):
+            member = ctx.guild.get_member(user.id)
+        else:
+            member = user
+
+       
+        title = f"{user.name}"
+
         
+        if user.id == 187747524646404105:  
+            title += " <:owner:1270728554388394086> <:staff:1270729949686534206> <:dev:1270730817458405468> "
+        if user.id == 392300135323009024:
+            title += " <:staff:1270729949686534206> <:dev:1270730817458405468>"
+        if user.id == 461914901624127489:
+            title += " <:staff:1270729949686534206> <:dev:1270730817458405468>"
+
+        embed = discord.Embed(
+            title=title,
+            description=f"{user.name} / {user.display_name}",
+            color=Colors.BASE_COLOR 
+        )
+        embed.add_field(name="Created", value=format_dt(user.created_at, style='f'), inline=True)
+
+        if member is None:
+            embed.add_field(name="Joined", value="N/A", inline=True)
+            embed.add_field(name="Join Position", value="N/A", inline=False)
+            embed.add_field(name="Roles", value="N/A", inline=False)
+        else:
+            all_members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
+            position = all_members.index(member) + 1
+
+            roles = [role.mention for role in member.roles if role.id != ctx.guild.id]
+            roles_list = ", ".join(roles) if roles else "None"
+
+            embed.add_field(name="Joined", value=f"{format_dt(member.joined_at, style='f')} ({self.get_ordinal(position)})", inline=True)
+            embed.add_field(name="Roles", value=roles_list, inline=False)
+
+        embed.set_thumbnail(url=user.avatar.url)
+
+        await ctx.send(embed=embed)
 
 async def setup(bot: Heal):
     await bot.add_cog(Information(bot))

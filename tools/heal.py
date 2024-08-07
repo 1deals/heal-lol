@@ -48,7 +48,7 @@ class Heal(commands.Bot):
                 replied_user=False
             ),
             case_insensitive=True,
-            owner_ids=[1185934752478396528, 187747524646404105]
+            owner_ids=[1185934752478396528, 187747524646404105, 392300135323009024]
         )
 
         self.message_cache = defaultdict(list)

@@ -10,6 +10,7 @@ from discord.ext.commands import (
 from tools.heal import Heal
 from tools.managers.context import Context
 from tools.configuration import Colors, Emojis
+from typing import Union
 from tools.EmbedBuilder import EmbedBuilder, EmbedScript
 
 class Server(Cog):
@@ -205,6 +206,7 @@ class Server(Cog):
                 await channel.send(content=content, embed=embed, view=view)
             else:
                 await channel.send(content=processed_message)
+
     
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Server(bot))
