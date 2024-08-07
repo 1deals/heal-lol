@@ -170,21 +170,24 @@ class Moderation(commands.Cog):
     async def forcenickname(self, ctx: Context, user: discord.Member, *, name: str = None):
         if name is None:
             check = await self.bot.pool.fetchrow(
-                "SELECT name FROM forcenick WHERE guild_id = $1 AND user_id = $2", 
+                "SELECT name FROM forcenick WHERE guild_id = $1 AND user_id = $2",
                 ctx.guild.id, user.id
             )
             if check and check["name"]:
                 await self.bot.pool.execute(
-                    "DELETE FROM forcenick WHERE guild_id = $1 AND user_id = $2", 
+                    "DELETE FROM forcenick WHERE guild_id = $1 AND user_id = $2",
                     ctx.guild.id, user.id
                 )
                 await user.edit(nick=None)
                 return await ctx.approve(f"Removed the **forced nickname** from {user.mention}!")
+            else:
+                return await ctx.deny(f"No forced nickname found for {user.mention}.")
         else:
-            await self.bot.pool.execute(
-                "INSERT INTO forcenick (guild_id, user_id, name) VALUES ($1, $2, $3) ON CONFLICT (guild_id, user_id) DO UPDATE SET name = $3", 
-                ctx.guild.id, user.id, name
-            )
+            check = await self.bot.pool.fetchrow("SELECT * FROM forcenick WHERE user_id = $1 AND guild_id = $2", user.id, ctx.guild.id)               
+            if check is None: 
+                await self.bot.pool.execute("INSERT INTO forcenick VALUES ($1,$2,$3)", ctx.guild.id, user.id, name)
+            else: 
+                await self.bot.pool.execute("UPDATE forcenick SET name = $1 WHERE user_id = $2 AND guild_id = $3", name, user.id, ctx.guild.id)  
             await user.edit(nick=name)
             return await ctx.approve(f"Forced **{user.name}'s** nickname to be **`{name}`**!")
 
