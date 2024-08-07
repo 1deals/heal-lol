@@ -205,6 +205,7 @@ class Moderation(commands.Cog):
         description = "Purge messages."
     )
     @commands.has_permissions(manage_messages = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def purge(self, ctx: Context, *, amount: int):
         await ctx.message.delete()
         await ctx.channel.purge(limit=amount)
@@ -214,6 +215,7 @@ class Moderation(commands.Cog):
 
     @commands.command(name = "role", aliases = ["r"], description = "Adds a role to mentioned user.", usage = "Syntax: role <user> <role> \nExample: role @psutil owner")
     @commands.has_permissions(manage_roles = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def role(self, ctx:Context, member: discord.Member = None, *, role: discord.Role = None):
         if member is None or role is None:
             await ctx.send_help(ctx.command)
@@ -228,6 +230,7 @@ class Moderation(commands.Cog):
     
     @commands.command(description="Adds an emoji to your server", usage="steal [emoji] <name>", aliases = ["steal"])
     @commands.has_permissions(manage_expressions = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def addemoji(self, ctx: Context, emoji: Union[discord.Emoji, discord.PartialEmoji] = None, *, name: str=None):
         if not emoji:
             return await ctx.send_help(ctx.command)
@@ -236,7 +239,35 @@ class Moderation(commands.Cog):
             emoji = await ctx.guild.create_custom_emoji(image= await emoji.read(), name=name)
             return await ctx.approve(f"added {emoji} as `{name}`")
 
+    @commands.command(
+        name = "pin",
+        description = "Pins the message you reply to."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def pin(self, ctx: Context, *, link: str = None):
+        message = None
 
+        if ctx.message.reference:
+            message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+        elif link:
+            pattern = re.compile(r'https://discord.com/channels/(\d+)/(\d+)/(\d+)')
+            match = pattern.match(link)
+            if match:
+                guild_id, channel_id, message_id = map(int, match.groups())
+                if guild_id == ctx.guild.id:
+                    channel = ctx.guild.get_channel(channel_id)
+                    if channel:
+                        message = await channel.fetch_message(message_id)
+
+        if message:
+            try:
+                await message.pin()
+            except discord.Forbidden:
+                await ctx.warn("I do not have permission to pin messages.")
+            except discord.HTTPException as e:
+                await ctx.warn(f"Failed to pin the message: {e}")
+        else:
+            return await ctx.send_help(ctx.command)
         
 
 async def setup(bot: Heal):
