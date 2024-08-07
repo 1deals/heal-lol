@@ -99,7 +99,7 @@ class Information(commands.Cog):
         if user.id == 392300135323009024:
             title += " <:staff:1270729949686534206> <:dev:1270730817458405468>"
         if user.id == 461914901624127489:
-            title += " <:staff:1270729949686534206> <:dev:1270730817458405468>"
+            title += "<:zzmilklove2:1270873236841693267> <:staff:1270729949686534206> <:dev:1270730817458405468>"
 
         embed = discord.Embed(
             title=title,
