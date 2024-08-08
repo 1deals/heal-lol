@@ -13,10 +13,17 @@ from discord.ext                import commands
 from tools.heal                 import Heal
 import asyncio
 from typing import Union
+from collections import defaultdict
+from humanfriendly import format_timespan
 
 class Moderation(commands.Cog):
+    """
+    Moderation commands.
+    """
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
+        self.locks = defaultdict(asyncio.Lock)
+        self.role_lock = defaultdict(asyncio.Lock)
 
     @command(
         name = "lock",
@@ -269,6 +276,57 @@ class Moderation(commands.Cog):
         else:
             return await ctx.send_help(ctx.command)
         
+    @command(
+        name = "roleall",
+        description = "Gives a role to all users."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @has_permissions(manage_roles = True)
+    async def roleall(self, ctx: Context, *, role: discord.Role = None):
+        """
+        add a role to all members
+        """
+        if role is None:
+            return await ctx.send_help(ctx.command)
+        async with self.role_lock[ctx.guild.id]:
+            tasks = [
+                m.add_roles(role, reason=f"Role all invoked by {ctx.author}")
+                for m in ctx.guild.members
+                if not role in m.roles
+            ]
+
+            if len(tasks) == 0:
+                return await ctx.warn(f"Everyone has this role")
+
+            mes = await ctx.neutral(
+                f"Giving {role.mention} to **{len(tasks)}** members. This may take around **{format_timespan(0.3*len(tasks))}**"
+            )
+
+            await asyncio.gather(*tasks)
+            return await mes.edit(
+                embed=discord.Embed(
+                    color= Colors.BASE_COLOR,
+                    description=f"Added {role.mention} to **{len(tasks)}** members",
+                )
+            )
+
+    @commands.command(
+        name = "nuke",
+        description = "Nukes a channel."
+    )
+    @commands.has_permissions(administrator=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def nuke(self, ctx: Context, *, channel: discord.TextChannel = None):
+        """
+        Clone a channel
+        """
+        if channel is None:
+            return await ctx.send_help(ctx.command)
+        new = await ctx.channel.clone()
+        await new.edit(position=ctx.channel.position, topic=ctx.channel.topic, overwrites=ctx.channel.overwrites)
+        await ctx.channel.delete()
+        embed = discord.Embed(description = f"**Nuked** by: **{ctx.author}**", color = self.bot.color)
+        await new.send(embed=embed)
 
 async def setup(bot: Heal):
     await bot.add_cog(Moderation(bot))

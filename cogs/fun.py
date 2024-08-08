@@ -3,6 +3,7 @@ import asyncio
 import random
 import aiohttp
 import uwuipy
+import requests
 
 from discord.ext import commands
 from discord.ext.commands       import command, group, BucketType, cooldown, has_permissions
@@ -18,6 +19,10 @@ class Fun(commands.Cog):
         self.bot = bot
         self.MatchStart = {}
         self.lifes = {}
+        self.valid_flavors = [
+            "Strawberry", "Mango", "Blue Raspberry", "Pineapple", "Grape", 
+            "Watermelon", "Lime", "Melon", "Apple", "Blueberry", "Tropical"
+        ]
 
     async def get_string(self): 
         lis = await self.get_words()
@@ -107,7 +112,7 @@ class Fun(commands.Cog):
         max = 100
         value = random.randint(min,max)
         if member.id == 187747524646404105:
-            value = 1000
+            value = ":infinity:"
 
         await ctx.neutral(f":rainbow_flag: {member.mention} is **{value}%** gay.")
 
@@ -124,7 +129,122 @@ class Fun(commands.Cog):
 
         await ctx.neutral(f"<:lesbian:1271068282652463144> {member.mention} is **{value}%** lesbian.") 
 
+    @commands.command(name="bible", aliases=["verse"])
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def bible(self, ctx: Context):
+        try:
+            response = requests.get("https://labs.bible.org/api/?passage=random&type=json")
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data and isinstance(data, list) and len(data) > 0:
+                    verse_text = data[0]['text']
+
+                    if 'bookname' in data[0] and 'chapter' in data[0] and 'verse' in data[0]:
+                        book = data[0]['bookname']
+                        chapter = data[0]['chapter']
+                        verse = data[0]['verse']
+                        verse_info = f"{book} {chapter}:{verse}"
+                    else:
+                        verse_info = "Unknown"
+
+                    await ctx.neutral(f"**Random Bible Verse ({verse_info})-**\n{verse_text}")
+                else:
+                    await ctx.warn("No data found or empty response.")
+            else:
+                await ctx.deny("Failed to fetch data from the API.")
+        except Exception as e:
+            await ctx.warn(f"An error occurred: {e}")
+
+    @commands.group(
+        name = "vape",
+        aliases = ["juul"],
+        description = "Vape commands.",
+        invoke_without_command = True
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def vape(self, ctx: Context):
+
+        data = await self.bot.pool.fetchrow("SELECT * FROM vape WHERE user_id = $1", ctx.author.id)
+        
+        if data is None:
+            return await ctx.warn(f"You don't have a **vape**. Use `{ctx.clean_prefix}vape flavor <flavor>` to get a vape.")
+        
+        flavor = data["flavor"]
+        embed = discord.Embed(description=f"<:juul:1264269164722524281> You have a **{flavor}** vape.", color=Colors.COLOR)
+        return await ctx.send(embed=embed)
+        
+    @vape.command(
+        name = "flavors",
+        aliases = ["flavours"],
+        description = "See a list of vape flavors."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def vape_flavors(self, ctx: Context):
+
+        embed = Embed(title = "Available vape flavors", description="> Strawberry \n> Mango \n> Blue Raspberry \n> Pineapple \n> Grape \n> Watermelon \n> Lime \n> Melon \n> Apple \n> Blueberry \n> Tropical", color = Colors.COLOR)
+        return await ctx.reply(embed=embed)
     
+    @vape.command(
+        name = "hit",
+        aliases = ["smoke"],
+        description = "Hit your vape."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def vape_hit(self, ctx: Context):
+
+        data = await self.bot.pool.fetchrow("SELECT * FROM vape WHERE user_id = $1", ctx.author.id)
+        hits = data["hits"] or 0
+        flavor = data ["flavor"]
+
+        if data is None:
+            return await ctx.deny(f"You don't have a **vape**. Use `{ctx.clean_prefix}vape flavor <flavor` to get a vape.")
+
+        if data:
+
+            hits += 1
+            await self.bot.pool.execute(
+                """
+                INSERT INTO vape (user_id, hits)
+                VALUES ($1, $2)
+                ON CONFLICT (user_id)
+                DO UPDATE SET hits = $2
+                """,
+                ctx.author.id, hits
+            )
+            embed1 = Embed(description=f"<:juul:1264269164722524281> **Hitting your vape..**", color = Colors.COLOR)
+
+            msg = await ctx.send(embed=embed1)
+
+            await asyncio.sleep(1)
+
+            embed = Embed(description= f"<:juul:1264269164722524281> Hit your **{flavor}** vape. You now have **{hits}** hits.", color = Colors.COLOR)
+            await msg.edit(embed=embed)
+
+    @vape.command(
+        name = "flavor",
+        aliases = ["flavour", "set"],
+        description = "Set your vape flavor"
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def vape_flavor(self, ctx: Context, *, flavor: str = None):
+        if flavor is None:
+            return await ctx.warn(f"A flavor is needed.")
+        
+        flavor = flavor.title() 
+        if flavor not in self.valid_flavors:
+            return await ctx.deny(f"Invalid flavor. Use `{ctx.prefix}flavors` to see the list of available flavors.")
+        
+        await self.bot.pool.execute(
+            """
+            INSERT INTO vape (user_id, flavor)
+            VALUES ($1, $2)
+            ON CONFLICT (user_id)
+            DO UPDATE SET flavor = $2
+            """,
+            ctx.author.id, flavor
+        )
+        return await ctx.approve(f"Your vape flavor has been set to **{flavor}**.")
 
 async def setup(bot: Heal):
     return await bot.add_cog(Fun(bot))

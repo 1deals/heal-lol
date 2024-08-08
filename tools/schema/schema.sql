@@ -51,3 +51,9 @@ CREATE TABLE IF NOT EXISTS joinping (
     channel_id BIGINT,
     PRIMARY KEY (guild_id, channel_id)
 );
+
+CREATE TABLE IF NOT EXISTS vape (
+    user_id BIGINT PRIMARY KEY,
+    flavor TEXT,
+    hits BIGINT
+);

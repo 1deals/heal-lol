@@ -33,18 +33,20 @@ class Information(commands.Cog):
     )
     @cooldown(1, 5, commands.BucketType.user)
     async def botinfo(self, ctx: Context):
-        commands = [command for command in set(self.bot.walk_commands()) if command.cog_name != 'Jishaku']
-
-        embed = discord.Embed(
-            title = f"heal",
-            color = Colors.BASE_COLOR
-        )
-        embed.add_field(name="statistics", value=f"> guilds: `{len(self.bot.guilds):,}`\n> users: `{len(self.bot.users):,}`\n> commands: `{len(commands):,}`", inline=False)
-        embed.add_field(name="system", value=f"> cpu usage: `{psutil.cpu_percent()}%`\n> ram usage: `{psutil.virtual_memory().percent}%`\n> python version: `{sys.version.split(" (")[0]}`", inline=False)
-        embed.set_thumbnail(url=self.bot.user.display_avatar.url)
-        embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar.url)
-
-        await ctx.send(embed=embed)
+        try:
+            total_channels = 0
+            for guild in self.bot.guilds:
+                    
+                total_channels += len(guild.channels)
+            uptime = self.bot.uptime
+            embed = discord.Embed(timestamp=ctx.message.created_at, colour=Colors.BASE_COLOR)
+            embed.add_field(name = f"**{self.bot.user.name}'s statistics**", value = f"**{len(self.bot.guilds)}** guilds \n**{sum(g.member_count for g in self.bot.guilds)}** users \n**{total_channels}** channels", inline = False)
+            embed.add_field(name = "**Bot**", value = f"**{len(self.bot.commands)}** commands \nwebsocket latency: **{round(self.bot.latency * 1000)} ms** \nuptime: **{uptime}**", inline = False)
+            embed.set_author(name = self.bot.user.display_name, icon_url = self.bot.user.avatar)
+            embed.set_thumbnail(url = self.bot.user.avatar)
+            await ctx.send(embed=embed)
+        except Exception as e:
+            print(e) 
 
     @command(
         name = "ping",
