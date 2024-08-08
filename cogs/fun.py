@@ -96,7 +96,35 @@ class Fun(commands.Cog):
             
         await ctx.neutral(f"👑 <@{players[0]}> won the game!", allowed_mentions=discord.AllowedMentions(users=True))
         self.lifes[players[0]] = 0
-        self.MatchStart[ctx.guild.id] = False   
+        self.MatchStart[ctx.guild.id] = False  
+
+    @command(name = "howgay", aliases = ["gayrate", "gay"])
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    async def howgay(self, ctx:Context, member:discord.Member = None):
+        if member is None:
+            member = ctx.author
+        min = 0
+        max = 100
+        value = random.randint(min,max)
+        if member.id == 187747524646404105:
+            value = 1000
+
+        await ctx.neutral(f":rainbow_flag: {member.mention} is **{value}%** gay.")
+
+    @command(name = "howlesbian", aliases = ["lesbianrate", "lesbian"])
+    @commands.cooldown(1, 5, commands.BucketType.guild)
+    async def howlesbian(self, ctx:Context, member:discord.Member = None):
+        if member is None:
+            member = ctx.author
+        min = 0
+        max = 100
+        value = random.randint(min,max)
+        if member.id == 1035497951591673917:
+            value = 500000
+
+        await ctx.neutral(f"<:lesbian:1271068282652463144> {member.mention} is **{value}%** lesbian.") 
+
+    
 
 async def setup(bot: Heal):
     return await bot.add_cog(Fun(bot))
