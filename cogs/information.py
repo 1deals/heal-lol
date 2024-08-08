@@ -103,7 +103,7 @@ class Information(commands.Cog):
 
         embed = discord.Embed(
             title=title,
-            description=f"{user.name} / {user.display_name}",
+            description=f"",
             color = Colors.BASE_COLOR
         )
         embed.add_field(name="Created", value=format_dt(user.created_at, style='f'), inline=True)

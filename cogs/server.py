@@ -11,11 +11,17 @@ from tools.heal import Heal
 from tools.managers.context import Context
 from tools.configuration import Colors, Emojis
 from typing import Union
-from tools.EmbedBuilder import EmbedBuilder, EmbedScript
 
 class Server(Cog):
     def __init__(self, bot: Heal):
         self.bot = bot
+
+    def variable_replace(self, message, member):
+        message = message.replace('{user.mention}', str(member.mention))
+        message = message.replace('{user.id}', str(member.id))
+        message = message.replace('{guild.name}', (member.guild.name))
+        message = message.replace('{guild.count}', str(len(member.guild.members)))
+        return message
         
     @hybrid_group(
         description='View guild prefix',
@@ -78,42 +84,50 @@ class Server(Cog):
         return await ctx.send_help(ctx.command)
 
     @welcome.command(
-        name = "set",
-        aliases = ["add", "config"],
-        description = "Setup a welcome channel and message."
+        name = "channel",
+        aliases = ["chan", "chnl"],
+        description = "Add the welcome channel."
     )
     @commands.has_permissions(manage_messages = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_set(self, ctx: Context, channel: discord.TextChannel = None, *, message: str = None):
-
+    async def welcome_channel(self, ctx: Context, *, channel: discord.TextChannel = None):
         if channel is None:
-
-            return await ctx.warn(f"A **channel** is required.")
+            return await ctx.send_help(ctx.command)
         
+        await self.bot.pool.execute(
+            """
+            INSERT INTO welcome (guild_id, channel_id) 
+            VALUES ($1, $2) 
+            ON CONFLICT (guild_id) 
+            DO UPDATE SET channel_id = EXCLUDED.channel_id
+            """,
+            ctx.guild.id, channel.id
+        )
+        await ctx.approve(f"**Welcome** channel has been configured to: {channel.mention}")
+
+    @welcome.command(
+        name = "message",
+        aliases = ["msg", "mes"],
+        description = "Set the welcome message."
+    )
+    @commands.has_permissions(manage_messages = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def welcome_message(self, ctx: Context, *, message: str = None):
         if message is None:
-
-            return await ctx.warn(f"A **message** is required.")
+            return await ctx.send_help(ctx.command)
         
-        else:
-
-            await self.bot.pool.execute(
-                """
-                INSERT INTO welcome (guild_id, channel_id, message)
-                VALUES ($1,$2,$3)
-                ON CONFLICT (guild_id, channel_id)
-                DO UPDATE SET message = $3
-                """,
-                ctx.guild.id, channel.id, message
-            )
-
-            processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
-            content, embed, view = await EmbedBuilder.to_object(processed_message)
-            
-            await ctx.approve(f"Set the **welcome** message in {channel.mention} to:")
-            if content or embed:
-                await ctx.send(content=content, embed=embed, view=view)
-            else:
-                await ctx.send(content=processed_message)
+        await self.bot.pool.execute(
+            """
+            INSERT INTO welcome (guild_id, message) 
+            VALUES ($1, $2) 
+            ON CONFLICT (guild_id) 
+            DO UPDATE SET message = EXCLUDED.message
+            """,
+            ctx.guild.id, message
+        )
+        await ctx.approve(f"Set the **welcome message** to:")
+        message_content = self.variable_replace(message, ctx.author)
+        await ctx.channel.send(content=message_content)
 
     @welcome.command(
         name = "remove",
@@ -155,57 +169,24 @@ class Server(Cog):
                 return await ctx.warn("The channel set for welcome messages does not exist.")
             
             message = res["message"]
-            processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
-            content, embed, view = await EmbedBuilder.to_object(processed_message)
             
-            if content or embed:
-                await channel.send(content=content, embed=embed, view=view)
-            else:
-                await channel.send(content=processed_message)
-            
-            await ctx.approve("Welcome message sent.")
-        else:
-            return await ctx.warn("No welcome message set for this server.")
+            message_content = self.variable_replace(message, ctx.author)
+            await channel.send(content=message_content)
         
-    @welcome.command(
-        name = "list",
-        description = "List all of the welcome channels"
-    )
-    @commands.has_permissions(manage_messages = True)
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_list(self, ctx: Context):
-        data = await self.bot.pool.fetch("SELECT * FROM welcome WHERE guild_id = $1", ctx.guild.id)
-
-        if not data:
-            return await ctx.deny("There are no **welcome settings** saved for this server.")
-        
-        embed = discord.Embed(title="Welcome Channels", color=Colors.BASE_COLOR)
-        for entry in data:
-            channel = self.bot.get_channel(entry["channel_id"])
-            if channel:
-                embed.add_field(name=channel.name, value=f"<:dddd:1263945000111177790> {entry['message']}", inline=False)
-        
-        await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         res = await self.bot.pool.fetchrow("SELECT * from welcome WHERE guild_id = $1", member.guild.id)
-
+        
         if res:
-            channel_id = res["channel_id"]
+            channel_id = res['channel_id']
             channel = member.guild.get_channel(channel_id)
-
             if channel is None:
                 return
-            
-            message = res["message"]
-            processed_message = EmbedBuilder.embed_replacement(member, message)
-            content, embed, view = await EmbedBuilder.to_object(processed_message)
-            
-            if content or embed:
-                await channel.send(content=content, embed=embed, view=view)
-            else:
-                await channel.send(content=processed_message)
+            message_content = self.variable_replace(res['message'], member)
+            await channel.send(content=message_content)
+        else:
+            return
 
     
 async def setup(bot: Heal) -> None:
