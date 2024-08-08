@@ -102,8 +102,6 @@ class Information(commands.Cog):
             title += " <:staff:1270729949686534206> <:dev:1270730817458405468>"
         if user.id == 461914901624127489: # logan
             title += " <:zzmilklove2:1270873236841693267> <:staff:1270729949686534206> <:dev:1270730817458405468>"
-        if user.id == 1259443225542918218: # menace 
-            title += " <a:menacemonkey:1271184769836912680> <:staff:1270729949686534206>"
         if user.id == 1261756025275547719: # neca
             title += " <:staff:1270729949686534206>"
 
