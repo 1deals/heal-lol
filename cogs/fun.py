@@ -99,7 +99,7 @@ class Fun(commands.Cog):
         self.MatchStart[ctx.guild.id] = False  
 
     @command(name = "howgay", aliases = ["gayrate", "gay"])
-    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def howgay(self, ctx:Context, member:discord.Member = None):
         if member is None:
             member = ctx.author
@@ -112,7 +112,7 @@ class Fun(commands.Cog):
         await ctx.neutral(f":rainbow_flag: {member.mention} is **{value}%** gay.")
 
     @command(name = "howlesbian", aliases = ["lesbianrate", "lesbian"])
-    @commands.cooldown(1, 5, commands.BucketType.guild)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def howlesbian(self, ctx:Context, member:discord.Member = None):
         if member is None:
             member = ctx.author
