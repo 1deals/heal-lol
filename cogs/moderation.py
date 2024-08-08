@@ -87,11 +87,11 @@ class Moderation(commands.Cog):
     @command(
         name = "ban",
         aliases = ["fuckoff", "banish"],
-        usage = "ban @fetchrow raider"
+        usage = ""
     )
     @commands.cooldown(1, 5, BucketType.user)
     @has_permissions(moderate_members=True)
-    async def ban(self, ctx: Context, user: discord.Member, *, reason: str = "no reason"):
+    async def ban(self, ctx: Context, user: Union[discord.Member, discord.User], *, reason: str = "no reason"):
         reason += ' | executed by {}'.format(ctx.author)
         await ctx.typing()
 

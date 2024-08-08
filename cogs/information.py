@@ -41,7 +41,7 @@ class Information(commands.Cog):
             uptime = self.bot.uptime
             embed = discord.Embed(timestamp=ctx.message.created_at, colour=Colors.BASE_COLOR)
             embed.add_field(name = f"**{self.bot.user.name}'s statistics**", value = f"**{len(self.bot.guilds)}** guilds \n**{sum(g.member_count for g in self.bot.guilds)}** users \n**{total_channels}** channels", inline = False)
-            embed.add_field(name = "**Bot**", value = f"**{len(self.bot.commands)}** commands \nwebsocket latency: **{round(self.bot.latency * 1000)} ms** \nuptime: **{uptime}**", inline = False)
+            embed.add_field(name = "**Bot**", value = f"**{len(set(command for command in self.bot.walk_commands()if not command.cog_name == 'Jishaku'))}** commands \nwebsocket latency: **{round(self.bot.latency * 1000)} ms** \nuptime: **{uptime}**", inline = False)
             embed.set_author(name = self.bot.user.display_name, icon_url = self.bot.user.avatar)
             embed.set_thumbnail(url = self.bot.user.avatar)
             await ctx.send(embed=embed)
@@ -96,12 +96,16 @@ class Information(commands.Cog):
         title = f"{user.name}"
 
         
-        if user.id == 187747524646404105:
+        if user.id == 187747524646404105: # me
             title += " <:owner:1270728554388394086> <:staff:1270729949686534206> <:dev:1270730817458405468> "
-        if user.id == 392300135323009024:
+        if user.id == 392300135323009024: #xur
             title += " <:staff:1270729949686534206> <:dev:1270730817458405468>"
-        if user.id == 461914901624127489:
-            title += "<:zzmilklove2:1270873236841693267> <:staff:1270729949686534206> <:dev:1270730817458405468>"
+        if user.id == 461914901624127489: # logan
+            title += " <:zzmilklove2:1270873236841693267> <:staff:1270729949686534206> <:dev:1270730817458405468>"
+        if user.id == 1259443225542918218: # menace 
+            title += " <a:menacemonkey:1271184769836912680> <:staff:1270729949686534206>"
+        if user.id == 1261756025275547719: # neca
+            title += " <:staff:1270729949686534206>"
 
         embed = discord.Embed(
             title=title,

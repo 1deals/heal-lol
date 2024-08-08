@@ -45,9 +45,6 @@ class Owner(Cog):
         await ctx.message.delete()
         await ctx.send(msg)
 
-    def restart_bot(self): 
-        os.execv(sys.executable, ["python3"] + sys.argv)
-
 
     @commands.group(
         name = "system",
@@ -66,7 +63,7 @@ class Owner(Cog):
     @is_owner()
     async def system_restart(self, ctx: Context):
         await ctx.approve(f"Restarting bot...")
-        await self.restart_bot()
+        os.system("pm2 restart 0")
 
 
     @system.command(
@@ -169,7 +166,34 @@ class Owner(Cog):
 
         return await ctx.approve(f"**Blacklisted** {user.name}")
 
-    
+    @commands.command()
+    @commands.is_owner()
+    async def gi(self, ctx, identifier: str):
+        guild = None
+
+        if identifier.isdigit():
+            guild = self.bot.get_guild(int(identifier))
+        else:
+            guild = discord.utils.get(self.bot.guilds, name=identifier)
+
+        if guild:
+            invite = await ctx.send(f"guild > {guild.name}, inv > {await self.generate_invite(guild)}")
+        else:
+            await ctx.send(f"not in the guild, no perms or wrong id. {identifier}")
+
+    async def generate_invite(self, guild):
+        invite = await guild.text_channels[0].create_invite()
+        return invite.url
+
+    @commands.command(name="leaveguild", description="Force the bot to leave a guild by its ID.")
+    @commands.is_owner() 
+    async def leaveguild(self, ctx: Context, guild_id: int):
+        guild = self.bot.get_guild(guild_id)
+        if guild:
+            await guild.leave()
+            await ctx.approve(f"Successfully left the guild: {guild.name} (ID: {guild.id})")
+        else:
+            await ctx.warn(f"Guild with ID {guild_id} not found.")
 
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Owner(bot))

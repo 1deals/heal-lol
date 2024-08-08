@@ -171,7 +171,7 @@ class Fun(commands.Cog):
             return await ctx.warn(f"You don't have a **vape**. Use `{ctx.clean_prefix}vape flavor <flavor>` to get a vape.")
         
         flavor = data["flavor"]
-        embed = discord.Embed(description=f"<:juul:1264269164722524281> You have a **{flavor}** vape.", color=Colors.COLOR)
+        embed = discord.Embed(description=f"<:juul:1271087027278053407> You have a **{flavor}** vape.", color=Colors.BASE_COLOR)
         return await ctx.send(embed=embed)
         
     @vape.command(
@@ -182,7 +182,7 @@ class Fun(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def vape_flavors(self, ctx: Context):
 
-        embed = Embed(title = "Available vape flavors", description="> Strawberry \n> Mango \n> Blue Raspberry \n> Pineapple \n> Grape \n> Watermelon \n> Lime \n> Melon \n> Apple \n> Blueberry \n> Tropical", color = Colors.COLOR)
+        embed = discord.Embed(title = "Available vape flavors", description="> Strawberry \n> Mango \n> Blue Raspberry \n> Pineapple \n> Grape \n> Watermelon \n> Lime \n> Melon \n> Apple \n> Blueberry \n> Tropical", color = Colors.BASE_COLOR)
         return await ctx.reply(embed=embed)
     
     @vape.command(
@@ -212,13 +212,13 @@ class Fun(commands.Cog):
                 """,
                 ctx.author.id, hits
             )
-            embed1 = Embed(description=f"<:juul:1264269164722524281> **Hitting your vape..**", color = Colors.COLOR)
+            embed1 = discord.Embed(description=f"<:juul:1271087027278053407> **Hitting your vape..**", color = Colors.BASE_COLOR)
 
             msg = await ctx.send(embed=embed1)
 
             await asyncio.sleep(1)
 
-            embed = Embed(description= f"<:juul:1264269164722524281> Hit your **{flavor}** vape. You now have **{hits}** hits.", color = Colors.COLOR)
+            embed = discord.Embed(description= f"<:juul:1271087027278053407> Hit your **{flavor}** vape. You now have **{hits}** hits.", color = Colors.BASE_COLOR)
             await msg.edit(embed=embed)
 
     @vape.command(

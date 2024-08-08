@@ -57,3 +57,12 @@ CREATE TABLE IF NOT EXISTS vape (
     flavor TEXT,
     hits BIGINT
 );
+
+CREATE TABLE IF NOT EXISTS premium (
+    user_id BIGINT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS uwulock (
+    guild_id BIGINT, 
+    user_id BIGINT
+);
