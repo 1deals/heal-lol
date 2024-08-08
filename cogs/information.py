@@ -90,7 +90,7 @@ class Information(commands.Cog):
         description="Get info about a user."
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def userinfo(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
+    async def userinfo(self, ctx: Context, *, user: discord.Member= None):
         user = user or ctx.author
 
         title = f"{user.name}"
