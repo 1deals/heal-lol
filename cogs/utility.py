@@ -9,7 +9,6 @@ from tools.paginator            import Paginator
 from discord.utils              import format_dt
 from discord.ext                import commands
 from tools.heal                 import Heal
-from tools.EmbedBuilder         import EmbedBuilder, EmbedScript
 from discord.ui import View, Button
 from typing import Union
 import datetime
@@ -167,14 +166,6 @@ class Utility(commands.Cog):
             if before.content != after.content:
                 await self.bot.process_commands(after)
 
-    @commands.command(
-        name = "createembed",
-        aliases = ["ce"],
-        description = "Create an embed."
-    )
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def createembed(self, ctx: Context,  *, code: EmbedScript):
-        await ctx.send(**code)
 
     @commands.command(name = "avatar", aliases = ["av"])
     @commands.cooldown(1, 5, commands.BucketType.user)

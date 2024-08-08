@@ -11,6 +11,7 @@ from tools.heal import Heal
 from tools.managers.context import Context
 from tools.configuration import Colors, Emojis
 from typing import Union
+import asyncio
 
 class Server(Cog):
     def __init__(self, bot: Heal):
@@ -187,6 +188,49 @@ class Server(Cog):
             await channel.send(content=message_content)
         else:
             return
+
+        data = await self.bot.pool.fetch("SELECT channel_id FROM joinping WHERE guild_id = $1", member.guild.id)
+        for data in data:
+             channel = member.guild.get_channel(data[0])
+             if channel:
+                message = await channel.send(f"<@{member.id}>")
+                await asyncio.sleep(1)
+                await message.delete()
+
+    @commands.group(
+        name = "joinping",
+        aliases = ["poj", "ghostping", "pingonjoin"],
+        invoke_without_command=True,
+        description = "Add join pings to your server!"
+    )
+    async def joinping(self, ctx):
+        return await ctx.send_help(ctx.command)
+        
+    @joinping.command(name="channel", usage="#channel", aliases=["chan"])
+    @commands.has_permissions(manage_channels = True)
+    async def joinpingchannel(self, ctx: Context, channel: discord.TextChannel = None):
+        if channel is None:
+            return await ctx.send_help(ctx.command)
+
+        data = await self.bot.pool.fetchrow("SELECT * FROM joinping WHERE guild_id = $1 AND channel_id = $2", ctx.guild.id, channel.id)
+        if data:
+            await self.bot.pool.execute("DELETE FROM joinping WHERE guild_id = $1 AND channel_id = $2", ctx.guild.id, channel.id)
+            await ctx.approve(f"Joinping has been disabled from {channel.mention}")
+        else:
+            await self.bot.pool.execute("INSERT INTO joinping (guild_id, channel_id) VALUES ($1, $2)", ctx.guild.id, channel.id)
+            await ctx.approve(f"Joinping has been enabled for {channel.mention}")
+
+    @joinping.command(name="list", usage="list")
+    @commands.has_permissions(manage_channels = True)
+    async def joinpinglist(self, ctx: Context):
+        data = await self.bot.pool.fetch("SELECT channel_id FROM joinping WHERE guild_id = $1", ctx.guild.id)
+        channels = [ctx.guild.get_channel(record['channel_id']).mention for record in data]
+        if channels:
+            embed = discord.Embed(description=f"Joinping is enabled for:\n" + "\n".join(channels), color= 0x2b2d31)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.error(f"Joinping is not set up.")
+
 
     
 async def setup(bot: Heal) -> None:

@@ -45,3 +45,9 @@ CREATE TABLE IF NOT EXISTS afk (
     status TEXT,
     time BIGINT
 );
+
+CREATE TABLE IF NOT EXISTS joinping (
+    guild_id BIGINT,
+    channel_id BIGINT,
+    PRIMARY KEY (guild_id, channel_id)
+);
