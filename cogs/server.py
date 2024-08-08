@@ -206,7 +206,7 @@ class Server(Cog):
     async def joinping(self, ctx):
         return await ctx.send_help(ctx.command)
         
-    @joinping.command(name="channel", usage="#channel", aliases=["chan"])
+    @joinping.command(name="channel", description="Adds or removes a joinping from your guild.", aliases=["chan"])
     @commands.has_permissions(manage_channels = True)
     async def joinpingchannel(self, ctx: Context, channel: discord.TextChannel = None):
         if channel is None:
@@ -220,16 +220,16 @@ class Server(Cog):
             await self.bot.pool.execute("INSERT INTO joinping (guild_id, channel_id) VALUES ($1, $2)", ctx.guild.id, channel.id)
             await ctx.approve(f"Joinping has been enabled for {channel.mention}")
 
-    @joinping.command(name="list", usage="list")
+    @joinping.command(name="list", description="Get a list of channels which have joinping enabled.")
     @commands.has_permissions(manage_channels = True)
     async def joinpinglist(self, ctx: Context):
         data = await self.bot.pool.fetch("SELECT channel_id FROM joinping WHERE guild_id = $1", ctx.guild.id)
         channels = [ctx.guild.get_channel(record['channel_id']).mention for record in data]
         if channels:
-            embed = discord.Embed(description=f"Joinping is enabled for:\n" + "\n".join(channels), color= 0x2b2d31)
+            embed = discord.Embed(description=f"Joinping is enabled for:\n" + "\n".join(channels), color= Colors.BASE_COLOR)
             await ctx.send(embed=embed)
         else:
-            await ctx.error(f"Joinping is not set up.")
+            await ctx.warn(f"Joinping is not set up.")
 
 
     
