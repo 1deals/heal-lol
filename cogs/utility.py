@@ -11,6 +11,8 @@ from discord.ext                import commands
 from tools.heal                 import Heal
 from discord.ui import View, Button
 from typing import Union
+from datetime import datetime, timedelta
+import humanize
 import datetime
 
 
@@ -250,10 +252,12 @@ class Utility(commands.Cog):
 
         check = await self.bot.pool.fetchrow("SELECT * from afk WHERE user_id = $1", message.author.id)
         if check:
-            startTime = int(check["time"])
+            startTime = datetime.datetime.fromtimestamp(check["time"])  
+            now = datetime.datetime.now()
+            time_away = humanize.precisedelta(now - startTime)
             
             embed = discord.Embed(
-                description=f"> <:steamhappy:1265787000573792397> **welcome back!** you went away {startTime}",
+                description=f"> <:steamhappy:1265787000573792397> **welcome back!** you went away **{time_away} ago**",
                 color=Colors.BASE_COLOR
             )
             await message.channel.send(embed=embed)
@@ -263,9 +267,12 @@ class Utility(commands.Cog):
             for user in message.mentions:
                 check = await self.bot.pool.fetchrow("SELECT * FROM afk WHERE user_id = $1", user.id)
                 if check:
+                    startTime = datetime.datetime.fromtimestamp(check["time"])  
+                    now = datetime.datetime.now()
+                    time_away = humanize.precisedelta(now - startTime)
                     embed = discord.Embed(
                         color=Colors.BASE_COLOR,
-                        description=f'> <:steambored:1265785956930420836> {user.mention} is currently **AFK:** `{check["status"]}` - {int(check["time"])}'
+                        description=f'> <:steambored:1265785956930420836> {user.mention} is currently **AFK:** `{check["status"]}` - **{time_away} ago**'
                     )
                     await message.channel.send(embed=embed)
 

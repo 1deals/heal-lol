@@ -13,6 +13,7 @@ from discord.utils              import format_dt
 from discord.ext                import commands
 from tools.heal                 import Heal
 from typing import Union
+import aiohttp
 
 def get_ordinal(number):
         if 10 <= number % 100 <= 20:
@@ -143,6 +144,67 @@ class Information(commands.Cog):
         embed.set_thumbnail(url=user.avatar.url)
 
         await ctx.send(embed=embed)
+
+    @hybrid_command(
+        name = "instagram",
+        aliases = ["insta", "ig"],
+        description = "Get information about an instagram user."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    async def instagram(self, ctx: commands.Context, username: str):
+        url = "https://api.fulcrum.lol/instagram"
+        params = {"username": username}
+        headers = {"Authorization": "SfHY8HukqUATXUwm"} 
+
+        def humanize_number(value: int) -> str:
+            if value >= 1_000_000:
+                return f"{value / 1_000_000:.1f}M"
+            elif value >= 1_000:
+                return f"{value / 1_000:.1f}K"
+            return str(value)
+
+            
+        await ctx.typing()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+
+                    profile_name = data.get("username", "None set.")
+                    followers = data.get("followers", "N/A")
+                    following = data.get("following", "N/A")
+                    bio = data.get("bio", "N/A")
+                    verified = data.get("is_verified", False)  
+                    profile_pic = data.get("avatar_url", None)
+
+                    
+                    if isinstance(followers, int):
+                        followers = humanize_number(followers)
+                    if isinstance(following, int):
+                        following = humanize_number(following)
+
+                    
+                    title = f"{profile_name}'s profile info"
+                    if verified:
+                        title += " <:verified:1271542657897992373>"
+
+                    
+                    embed = discord.Embed(
+                        title=title,
+                        description=bio,
+                        color=Colors.BASE_COLOR
+                    )
+                    embed.add_field(name="Followers", value=followers, inline=True)
+                    embed.add_field(name="Following", value=following, inline=True)
+                    if profile_pic:
+                        embed.set_thumbnail(url=profile_pic)
+
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send("Failed to retrieve Instagram profile information. Please try again later.")
+
 
 async def setup(bot: Heal):
     await bot.add_cog(Information(bot))
