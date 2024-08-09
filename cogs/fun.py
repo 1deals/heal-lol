@@ -262,7 +262,7 @@ class Fun(commands.Cog):
                 async with cs.get(
                     "https://api.fulcrum.lol/uwu",
                     params={"message": message},
-                    headers={"Authorization": "vWTOADpfSDa3BWgm"}
+                    headers={"Authorization": "SfHY8HukqUATXUwm"}
                 ) as r:
                     if r.status == 200:
                         data = await r.json()

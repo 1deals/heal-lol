@@ -106,16 +106,13 @@ class Heal(commands.Bot):
         if message.guild is None:
             return (';',)
 
-        
         guild_prefix = await self.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id)
         if guild_prefix is None:
             guild_prefix = ';'  
 
-
         self_prefix = await self.pool.fetchval("SELECT prefix FROM selfprefix WHERE user_id = $1", message.author.id)
         if self_prefix is None:
             self_prefix = guild_prefix  
-
 
         return (self_prefix, guild_prefix)
 

@@ -303,7 +303,7 @@ class Utility(commands.Cog):
     async def selfprefix_set(self, ctx: Context, *, prefix: str = None):
         if prefix is None:
             return await ctx.send_help(ctx.command)
-        
+
         if len(prefix) > 10:
             return await ctx.deny(f"Your **selfprefix** cannot be more than `10` characters long.")
 
