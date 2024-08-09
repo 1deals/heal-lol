@@ -12,6 +12,8 @@ from tools.heal                 import Heal
 from discord.ui import View, Button
 from typing import Union
 import datetime
+import shazamio
+from shazamio import Shazam, Serialize
 
 class Utility(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -298,6 +300,39 @@ class Utility(commands.Cog):
                         description=f'> <:steambored:1265785956930420836> {user.mention} is currently **AFK:** `{check["status"]}` - <t:{int(check["time"])}:R>'
                     )
                     await message.channel.send(embed=embed)
+
+    @commands.command(name="shazam", description="Get a track name from sound", aliases = ["sh", "shzm"])
+    async def shazam(self, ctx: Context):
+        if not ctx.message.attachments:
+            return await ctx.send("Please provide a video")
+        attachment = ctx.message.attachments[0]
+        audio_data = await attachment.read()
+        shazam = Shazam()
+        song = await shazam.recognize(audio_data)
+        if 'track' not in song or 'share' not in song['track']:
+            return await ctx.send("Could not recognize the track")
+        song_cover_url = song['track']['images'].get('coverart', '')
+        embed = discord.Embed(
+            color=Colors.BASE_COLOR,
+            description=f"> **[{song['track']['share']['text']}]({song['track']['share']['href']})**"
+        )
+        embed.set_author(name=f"{ctx.author}", icon_url=ctx.author.avatar.url)
+        if song_cover_url:
+            embed.set_thumbnail(url=song_cover_url)
+        await ctx.reply(embed=embed)
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author == self.bot.user:
+            return
+        
+        if message.content == self.bot.user.mention:
+            prefix = await self.bot.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id) or (';')
+            embed = discord.Embed(
+                title="",
+                description=f"> Your **prefixes** are: `{prefix}`",
+                color=Colors.BASE_COLOR)
+            await message.channel.send(embed=embed)
 
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))
