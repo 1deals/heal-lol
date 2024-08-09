@@ -14,6 +14,7 @@ from tools.heal                 import Heal
 import asyncio
 from typing import Union
 from collections import defaultdict
+import typing
 from humanfriendly import format_timespan
 
 class Moderation(commands.Cog):
@@ -327,6 +328,110 @@ class Moderation(commands.Cog):
         await ctx.channel.delete()
         embed = discord.Embed(description = f"**Nuked** by: **{ctx.author}**", color = self.bot.color)
         await new.send(embed=embed)
+
+    @command(
+        name = "imute",
+        aliases = ["imgmute", "imagemute"],
+        description = "Remove image permissions from a user in a channel."
+    )
+    @commands.has_permissions(administrator=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def imute(self, ctx: Context, member: discord.Member, channel : discord.TextChannel=None):
+        channel = channel or ctx.channel
+        overwrite = channel.overwrites_for(member)
+        overwrite.attach_files = False
+        overwrite.embed_links = False
+        await channel.set_permissions(member, overwrite=overwrite)
+        await ctx.approve(f"Removed media permissions from **{member.mention}** in {channel.mention}.")
+    
+    @command(
+        name = "iunmute",
+        aliases = ["imgunmute", "imageunmute"],
+        description = "Restore someones image permissions in a channel."
+    )
+    @commands.has_permissions(administrator=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def iunmute(self, ctx: Context, member: discord.Member, channel : discord.TextChannel=None):
+        channel = channel or ctx.channel
+        overwrite = channel.overwrites_for(member)
+        overwrite.attach_files = True
+        overwrite.embed_links = True
+        await channel.set_permissions(member, overwrite=overwrite)
+        await ctx.approve(f"Restored media permissions to **{member.mention}** in {channel.mention}.")
+
+    @commands.group(
+        name = "thread",
+        aliases = ["thr"],
+        description = "Thread settings.",
+        invoke_without_command = True
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @has_permissions(manage_threads = True)
+    async def thread(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+
+    @thread.command(
+        name = "rename",
+        aliases = ["name"],
+        description = "Renames a thread."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @has_permissions(manage_threads = True)
+    async def thread_rename(self, ctx: Context, thread: typing.Optional[discord.Thread], *, name: str = None):
+        if thread is None:
+            if isinstance(ctx.channel, discord.Thread):
+                thread = ctx.channel
+            if isinstance(ctx.channel, discord.TextChannel):
+                return await ctx.deny(f"This channel is not a **thread**.")
+        await thread.edit(name=name, reason=f"{ctx.author} renamed the thread.")
+        await ctx.approve(f'Renamed the **thread** to **`{name}`**')
+    
+    @thread.command(
+        name = "delete",
+        aliases = ["remove"],
+        description = "Deletes a thread."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @has_permissions(manage_threads = True)
+    async def thread_delete(self, ctx: Context, *, thread: typing.Optional[discord.Thread] = None):
+        if thread is None:
+            if isinstance(ctx.channel, discord.Thread):
+                thread = ctx.channel
+            if isinstance(ctx.channel, discord.TextChannel):
+                return await ctx.deny(f"This channel is not a **thread**.")
+        await thread.delete()
+
+    @thread.command(
+        name = "lock",
+        aliases = ["close"],
+        description = "Lock a thread."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @has_permissions(manage_threads = True)
+    async def thread_lock(self, ctx: Context, *, thread: typing.Optional[discord.Thread] = None):
+        if thread is None:
+            if isinstance(ctx.channel, discord.Thread):
+                thread = ctx.channel
+            if isinstance(ctx.channel, discord.TextChannel):
+                return await ctx.deny(f"This channel is not a **thread**.")
+        await thread.edit(locked=True, reason=f"Locked by {ctx.author}")
+        await ctx.approve(f"The **thread** has been **locked**.")
+
+    @thread.command(
+        name = "unlock",
+        aliases = ["open"],
+        description = "Unlocks a thread."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @has_permissions(manage_threads = True)
+    async def thread_unlock(self, ctx: Context, *, thread: typing.Optional[discord.Thread] = None):
+        if thread is None:
+            if isinstance(ctx.channel, discord.Thread):
+                thread = ctx.channel
+            if isinstance(ctx.channel, discord.TextChannel):
+                return await ctx.deny(f"This channel is not a **thread**.")
+        await thread.edit(locked=False, reason=f"Unlocked by {ctx.author}")
+        await ctx.approve(f"The **thread** has been **unlocked**.")
 
 async def setup(bot: Heal):
     await bot.add_cog(Moderation(bot))

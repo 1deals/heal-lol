@@ -6,7 +6,7 @@ import random
 from random import choice
 
 from tools.managers.context     import Context
-from discord.ext.commands       import command, group, BucketType, cooldown, has_permissions
+from discord.ext.commands       import command, group, BucketType, cooldown, has_permissions, hybrid_command, hybrid_group
 from tools.configuration        import Emojis, Colors
 from tools.paginator            import Paginator
 from discord.utils              import format_dt
@@ -26,11 +26,13 @@ class Information(commands.Cog):
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
 
-    @command(
+    @hybrid_command(
         name = "botinfo",
         aliases = ["bi", "bot"],
         description = "Get information about the bot."
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @cooldown(1, 5, commands.BucketType.user)
     async def botinfo(self, ctx: Context):
         try:
@@ -48,11 +50,13 @@ class Information(commands.Cog):
         except Exception as e:
             print(e) 
 
-    @command(
+    @hybrid_command(
         name = "ping",
         aliases = ["heartbeat", "latency", "websocket"],
         usage = "ping"
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @cooldown(1, 5, commands.BucketType.user)
     async def ping(self, ctx: Context):
         list = ["china", "north korea", "your ip", "localhost", "heal", "discord", "your mom", 'horny asian women', 'discord.com', 'google.com', 'healbot.lol', 'instagram', 'onlyfans.com', '911', 'no one', 'tiktok', 'github', 'lucky bro', 'a connection to the server']
@@ -65,54 +69,65 @@ class Information(commands.Cog):
             content=f"it took `{int(self.bot.latency * 1000)}ms` to ping **{choice(list)}** (edit: `{finished:.2f}ms`)"
         )
 
-    @command(
+    @hybrid_command(
         name = "invite",
         aliases = ["inv"],
         usage = "invite"
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @cooldown(1, 5, commands.BucketType.user)
     async def invite(self, ctx: Context):
         await ctx.send(f"{discord.utils.oauth_url(client_id=self.bot.user.id, permissions=discord.Permissions(8))}")
 
-    @command(
+    @hybrid_command(
         name = "uptime",
         aliases = ["up"],
         usage = "uptime"
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @cooldown(1, 5, commands.BucketType.user)
     async def uptime(self, ctx: Context):
         await ctx.neutral(f":alarm_clock: I have been **up** for `{self.bot.uptime}`")
 
 
-    @commands.command(
-        name="userinfo",
-        aliases=["ui", "whois"],
-        description="Get info about a user."
+    @hybrid_command(
+    name="userinfo",
+    aliases=["ui", "whois"],
+    description="Get info about a user."
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def userinfo(self, ctx: Context, *, user: discord.Member= None):
-        user = user or ctx.author
+    async def userinfo(self, ctx: Context, *, user: Union[discord.Member, discord.User] = None):
+        if isinstance(user, int):
+            try:
+                user = await self.bot.fetch_user(user)
+            except discord.NotFound:
+                return await ctx.send("User not found.")
+        else:
+            user = user or ctx.author
 
         title = f"{user.name}"
 
-        
-        if user.id == 187747524646404105: # me
+
+        if user.id == 187747524646404105:  # me
             title += " <:owner:1270728554388394086> <:staff:1270729949686534206> <:dev:1270730817458405468> "
-        if user.id == 392300135323009024: #xur
+        if user.id == 392300135323009024:  # xur
             title += " <:staff:1270729949686534206> <:dev:1270730817458405468>"
-        if user.id == 461914901624127489: # logan
+        if user.id == 461914901624127489:  # logan
             title += " <:zzmilklove2:1270873236841693267> <:staff:1270729949686534206> <:dev:1270730817458405468>"
-        if user.id == 1261756025275547719: # neca
+        if user.id == 1261756025275547719:  # neca
             title += " <:staff:1270729949686534206>"
 
         embed = discord.Embed(
             title=title,
-            description=f"",
-            color = Colors.BASE_COLOR
+            description="",
+            color=Colors.BASE_COLOR
         )
         embed.add_field(name="Created", value=format_dt(user.created_at, style='f'), inline=True)
 
-        if user.joined_at:
+
+        if isinstance(user, discord.Member) and user.joined_at:
             all_members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
             position = all_members.index(user) + 1
 
@@ -123,9 +138,8 @@ class Information(commands.Cog):
             embed.add_field(name=f"Joined {join_position_ordinal}", value=f"{format_dt(user.joined_at, style='f')}", inline=True)
             embed.add_field(name="Roles", value=roles_list, inline=False)
         else:
-            embed.add_field(name="Joined", value="N/A", inline=True)
-            embed.add_field(name="Roles", value="N/A", inline=False)
-        
+            pass
+
         embed.set_thumbnail(url=user.avatar.url)
 
         await ctx.send(embed=embed)

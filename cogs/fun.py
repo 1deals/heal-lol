@@ -6,7 +6,7 @@ import uwuipy
 import requests
 
 from discord.ext import commands
-from discord.ext.commands       import command, group, BucketType, cooldown, has_permissions
+from discord.ext.commands       import command, group, BucketType, cooldown, has_permissions, hybrid_command, hybrid_group
 
 from tools.managers.context import Context, Colors
 from tools.heal import Heal
@@ -103,7 +103,9 @@ class Fun(commands.Cog):
         self.lifes[players[0]] = 0
         self.MatchStart[ctx.guild.id] = False  
 
-    @command(name = "howgay", aliases = ["gayrate", "gay"])
+    @hybrid_command(name = "howgay", aliases = ["gayrate", "gay"])
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def howgay(self, ctx:Context, member:discord.Member = None):
         if member is None:
@@ -116,7 +118,9 @@ class Fun(commands.Cog):
 
         await ctx.neutral(f":rainbow_flag: {member.mention} is **{value}%** gay.")
 
-    @command(name = "howlesbian", aliases = ["lesbianrate", "lesbian"])
+    @hybrid_command(name = "howlesbian", aliases = ["lesbianrate", "lesbian"])
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def howlesbian(self, ctx:Context, member:discord.Member = None):
         if member is None:
@@ -156,12 +160,14 @@ class Fun(commands.Cog):
         except Exception as e:
             await ctx.warn(f"An error occurred: {e}")
 
-    @commands.group(
+    @hybrid_group(
         name = "vape",
         aliases = ["juul"],
         description = "Vape commands.",
         invoke_without_command = True
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def vape(self, ctx: Context):
 
@@ -246,18 +252,19 @@ class Fun(commands.Cog):
         )
         return await ctx.approve(f"Your vape flavor has been set to **{flavor}**.")
 
-    @command(
+    @hybrid_command(
         name = "uwuify",
         aliases = ["uwu"],
         description = "Uwuify a message."
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def uwuify(self, ctx: Context, *, message: str = None):
         if message is None:
             return await ctx.send_help(ctx.command)
 
         try:
-            await ctx.message.delete()
             async with aiohttp.ClientSession() as cs:
                 async with cs.get(
                     "https://api.fulcrum.lol/uwu",

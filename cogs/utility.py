@@ -3,7 +3,7 @@ import sys
 import aiohttp
 
 from tools.managers.context     import Context
-from discord.ext.commands       import command, group, BucketType, cooldown, has_permissions
+from discord.ext.commands       import command, group, BucketType, cooldown, has_permissions, hybrid_command
 from tools.configuration        import Emojis, Colors
 from tools.paginator            import Paginator
 from discord.utils              import format_dt
@@ -144,11 +144,13 @@ class Utility(commands.Cog):
         view.add_item(Button(label="avatar", url=user.avatar.url))
         await ctx.send(embed=embed, view=view)
 
-    @command(
+    @hybrid_command(
         name = "chatgpt",
         aliases = ["openai", "ai", "ask"],
         description = "Ask chatgpt a question."
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def chatgpt(self, ctx: Context, *, prompt: str):
         await ctx.typing()
@@ -156,7 +158,8 @@ class Utility(commands.Cog):
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://api.kastg.xyz/api/ai/llamaV3?prompt={prompt} ") as r:
                 response = await r.json()
-                await ctx.send(response["result"][0]["response"])
+                em = discord.Embed(title = f"{prompt}", description = response["result"][0]["response"], color = Colors.BASE_COLOR)
+                await ctx.send(embed=em)
 
 
     @commands.Cog.listener()
