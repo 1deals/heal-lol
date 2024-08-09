@@ -55,7 +55,7 @@ class Information(commands.Cog):
     )
     @cooldown(1, 5, commands.BucketType.user)
     async def ping(self, ctx: Context):
-        list = ["china", "north korea", "your ip", "localhost", "heal", "discord", "your mom", 'horny asian women', 'discord.com', 'google.com', 'healbot.lol', 'instagram', 'onlyfans.com', '911', 'no one', 'tiktok', 'github', 'lucky bro']
+        list = ["china", "north korea", "your ip", "localhost", "heal", "discord", "your mom", 'horny asian women', 'discord.com', 'google.com', 'healbot.lol', 'instagram', 'onlyfans.com', '911', 'no one', 'tiktok', 'github', 'lucky bro', 'a connection to the server']
 
         start = time.time()
         message = await ctx.send(content="pong!")

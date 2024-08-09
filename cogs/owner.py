@@ -49,7 +49,8 @@ class Owner(Cog):
     @commands.group(
         name = "system",
         aliases = ["sys"],
-        description = "System commands."
+        description = "System commands.",
+        invoke_without_command = True
     )
     @is_owner()
     async def system(self, ctx: Context):

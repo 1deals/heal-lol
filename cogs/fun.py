@@ -246,5 +246,35 @@ class Fun(commands.Cog):
         )
         return await ctx.approve(f"Your vape flavor has been set to **{flavor}**.")
 
+    @command(
+        name = "uwuify",
+        aliases = ["uwu"],
+        description = "Uwuify a message."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def uwuify(self, ctx: Context, *, message: str = None):
+        if message is None:
+            return await ctx.send_help(ctx.command)
+
+        try:
+            await ctx.message.delete()
+            async with aiohttp.ClientSession() as cs:
+                async with cs.get(
+                    "https://api.fulcrum.lol/uwu",
+                    params={"message": message},
+                    headers={"Authorization": "vWTOADpfSDa3BWgm"}
+                ) as r:
+                    if r.status == 200:
+                        data = await r.json()
+                        uwuified_message = data.get("message")
+                        if uwuified_message:
+                            await ctx.send(uwuified_message)
+                        else:
+                            await ctx.send("Failed to retrieve the uwuified message.")
+                    else:
+                        await ctx.send(f"API request failed with status code: {r.status}")
+        except Exception as e:
+            await ctx.send(f"An error occurred: {str(e)}")
+
 async def setup(bot: Heal):
     return await bot.add_cog(Fun(bot))

@@ -63,6 +63,7 @@ class Server(Cog):
         ]
     )
     @commands.has_permissions(administrator=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def prefix_remove(self, ctx: Context) -> Message:
         await self.bot.pool.execute(
             """
@@ -71,7 +72,7 @@ class Server(Cog):
             """,
             ctx.guild.id
         )
-        return await ctx.approve(f"Your server's prefix has been **removed**. You can set a **new prefix** using `,prefix set <prefix>`")
+        return await ctx.approve(f"Your server's prefix has been **removed**. You can set a **new prefix** using `;prefix set <prefix>`")
 
     @group(
         name = "welcome",

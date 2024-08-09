@@ -9,7 +9,8 @@ from discord.ext.commands import (
     Cog,
     command,
     hybrid_command,
-    is_owner
+    is_owner,
+    group
 )
 from typing import Union
 from discord.ext.tasks import loop
@@ -21,66 +22,61 @@ import logging
 from tools.heal import Heal
 from tools.managers.context import Context, Emojis, Colors
 
-def uwuify_text(text: str) -> str: 
-    uwu_converter = uwuipy.uwuipy()
-    return uwu_converter.uwuify(text)
 
 class Premium(Cog):
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_message(self, message: discord.Message): 
-        if not message.guild: 
-            return
-        if isinstance(message.author, discord.User): 
-            return
+    @group(
+        name = "selfprefix",
+        description = "Selfprefix settings.",
+        invoke_without_command = True
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def selfprefix(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+    
+    @selfprefix.command(
+        name = "set",
+        aliases = ["add", "use"],
+        description = "Set your selfprefix"
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def selfprefix_set(self, ctx: Context, *, prefix: str = None):
+        if prefix is None:
+            return await ctx.send_help(ctx.command)
         
-        check = await self.bot.pool.fetchrow(
-            "SELECT * FROM uwulock WHERE guild_id = $1 AND user_id = $2", 
-            message.guild.id, message.author.id
+        if len(prefix) > 10:
+            return await ctx.deny(f"Your **selfprefix** cannot be more than `10` characters long.")
+
+        await self.bot.pool.execute(
+            """
+            INSERT INTO selfprefix (user_id, prefix)
+            VALUES ($1, $2)
+            ON CONFLICT (user_id)
+            DO UPDATE SET prefix = $2
+            """,
+            ctx.author.id, prefix
         )
-        
-        if check: 
-            try: 
-                await message.delete()
+        await ctx.approve(f"Your **selfprefix** has been set to **`{prefix}`**")
+
+    @selfprefix.command(
+        name = "remove",
+        aliases = ["delete", "del", "clear"],
+        description = "Delete your selfprefix."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def selfprefix_remove(self, ctx: Context):
+        check = await self.bot.pool.fetchval("SELECT prefix FROM selfprefix WHERE user_id = $1", ctx.author.id)
+        if not check:
+            return await ctx.deny(f"You dont have a **selfprefix** setup.")
+        else:
+            await self.bot.pool.execute("DELETE FROM selfprefix WHERE user_id = $1", ctx.author.id)
+            return await ctx.approve("Removed your **selfprefix**.")
 
 
-                uwuified_content = uwuify_text(message.clean_content)
-                webhooks = await message.channel.webhooks()
 
-                if not webhooks:
-                    webhook = await message.channel.create_webhook(
-                        name=f"heal UwUlock", reason="UwUlocked"
-                    )
-                else:
-                    webhook = webhooks[0]
-
-                await webhook.send(
-                    content=uwuified_content, 
-                    username=message.author.name, 
-                    avatar_url=message.author.display_avatar.url
-                )
-
-            except Exception as e:
-                logging.error(f"Failed to process uwulock message: {e}")
-
-    @commands.command(
-        name = "uwulock",
-        description = "UwUlock a user."
-        )
-    @commands.has_permissions(manage_messages = True)
-    async def uwulock(self, ctx: Context, *, member: discord.Member): 
-        if member.bot: 
-            return await ctx.warn("You can't **uwulock** a bot")
-        check = await self.bot.pool.fetchrow("SELECT user_id FROM uwulock WHERE user_id = $1 AND guild_id = $2", member.id, ctx.guild.id)    
-        if check is None: 
-            await self.bot.pool.execute("INSERT INTO uwulock VALUES ($1,$2)", ctx.guild.id, member.id)
-            return await ctx.approve(f"{member.mention} is now **uwulocked**!") 
-        else: 
-            await self.bot.pool.execute("DELETE FROM uwulock WHERE user_id = $1 AND guild_id = $2", member.id, ctx.guild.id)    
-        return await ctx.approve(f"{member.mention} is no longer **uwulocked**!") 
-
+    
     
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Premium(bot))

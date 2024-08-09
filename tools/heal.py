@@ -102,10 +102,22 @@ class Heal(commands.Bot):
             log.error(f'Error loading database: {e}')
             raise e
 
-    async def get_prefix(self, message: Message) -> str:
+    async def get_prefix(self, message: discord.Message) -> tuple:
         if message.guild is None:
-            return
-        return await self.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id) or (';')
+            return (';',)
+
+        
+        guild_prefix = await self.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id)
+        if guild_prefix is None:
+            guild_prefix = ';'  
+
+
+        self_prefix = await self.pool.fetchval("SELECT prefix FROM selfprefix WHERE user_id = $1", message.author.id)
+        if self_prefix is None:
+            self_prefix = guild_prefix  
+
+
+        return (self_prefix, guild_prefix)
 
     async def on_ready(self) -> None:
         log.info(f'Logged in as {self.user.name}#{self.user.discriminator} ({self.user.id})')

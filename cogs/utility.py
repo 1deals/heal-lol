@@ -12,8 +12,7 @@ from tools.heal                 import Heal
 from discord.ui import View, Button
 from typing import Union
 import datetime
-import shazamio
-from shazamio import Shazam, Serialize
+
 
 class Utility(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -126,41 +125,6 @@ class Utility(commands.Cog):
 
         await ctx.paginate(embeds)
 
-    @command(
-        name = "bots",
-        aliases = ["botlist"],
-        usage = "bots"
-    )
-    @cooldown(1, 5, BucketType.user)
-    async def bots(self, ctx: Context):
-        bots = [member for member in ctx.guild.members if member.bot]
-        count = 0
-        embeds = []
-
-        if len(bots) == 0:
-            return await ctx.warn('There are no **bots** in this server.')
-
-        entries = [
-            f"` {i} `  **{b.name}**  (`{b.id}`)"
-            for i, b in enumerate(bots, start=1)
-        ]
-
-        embed = discord.Embed(color=Colors.BASE_COLOR, title=f"Bot list ({len(entries)})", description="")
-
-        for entry in entries:
-            embed.description += f'{entry}\n'
-            count += 1
-
-            if count == 10:
-                embeds.append(embed)
-                embed = discord.Embed(color=Colors.BASE_COLOR, description="", title=f"Bot list ({len(entries)})")
-                count = 0
-
-        if count > 0:
-            embeds.append(embed)
-
-        for e in embeds:
-            await ctx.paginate(embeds)
 
     @commands.Cog.listener("on_message_edit")
     async def process_edits(self, before: discord.Message, after: discord.Message) -> discord.Message:
@@ -284,8 +248,9 @@ class Utility(commands.Cog):
         check = await self.bot.pool.fetchrow("SELECT * from afk WHERE user_id = $1", message.author.id)
         if check:
             startTime = int(check["time"])
+            
             embed = discord.Embed(
-                description=f"> <:steamhappy:1265787000573792397> **welcome back!** you went away <t:{startTime}:R>",
+                description=f"> <:steamhappy:1265787000573792397> **welcome back!** you went away {startTime}",
                 color=Colors.BASE_COLOR
             )
             await message.channel.send(embed=embed)
@@ -297,42 +262,30 @@ class Utility(commands.Cog):
                 if check:
                     embed = discord.Embed(
                         color=Colors.BASE_COLOR,
-                        description=f'> <:steambored:1265785956930420836> {user.mention} is currently **AFK:** `{check["status"]}` - <t:{int(check["time"])}:R>'
+                        description=f'> <:steambored:1265785956930420836> {user.mention} is currently **AFK:** `{check["status"]}` - {int(check["time"])}'
                     )
                     await message.channel.send(embed=embed)
 
-    @commands.command(name="shazam", description="Get a track name from sound", aliases = ["sh", "shzm"])
-    async def shazam(self, ctx: Context):
-        if not ctx.message.attachments:
-            return await ctx.send("Please provide a video")
-        attachment = ctx.message.attachments[0]
-        audio_data = await attachment.read()
-        shazam = Shazam()
-        song = await shazam.recognize(audio_data)
-        if 'track' not in song or 'share' not in song['track']:
-            return await ctx.send("Could not recognize the track")
-        song_cover_url = song['track']['images'].get('coverart', '')
-        embed = discord.Embed(
-            color=Colors.BASE_COLOR,
-            description=f"> **[{song['track']['share']['text']}]({song['track']['share']['href']})**"
-        )
-        embed.set_author(name=f"{ctx.author}", icon_url=ctx.author.avatar.url)
-        if song_cover_url:
-            embed.set_thumbnail(url=song_cover_url)
-        await ctx.reply(embed=embed)
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
         if message.author == self.bot.user:
             return
         
         if message.content == self.bot.user.mention:
-            prefix = await self.bot.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id) or (';')
-            embed = discord.Embed(
-                title="",
-                description=f"> Your **prefixes** are: `{prefix}`",
-                color=Colors.BASE_COLOR)
-            await message.channel.send(embed=embed)
+            guild_prefix = await self.bot.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id) or (';')
+            self_prefix = await self.bot.pool.fetchval("SELECT prefix FROM selfprefix WHERE user_id = $1", message.author.id)
+            if not self_prefix:
+                embed = discord.Embed(
+                    title="",
+                    description=f"> Your **prefix** is: `{guild_prefix}`",
+                    color=Colors.BASE_COLOR)
+                await message.channel.send(embed=embed)
+            if self_prefix:
+                embed = discord.Embed(
+                    title="",
+                    description=f"> Your **prefixes** are: `{guild_prefix}` & `{self_prefix}`",
+                    color=Colors.BASE_COLOR)
+                await message.channel.send(embed=embed)
+
+
 
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))

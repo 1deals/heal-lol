@@ -67,3 +67,8 @@ CREATE TABLE IF NOT EXISTS uwulock (
     guild_id BIGINT, 
     user_id BIGINT
 );
+
+CREATE TABLE IF NOT EXISTS selfprefix (
+    user_id BIGINT PRIMARY KEY,
+    prefix TEXT
+);
