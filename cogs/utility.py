@@ -298,7 +298,7 @@ class Utility(commands.Cog):
 
         content = message.content.lower()
 
-        if "heal" in content and "https://www.tiktok.com/t/" in content:
+        if "heal" in content and "https://www.tiktok.com/" in content:
             async with message.channel.typing():
                 words = content.split()
                 tiktok_link = None
