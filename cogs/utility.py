@@ -241,7 +241,7 @@ class Utility(commands.Cog):
         embed = discord.Embed(description= f":zzz: You are now **AFK** - `{status}`", color = Colors.BASE_COLOR)
         await ctx.reply(embed=embed)
 
-    TIKTOK_URL_PATTERN = re.compile(r'https?://(?:www\.)?tiktok\.com/(?:t/|@[\w.-]+/video/)?[\w-]+')
+    TIKTOK_URL_PATTERN = re.compile(r'https://www\.tiktok\.com/t/[A-Za-z0-9_/]+')
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
