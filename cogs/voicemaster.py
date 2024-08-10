@@ -226,9 +226,22 @@ class VoiceMaster(Cog):
 
             await channel.set_permissions(ctx.guild.default_role, connect=False)
             await channel.set_permissions(ctx.author, connect=True, speak=True)
-            return await ctx.send(f"**Locked** {channel.mention}")
+            return await ctx.warn(f"**Locked** {channel.mention}")
         else:
-            return await ctx.send("You are not connected to a voice channel.")
+            return await ctx.deny("You are not connected to a voice channel.")
+        
+    @voice.command(
+        name = "unlock",
+        description = "Unlocks your voicechannel."
+    )
+    async def voice_unlock(self, ctx: Context):
+        if ctx.author.voice and ctx.author.voice.channel:
+            channel = ctx.author.voice.channel            
+
+            await channel.set_permissions(ctx.guild.default_role, connect=True)
+            return await ctx.warn(f"**Unlocked** {channel.mention}")
+        else:
+            return await ctx.deny("You are not connected to a voice channel.")
 
 async def setup(bot: Heal):
     await bot.add_cog(VoiceMaster(bot))
