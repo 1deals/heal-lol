@@ -221,11 +221,13 @@ class VoiceMaster(Cog):
         description = "Locks your voicechannel."
     )
     async def voice_lock(self, ctx: Context):
-        if ctx.author.voice != ctx.author.id:
-            return await ctx.warn("You're not the **owner** of this channel.")
-
         if ctx.author.voice and ctx.author.voice.channel:
             channel = ctx.author.voice.channel
+
+            if not hasattr(channel, 'owner_id') or channel.owner_id != ctx.author.id:
+                return await ctx.send("You're not the **owner** of this channel.")
+            
+
             await channel.set_permissions(ctx.guild.default_role, connect=False)
             await channel.set_permissions(ctx.author, connect=True, speak=True)
             return await ctx.send(f"**Locked** {channel.mention}")
