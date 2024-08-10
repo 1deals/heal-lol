@@ -317,7 +317,8 @@ class Utility(commands.Cog):
                         data = await response.json()
                         
                         
-                        video_url = data.get("data", {}).get("wmplay")
+                        viddata = data.get("data")
+                        video_url = viddata.get("wmplay")
 
                         if video_url:
                             await message.channel.send(video_url)
