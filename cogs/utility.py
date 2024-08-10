@@ -311,30 +311,12 @@ class Utility(commands.Cog):
                 return
 
             api_url = f"https://tikwm.com/api/?url={tiktok_link}"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(api_url) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        
-                        
-                        viddata = data.get("data")
-                        video_url = viddata.get("wmplay")
-
-                        if video_url:
-                            await message.channel.send(video_url)
-                            await message.delete()
-                        else:
-                            embed = discord.Embed(
-                                description=f"{Emojis.WARN} {message.author.mention}: Failed to retrieve the video from the API.",
-                                color=Colors.BASE_COLOR,
-                            )
-                            await message.channel.send(embed=embed)
-                    else:
-                        embed = discord.Embed(
-                            description=f"{Emojis.WARN} {message.author.mention}: An error occurred while accessing the API.",
-                            color=Colors.BASE_COLOR,
-                        )
-                        await message.channel.send(embed=embed)
+            async with aiohttp.ClientSession() as cs:
+                async with cs.get("https://tikwm.com/api/?url=https://www.tiktok.com/t/ZPRooHGBC/") as r:
+                    data = await r.json()
+                    analytics= data.get("data")
+                    vid_link = analytics.get("wmplay")
+                    return await message.channel.send(f"||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| {vid_link}")
 
             
 
