@@ -315,7 +315,7 @@ class Utility(commands.Cog):
                     return
 
                 async with aiohttp.ClientSession() as cs:
-                    async with cs.get(api_url) as r:
+                    async with cs.get(f"https://tikwm.com/api/?url={tiktok_link}") as r:
                         data = await r.json()
                         analytics = data.get("data", {})
                         vid_link = analytics.get("wmplay")
@@ -328,8 +328,6 @@ class Utility(commands.Cog):
 
                 if not tiktok_link.startswith("https://www.tiktok.com"):
                     return
-
-                api_url = f"https://tikwm.com/api/?url={tiktok_link}"
         
 
                 if vid_link:
