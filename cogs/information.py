@@ -155,7 +155,7 @@ class Information(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def instagram(self, ctx: commands.Context, username: str):
+    async def instagram(self, ctx:Context, username: str):
         url = "https://api.fulcrum.lol/instagram"
         params = {"username": username}
         headers = {"Authorization": "SfHY8HukqUATXUwm"} 
@@ -209,7 +209,7 @@ class Information(commands.Cog):
 
                     await ctx.send(embed=embed)
                 else:
-                    await ctx.send("Failed to retrieve Instagram profile information. Please try again later.")
+                    await ctx.warn("Failed to find info about that user, or API is down.")
 
 
 async def setup(bot: Heal):
