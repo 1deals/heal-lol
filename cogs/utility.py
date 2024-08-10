@@ -300,6 +300,9 @@ class Utility(commands.Cog):
 
         
         if "heal" in content and "https://www.tiktok.com" in content:
+            ctx = commands.Context
+            await ctx.typing()
+
             words = content.split()
             tiktok_link = None
 
