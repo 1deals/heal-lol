@@ -1,5 +1,5 @@
 **Heal Bot** 
--> The only bot you will ever need in your servers, it has a range of features such as:
+-> The only multipurpose, aesthetic bot you will ever need in your servers, it has a range of features such as:
 - Music
 - Moderation
 - Fun
