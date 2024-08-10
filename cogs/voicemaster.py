@@ -206,6 +206,27 @@ class VoiceMaster(Cog):
             if len(channel.members) == 0:
                 return await self.delete_vm_channel(channel, member)
             return channel
+        
+    @commands.group(
+        name = "voice",
+        aliases = ["vc", "voicechat"],
+        description = "Voicechannel settings.",
+        invoke_without_command = True
+    )
+    async def voice(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+    
+    @voice.command(
+        name = "lock",
+        description = "Locks your voicechannel."
+    )
+    async def voice_lock(self, ctx: Context):
+        
+        if isinstance(ctx.channel, discord.VoiceChannel):
+            channel = ctx.channel
+            await ctx.author.voice.channel.set_permissions(ctx.guild.default_role, connect = False)
+            await ctx.author.voice.channel.set_permissions(ctx.author, connect = True, speak = True)
+            return await ctx.approve(f"**Locked** {channel.mention}")
 
 async def setup(bot: Heal):
     await bot.add_cog(VoiceMaster(bot))
