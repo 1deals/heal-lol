@@ -15,7 +15,7 @@ from datetime import datetime, timedelta
 import humanize
 import datetime
 import requests
-import io
+import io, re
 
 
 class Utility(commands.Cog):
@@ -241,6 +241,8 @@ class Utility(commands.Cog):
         embed = discord.Embed(description= f":zzz: You are now **AFK** - `{status}`", color = Colors.BASE_COLOR)
         await ctx.reply(embed=embed)
 
+    TIKTOK_URL_PATTERN = re.compile(r'https://www\.tiktok\.com/t/[A-Za-z0-9_/]+')
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author == self.bot.user:
@@ -301,41 +303,23 @@ class Utility(commands.Cog):
 
         if "heal" in content and "https://www.tiktok.com" in content:
             async with message.channel.typing():
-                words = content.split()
-                tiktok_link = None
+                if self.TIKTOK_URL_PATTERN.match(message.content):
+                    tiktok_link = message.content
+                    api_url = f"https://tikwm.com/api/?url={tiktok_link}"
 
-               
-                for word in words:
-                    if "tiktok.com" in word:
-                        tiktok_link = word
-                        break
+                    async with aiohttp.ClientSession() as cs:
+                        async with cs.get(api_url) as r:
+                            data = await r.json()
+                            video_url = data['data']['play']
 
-                if not tiktok_link:
-                    return
-
-                if "/t/" in tiktok_link:
-                    video_id = tiktok_link.split('/')[3]
-                    tiktok_link = f"https://www.tiktok.com/@username/video/{video_id}?is_from_webapp=1&sender_device=pc"
-
-
-                if not tiktok_link.startswith("https://www.tiktok.com"):
-                    return
-
-                api_url = f"https://tikwm.com/api/?url={tiktok_link}"
-
-                async with aiohttp.ClientSession() as cs:
-                    async with cs.get(api_url) as r:
-                        data = await r.json()
-                        video_url = data['data']['play']
-
-                        async with cs.get(video_url) as video_response:
-                            video_data = await video_response.read()
-                            
-
-                            video_file = io.BytesIO(video_data)
-                            
-
-                            await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"))
+                            async with cs.get(video_url) as video_response:
+                                video_data = await video_response.read()
+                                
+                        
+                                video_file = io.BytesIO(video_data)
+                                
+                    
+                                await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"))
 
             
 
