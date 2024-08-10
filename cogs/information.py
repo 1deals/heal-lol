@@ -180,6 +180,8 @@ class Information(commands.Cog):
                     bio = data.get("bio", "N/A")
                     verified = data.get("is_verified", False)  
                     profile_pic = data.get("avatar_url", None)
+                    posts = data.get("posts", None)
+                    pronouns = data.get("pronouns", "None set")
 
                     
                     if isinstance(followers, int):
@@ -200,6 +202,8 @@ class Information(commands.Cog):
                     )
                     embed.add_field(name="Followers", value=followers, inline=True)
                     embed.add_field(name="Following", value=following, inline=True)
+                    embed.add_field(name="Posts", value= posts, inline = True)
+                    embed.set_footer(text=f"Pronouns: {pronouns}")
                     if profile_pic:
                         embed.set_thumbnail(url=profile_pic)
 
