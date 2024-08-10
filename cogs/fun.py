@@ -277,6 +277,7 @@ class Fun(commands.Cog):
                         data = await r.json()
                         uwuified_message = data.get("message")
                         if uwuified_message:
+                            await ctx.message.delete()
                             await ctx.send(uwuified_message)
                         else:
                             await ctx.send("Failed to retrieve the uwuified message.")
