@@ -300,41 +300,40 @@ class Utility(commands.Cog):
 
         
         if "heal" in content and "https://www.tiktok.com" in content:
-            ctx = commands.Context
-            await ctx.typing(self)
+            async with message.channel.typing():
 
-            words = content.split()
-            tiktok_link = None
+                words = content.split()
+                tiktok_link = None
 
-        
-            for word in words:
-                if "tiktok.com" in word:
-                    tiktok_link = word
-                    break
-
-            if not tiktok_link:
-                return
-
-        
-            if "/t/" in tiktok_link:
-
-                tiktok_link = tiktok_link.replace("https://www.tiktok.com/t/", "https://www.tiktok.com/@username/video/")
-
-
-            if not tiktok_link.startswith("https://www.tiktok.com"):
-                return
-
-            api_url = f"https://tikwm.com/api/?url={tiktok_link}"
             
-            async with aiohttp.ClientSession() as cs:
-                async with cs.get(api_url) as r:
-                    data = await r.json()
-                    analytics = data.get("data", {})
-                    vid_link = analytics.get("wmplay")
+                for word in words:
+                    if "tiktok.com" in word:
+                        tiktok_link = word
+                        break
 
-                    if vid_link:
-                        await message.delete()
-                        return await message.channel.send(f"||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||  {vid_link}")
+                if not tiktok_link:
+                    return
+
+            
+                if "/t/" in tiktok_link:
+
+                    tiktok_link = tiktok_link.replace("https://www.tiktok.com/t/", "https://www.tiktok.com/@username/video/")
+
+
+                if not tiktok_link.startswith("https://www.tiktok.com"):
+                    return
+
+                api_url = f"https://tikwm.com/api/?url={tiktok_link}"
+                
+                async with aiohttp.ClientSession() as cs:
+                    async with cs.get(api_url) as r:
+                        data = await r.json()
+                        analytics = data.get("data", {})
+                        vid_link = analytics.get("wmplay")
+
+                        if vid_link:
+                            await message.delete()
+                            return await message.channel.send(f"||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||  {vid_link}")
 
             
 
