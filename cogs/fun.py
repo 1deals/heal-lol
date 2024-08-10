@@ -152,7 +152,9 @@ class Fun(commands.Cog):
                     else:
                         verse_info = "Unknown"
 
-                    await ctx.neutral(f"**Random Bible Verse ({verse_info})-**\n{verse_text}")
+                    embed = discord.Embed(description= verse_text, color = Colors.BASE_COLOR)
+                    embed.set_author(name=verse_info)
+                    return await ctx.send(embed=embed)
                 else:
                     await ctx.warn("No data found or empty response.")
             else:
