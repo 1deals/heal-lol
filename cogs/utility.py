@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 import humanize
 import datetime
 import requests
+import io
 
 
 class Utility(commands.Cog):
@@ -312,11 +313,8 @@ class Utility(commands.Cog):
                 if not tiktok_link:
                     return
 
-               
                 if "/t/" in tiktok_link:
-                    
                     video_id = tiktok_link.split('/')[3]
-                    
                     tiktok_link = f"https://www.tiktok.com/@username/video/{video_id}?is_from_webapp=1&sender_device=pc"
 
 
@@ -328,18 +326,16 @@ class Utility(commands.Cog):
                 async with aiohttp.ClientSession() as cs:
                     async with cs.get(api_url) as r:
                         data = await r.json()
-                        analytics = data.get("data", {})
-                        vid_link = analytics.get("wmplay")
-                        username = analytics.get("unique_id")
-                        video_id = analytics.get("id")
+                        video_url = data['data']['play']
 
+                        async with cs.get(video_url) as video_response:
+                            video_data = await video_response.read()
+                            
 
-                if "/t/" in content:
-                    tiktok_link = f"https://www.tiktok.com/@{username}/video/{video_id}?is_from_webapp=1&sender_device=pc"
+                            video_file = io.BytesIO(video_data)
+                            
 
-                if vid_link:
-                    await message.delete()
-                    return await message.channel.send(f"||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||  {vid_link}")
+                            await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"))
 
             
 
