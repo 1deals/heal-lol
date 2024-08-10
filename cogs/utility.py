@@ -241,7 +241,7 @@ class Utility(commands.Cog):
         embed = discord.Embed(description= f":zzz: You are now **AFK** - `{status}`", color = Colors.BASE_COLOR)
         await ctx.reply(embed=embed)
 
-    TIKTOK_URL_PATTERN = re.compile(r'https?://(?:www\.)?tiktok\.com/(?:t/|@[\w.-]+/video/)?[\w-]+')
+    TIKTOK_URL_PATTERN = re.compile(r'https://www\.tiktok\.com/t/[A-Za-z0-9_/]+')
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -301,29 +301,22 @@ class Utility(commands.Cog):
 
         content = message.content.lower()
 
-        match = self.TIKTOK_URL_PATTERN.search(content)
-        if match:
-            tiktok_link = match.group()
-            try:
+        if message.content.lower().startswith('heal '):
+            tiktok_link = message.content[5:].strip()  
+            if self.TIKTOK_URL_PATTERN.match(tiktok_link):
                 api_url = f"https://tikwm.com/api/?url={tiktok_link}"
+
                 async with aiohttp.ClientSession() as cs:
                     async with cs.get(api_url) as r:
-                        if r.status == 200:
-                            data = await r.json()
-                            if data.get('code') == 0:
-                                video_url = data['data']['play']
-                                async with cs.get(video_url) as video_response:
-                                    video_data = await video_response.read()
-                                    
-                                    video_file = io.BytesIO(video_data)
-                                    await message.delete()
-                                    await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"))
-                            else:
-                                await message.channel.send("Failed to retrieve video information.")
-                        else:
-                            await message.channel.send("Failed to connect to TikTok API.")
-            except Exception as e:
-                await message.channel.send(f"An error occurred: {str(e)}")
+                        data = await r.json()
+                        video_url = data['data']['play']
+
+                        async with cs.get(video_url) as video_response:
+                            video_data = await video_response.read()
+                            
+                            video_file = io.BytesIO(video_data)
+                            await message.delete()
+                            await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"))
 
             
 
