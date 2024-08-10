@@ -153,7 +153,7 @@ class Fun(commands.Cog):
                         verse_info = "Unknown"
 
                     embed = discord.Embed(description= verse_text, color = Colors.BASE_COLOR)
-                    embed.set_author(name=verse_info)
+                    embed.set_author(name=verse_info, icon_url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1j_wSogE8gfO35iYFAe-Dpa_qsjNjnpusiQ&s")
                     return await ctx.send(embed=embed)
                 else:
                     await ctx.warn("No data found or empty response.")
