@@ -14,6 +14,7 @@ from typing import Union
 from datetime import datetime, timedelta
 import humanize
 import datetime
+import requests
 
 
 class Utility(commands.Cog):
@@ -295,6 +296,42 @@ class Utility(commands.Cog):
                     color=Colors.BASE_COLOR)
                 await message.channel.send(embed=embed)
 
+        content = message.content.lower()
+
+        
+        if "heal" in content and "https://tiktok.com" in content:
+           
+            words = content.split()
+            tiktok_link = None
+            for word in words:
+                if "tiktok.com" in word:
+                    tiktok_link = word
+                    break
+
+            if not tiktok_link:
+                return
+
+           
+            api_url = f"https://tikwm.com/api?url={tiktok_link}"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(api_url) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        video_url = data.get("wmplay")
+
+                        if video_url:
+                            
+                            await message.channel.send(content= f"||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| {tiktok_link}")
+                            
+                            await message.delete()
+                        else:
+                            embed = discord.Embed(description=f"{Emojis.WARN} {message.author.mention}: Failed to retrieve the video from the API.", color=Colors.BASE_COLOR)
+                            await message.channel.send(embed=embed)
+                    else:
+                        embed = discord.Embed(description = f"{Emojis.WARN} {message.author.mention}: An error occurred whule accessing the API.", color= Colors.BASE_COLOR)
+                        await message.channel.send(embed=embed)
+            
+
     @group(
         name = "selfprefix",
         description = "Selfprefix settings.",
@@ -341,6 +378,42 @@ class Utility(commands.Cog):
         else:
             await self.bot.pool.execute("DELETE FROM selfprefix WHERE user_id = $1", ctx.author.id)
             return await ctx.approve("Removed your **selfprefix**.")
+        
+    @commands.group(
+        name = "tiktok",
+        aliases = ["tt"],
+        description = "Tiktok commands",
+        usage = "tiktok <command>",
+        invoke_without_command=True
+    )
+    async def tiktok(self, ctx: Context):
+        await ctx.send_help(ctx.command)
+
+
+    @tiktok.command(
+        name = "user",
+        aliases = ["creator"],
+        description="get info about a tiktok creator",
+    )
+    async def tiktok_user(self, ctx: Context, *, user=None):
+        if user is None: 
+           return await ctx.send_help(ctx.command)
+        
+        res = requests.get(url=f'https://edgabot.akiomae.com/api/tiktokAPI/index.php?user={user}')
+        data = res.json()
+        user = data["user"]
+        stats = data["stats"]
+
+        embed = discord.Embed(
+            title = f"@{user["username"]}",
+            url = f'https://tiktok.com/@{user["profileName"]}',
+            description = f"Followers: {stats["follower"]} \nFollowing: {stats["following"]} \nVideos posted: {stats["video"]} \nLikes: {stats["like"]}",
+            color = Colors.BASE_COLOR
+        )
+        embed.set_thumbnail(url=user["avatar"])
+        await ctx.send(embed=embed)
+
+    
 
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))
