@@ -298,14 +298,12 @@ class Utility(commands.Cog):
 
         content = message.content.lower()
 
-        
         if "heal" in content and "https://www.tiktok.com" in content:
             async with message.channel.typing():
-
                 words = content.split()
                 tiktok_link = None
 
-            
+               
                 for word in words:
                     if "tiktok.com" in word:
                         tiktok_link = word
@@ -314,22 +312,30 @@ class Utility(commands.Cog):
                 if not tiktok_link:
                     return
 
+               
+                if "/t/" in tiktok_link:
+                    
+                    video_id = tiktok_link.split('/')[3]
+                    
+                    tiktok_link = f"https://www.tiktok.com/@username/video/{video_id}?is_from_webapp=1&sender_device=pc"
+
+
+                if not tiktok_link.startswith("https://www.tiktok.com"):
+                    return
+
+                api_url = f"https://tikwm.com/api/?url={tiktok_link}"
+
                 async with aiohttp.ClientSession() as cs:
-                    async with cs.get(f"https://tikwm.com/api/?url={tiktok_link}") as r:
+                    async with cs.get(api_url) as r:
                         data = await r.json()
                         analytics = data.get("data", {})
                         vid_link = analytics.get("wmplay")
                         username = analytics.get("unique_id")
                         video_id = analytics.get("id")
-            
-                if "/t/" in tiktok_link:
-
-                    tiktok_link = tiktok_link.replace("https://www.tiktok.com/t/", f"https://www.tiktok.com/@{username}/video/{video_id}?is_from_webapp=1&sender_device=pc")
 
 
-                if not tiktok_link.startswith("https://www.tiktok.com"):
-                    return
-        
+                if "/t/" in content:
+                    tiktok_link = f"https://www.tiktok.com/@{username}/video/{video_id}?is_from_webapp=1&sender_device=pc"
 
                 if vid_link:
                     await message.delete()
