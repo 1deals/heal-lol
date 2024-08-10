@@ -320,10 +320,11 @@ class Utility(commands.Cog):
                         analytics = data.get("data", {})
                         vid_link = analytics.get("wmplay")
                         username = analytics.get("unique_id")
+                        video_id = analytics.get("id")
             
                 if "/t/" in tiktok_link:
 
-                    tiktok_link = tiktok_link.replace("https://www.tiktok.com/t/", f"https://www.tiktok.com/@{username}/video/")
+                    tiktok_link = tiktok_link.replace("https://www.tiktok.com/t/", f"https://www.tiktok.com/@{username}/video/{video_id}?is_from_webapp=1&sender_device=pc")
 
 
                 if not tiktok_link.startswith("https://www.tiktok.com"):
