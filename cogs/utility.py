@@ -312,7 +312,7 @@ class Utility(commands.Cog):
 
             api_url = f"https://tikwm.com/api/?url={tiktok_link}"
             async with aiohttp.ClientSession() as cs:
-                async with cs.get("https://tikwm.com/api/?url=https://www.tiktok.com/t/ZPRooHGBC/") as r:
+                async with cs.get(f"https://tikwm.com/api/?url={tiktok_link}") as r:
                     data = await r.json()
                     analytics= data.get("data")
                     vid_link = analytics.get("wmplay")
