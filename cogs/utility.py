@@ -301,25 +301,22 @@ class Utility(commands.Cog):
 
         content = message.content.lower()
 
-        if "heal" in content and "https://www.tiktok.com" in content:
-            async with message.channel.typing():
-                if self.TIKTOK_URL_PATTERN.match(message.content):
-                    tiktok_link = message.content
-                    api_url = f"https://tikwm.com/api/?url={tiktok_link}"
+        if message.content.lower().startswith('heal '):
+            tiktok_link = message.content[5:].strip()  
+            if self.TIKTOK_URL_PATTERN.match(tiktok_link):
+                api_url = f"https://tikwm.com/api/?url={tiktok_link}"
 
-                    async with aiohttp.ClientSession() as cs:
-                        async with cs.get(api_url) as r:
-                            data = await r.json()
-                            video_url = data['data']['play']
+                async with aiohttp.ClientSession() as cs:
+                    async with cs.get(api_url) as r:
+                        data = await r.json()
+                        video_url = data['data']['play']
 
-                            async with cs.get(video_url) as video_response:
-                                video_data = await video_response.read()
-                                
-                        
-                                video_file = io.BytesIO(video_data)
-                                
-                    
-                                await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"))
+                        async with cs.get(video_url) as video_response:
+                            video_data = await video_response.read()
+                            
+                            video_file = io.BytesIO(video_data)
+                            
+                            await message.channel.send("Here's your video!", file=discord.File(fp=video_file, filename="video.mp4"))
 
             
 
