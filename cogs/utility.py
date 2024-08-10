@@ -310,15 +310,14 @@ class Utility(commands.Cog):
             if not tiktok_link:
                 return
 
-            api_url = f"https://tikwm.com/api?url={tiktok_link}"
+            api_url = f"https://tikwm.com/api/?url={tiktok_link}"
             async with aiohttp.ClientSession() as session:
                 async with session.get(api_url) as response:
                     if response.status == 200:
                         data = await response.json()
                         
                         
-                        dataa = data.get("data")
-                        video_url = dataa.get("wmplay")
+                        video_url = data.get("data", {}).get("wmplay")
 
                         if video_url:
                             await message.channel.send(video_url)
