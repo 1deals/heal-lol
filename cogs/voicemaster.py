@@ -221,12 +221,16 @@ class VoiceMaster(Cog):
         description = "Locks your voicechannel."
     )
     async def voice_lock(self, ctx: Context):
-        
-        if isinstance(ctx.channel, discord.VoiceChannel):
-            channel = ctx.channel
-            await ctx.author.voice.channel.set_permissions(ctx.guild.default_role, connect = False)
-            await ctx.author.voice.channel.set_permissions(ctx.author, connect = True, speak = True)
-            return await ctx.approve(f"**Locked** {channel.mention}")
+        if ctx.author.voice != ctx.author.id:
+            return await ctx.warn("You're not the **owner** of this channel.")
+
+        if ctx.author.voice and ctx.author.voice.channel:
+            channel = ctx.author.voice.channel
+            await channel.set_permissions(ctx.guild.default_role, connect=False)
+            await channel.set_permissions(ctx.author, connect=True, speak=True)
+            return await ctx.send(f"**Locked** {channel.mention}")
+        else:
+            return await ctx.send("You are not connected to a voice channel.")
 
 async def setup(bot: Heal):
     await bot.add_cog(VoiceMaster(bot))
