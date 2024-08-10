@@ -65,7 +65,7 @@ class Moderation(commands.Cog):
     )
     @commands.cooldown(1, 5, BucketType.user)
     @has_permissions(moderate_members=True)
-    async def kick(self, ctx: Context, user: discord.Member, *, reason: str = "no reason"):
+    async def kick(self, ctx: Context, user: Union[discord.Member, discord.User], *, reason: str = "no reason"):
         reason += ' | executed by {}'.format(ctx.author)
         await ctx.typing()
 
