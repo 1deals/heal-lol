@@ -298,27 +298,29 @@ class Utility(commands.Cog):
 
         content = message.content.lower()
 
-        if not message.guild:
-            return 
-        if message.author.bot:
-            return 
-        args = message.content.split(" ")
-        if (args[0] == "heal"):
-            url = args[1] 
-            if "tiktok" in url:
-                async with message.channel.typing():  
-                    async with message.channel.typing():  
-                        x = await self.bot.session.json("https://tikwm.com/api/", params={"url": url}) 
-                        video = x["data"]["play"]
-                        file = discord.File(fp=await self.bot.getbyte(video), filename="heal.mp4")
-                        embed = discord.Embed(color=self.bot.color, description=f"[{x['data']['title']}]({url})").set_author(name=f"@{x['data']['author']['unique_id']}", icon_url=x["data"]["author"]["avatar"])
-                        x = x["data"]
-                        embed.set_footer(text=f"❤ {self.bot.humanize_number(x['digg_count'])}  💬 {self.bot.humanize_number(x['comment_count'])}  🔗 {self.bot.humanize_number(x['share_count'])}  👀 {self.bot.humanize_number(x['play_count'])} | {message.author}", icon_url=f"{message.author.avatar.url}")
-                        await message.channel.send(embed=embed, file=file)
-                        try: 
-                            await message.delete()
-                        except:
-                            pass
+        if "heal" in content and "https://www.tiktok.com/t/" in content:
+            async with message.channel.typing():
+                words = content.split()
+                tiktok_link = None
+
+
+                for word in words:
+                    if "https://www.tiktok.com/t/" in word:
+                        tiktok_link = word
+                        break
+                if not tiktok_link:
+                    return
+
+                api_url = f"https://tikwm.com/api/?url={tiktok_link}"
+                async with aiohttp.ClientSession() as cs:
+                    async with cs.get(api_url) as r:
+                        data = await r.json()
+                        analytics = data.get("data", {})
+                        vid_link = analytics.get("wmplay")
+               
+                if vid_link:
+                    await message.delete()
+                    return await message.channel.send(f"||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||  {vid_link}")
 
             
 
