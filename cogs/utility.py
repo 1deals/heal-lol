@@ -307,13 +307,18 @@ class Utility(commands.Cog):
             url = args[1] 
             if "tiktok" in url:
                 async with message.channel.typing():  
-                    async with aiohttp.ClientSession() as cs:
-                        url = "https://tikwm.com/api/?url="
-                        params={"url": url}
-                        async with cs.get(url, params) as r:
-                            data = await r.json()
-                            video = data["data"]["wmplay"]
-                    await message.channel.send(f"||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| {video}")
+                    async with message.channel.typing():  
+                        x = await self.bot.session.json("https://tikwm.com/api/", params={"url": url}) 
+                        video = x["data"]["play"]
+                        file = discord.File(fp=await self.bot.getbyte(video), filename="heal.mp4")
+                        embed = discord.Embed(color=self.bot.color, description=f"[{x['data']['title']}]({url})").set_author(name=f"@{x['data']['author']['unique_id']}", icon_url=x["data"]["author"]["avatar"])
+                        x = x["data"]
+                        embed.set_footer(text=f"❤ {self.bot.humanize_number(x['digg_count'])}  💬 {self.bot.humanize_number(x['comment_count'])}  🔗 {self.bot.humanize_number(x['share_count'])}  👀 {self.bot.humanize_number(x['play_count'])} | {message.author}", icon_url=f"{message.author.avatar.url}")
+                        await message.channel.send(embed=embed, file=file)
+                        try: 
+                            await message.delete()
+                        except:
+                            pass
 
             
 
