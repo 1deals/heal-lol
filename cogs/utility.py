@@ -300,7 +300,6 @@ class Utility(commands.Cog):
 
         
         if "heal" in content and "https://www.tiktok.com" in content:
-           
             words = content.split()
             tiktok_link = None
             for word in words:
@@ -311,25 +310,31 @@ class Utility(commands.Cog):
             if not tiktok_link:
                 return
 
-           
             api_url = f"https://tikwm.com/api?url={tiktok_link}"
             async with aiohttp.ClientSession() as session:
                 async with session.get(api_url) as response:
                     if response.status == 200:
                         data = await response.json()
-                        video_url = data.get("wmplay")
+                        
+                        
+                        video_url = data.get("data", {}).get("wmplay")
 
                         if video_url:
-                            
-                            await message.channel.send("||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​||||​|| {tiktok_link}")
-                            
+                            await message.channel.send(video_url)
                             await message.delete()
                         else:
-                            embed = discord.Embed(description=f"{Emojis.WARN} {message.author.mention}: Failed to retrieve the video from the API.", color=Colors.BASE_COLOR)
+                            embed = discord.Embed(
+                                description=f"{Emojis.WARN} {message.author.mention}: Failed to retrieve the video from the API.",
+                                color=Colors.BASE_COLOR,
+                            )
                             await message.channel.send(embed=embed)
                     else:
-                        embed = discord.Embed(description = f"{Emojis.WARN} {message.author.mention}: An error occurred whule accessing the API.", color= Colors.BASE_COLOR)
+                        embed = discord.Embed(
+                            description=f"{Emojis.WARN} {message.author.mention}: An error occurred while accessing the API.",
+                            color=Colors.BASE_COLOR,
+                        )
                         await message.channel.send(embed=embed)
+
             
 
     @group(
