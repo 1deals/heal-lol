@@ -315,7 +315,7 @@ class Utility(commands.Cog):
                             video_data = await video_response.read()
                             
                             video_file = io.BytesIO(video_data)
-                            
+                            await message.delete()
                             await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"))
 
             
