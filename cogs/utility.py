@@ -299,7 +299,7 @@ class Utility(commands.Cog):
         content = message.content.lower()
 
         
-        if "heal" in content and "https://tiktok.com" in content:
+        if "heal" in content and "https://www.tiktok.com" in content:
            
             words = content.split()
             tiktok_link = None
