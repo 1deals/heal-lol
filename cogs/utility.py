@@ -316,7 +316,7 @@ class Utility(commands.Cog):
                             
                             video_file = io.BytesIO(video_data)
                             
-                            await message.channel.send("Here's your video!", file=discord.File(fp=video_file, filename="video.mp4"))
+                            await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"))
 
             
 
