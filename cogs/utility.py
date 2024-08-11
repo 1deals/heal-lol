@@ -16,7 +16,7 @@ import humanize
 import datetime
 import requests
 import io, re
-
+from PIL import Image, ImageDraw, ImageFont
 
 class Utility(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -412,6 +412,37 @@ class Utility(commands.Cog):
         )
         embed.set_thumbnail(url=user["avatar"])
         await ctx.send(embed=embed)
+
+    @command(
+        name = "gif",
+        description = "Turns an image into a gif."
+    )
+    async def gif(self, ctx: Context):
+        if ctx.message.attachments:
+
+            image_url = ctx.message.attachments[0].url
+        else:
+
+            image_url = ctx.message.content.split(" ")[1]
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(image_url) as response:
+                if response.status == 200:
+                    image_data = await response.read()
+                    with io.BytesIO(image_data) as image_binary:
+                        image = Image.open(image_binary)
+
+
+                        frames = []
+                        for i in range(0, 360, 10):
+                            frame = image.rotate(i)
+                            frames.append(frame)
+
+                        gif_buffer = io.BytesIO()
+                        frames[0].save(gif_buffer, format='GIF', save_all=True, append_images=frames[1:], duration=100, loop=0)
+                        gif_buffer.seek(0)
+
+                        await ctx.send(file=discord.File(gif_buffer, filename="output.gif"))
 
     
 
