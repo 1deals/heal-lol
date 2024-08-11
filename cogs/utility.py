@@ -443,23 +443,6 @@ class Utility(commands.Cog):
                         gif_buffer.seek(0)
                         await ctx.send(file=discord.File(gif_buffer, filename="output.gif"))
 
-    @commands.Cog.listener()
-    async def on_member_kick(self, guild: discord.Guild, user: Union[discord.Member, discord.User]):
-
-        if isinstance(user, discord.User):
-            return
-            
-        for role in user.roles:
-            await self.bot.pool.execute('INSERT INTO restore (guild_id, user_id, role) VALUES ($1, $2, $3)', user.guild.id, user.id, role.id)
-
-    @commands.Cog.listener()
-    async def on_member_ban(self, guild: discord.Guild, user: Union[discord.Member, discord.User]):
-
-        if isinstance(user, discord.User):
-            return
-            
-        for role in user.roles:
-            await self.bot.pool.execute('INSERT INTO restore (guild_id, user_id, role) VALUES ($1, $2, $3)', user.guild.id, user.id, role.id)
     
 
 async def setup(bot: Heal):
