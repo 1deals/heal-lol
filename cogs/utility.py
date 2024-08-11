@@ -314,8 +314,8 @@ class Utility(commands.Cog):
                         comments = data['data']['comment_count']
                         shares = data['data']['share_count']
                         description = data['data']['title']
-                        username = data['unique_id']
-                        avatar = data['avatar']
+                        username = data['data'].get('unique_id', 'Unknown User')
+                        avatar = data['data'].get('avatar', 'https://none.none')
 
                         async with cs.get(video_url) as video_response:
                             video_data = await video_response.read()
