@@ -25,13 +25,17 @@ class member(Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_member_remove(self, guild: discord.Guild, user: Union[discord.Member, discord.User]):
-
-        if isinstance(user, discord.User):
+    async def on_member_remove(self, member: discord.Member):
+        if member.bot:
             return
-                
-        for role in user.roles:
-            await self.bot.pool.execute('INSERT INTO restore (guild_id, user_id, role) VALUES ($1, $2, $3)', user.guild.id, user.id, role.id)
+
+        for role in member.roles:
+            if role.is_default():
+                continue  
+            await self.bot.pool.execute(
+                'INSERT INTO restore (guild_id, user_id, role) VALUES ($1, $2, $3)',
+                member.guild.id, member.id, role.id
+            )
 
 async def setup(bot: Heal):
     await bot.add_cog(member(bot))
