@@ -206,7 +206,7 @@ class Owner(Cog):
     
         if member.id in self.bot.owner_ids:
             return await ctx.deny("You can't global ban a bot owner, retard.")
-        if member.id == ctx.bot.user.id:
+        if member.id == self.bot.user.id:
             return await ctx.deny(f"Bro tried global banning me from {len(self.bot.guilds)} 💀")
         
         check = await self.bot.pool.fetchrow("SELECT * FROM globalban WHERE user_id = $1", member.id) 
