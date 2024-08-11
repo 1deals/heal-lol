@@ -106,7 +106,7 @@ class Moderation(commands.Cog):
                 return await ctx.send(f"You're unable to ban a user with a **higher role** than **yourself**.")
                 
         await ctx.guild.ban(user, reason=reason)
-        return await ctx.send(f'Successfully banned {user.mention} for {reason.split(" |")[0]}')
+        return await ctx.approve(f'Successfully banned {user.mention} for {reason.split(" |")[0]}')
         
     @commands.command(name='mute', description='mute a user in your server', brief='-mute <user> <time> <reason>')
     @commands.has_permissions(manage_messages=True)
