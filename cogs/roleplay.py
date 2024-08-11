@@ -232,3 +232,6 @@ class Roleplay(Cog):
                     embed = discord.Embed(description = f"{ctx.author.mention} **feeds** {user.name}", color = Colors.BASE_COLOR)
                     embed.set_image(url=gif_url)
                     await ctx.send(embed=embed)
+
+async def setup(bot: Heal) -> None:
+    await bot.add_cog(Roleplay(bot))
