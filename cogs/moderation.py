@@ -93,21 +93,20 @@ class Moderation(commands.Cog):
     @commands.cooldown(1, 5, BucketType.user)
     @has_permissions(moderate_members=True)
     async def ban(self, ctx: Context, user: Union[discord.Member, discord.User], *, reason: str = "no reason"):
-        reason += ' | executed by {}'.format(ctx.author)
+        reason += f' | executed by {ctx.author}'
         await ctx.typing()
 
-        try:
-            if user is ctx.guild.owner:
-                return await ctx.warn(f"You're unable to ban the **server owner**.")
-            if user is ctx.author:
-                return await ctx.warn(f"You're unable to ban **yourself**.")
+        
+        if isinstance(user, discord.Member):
+            if user == ctx.guild.owner:
+                return await ctx.send(f"You're unable to ban the **server owner**.")
+            if user == ctx.author:
+                return await ctx.send(f"You're unable to ban **yourself**.")
             if ctx.author.top_role.position <= user.top_role.position:
-                return await ctx.warn(f"You're unable to ban a user with a **higher role** than **yourself**.")
-            
-            await user.ban(reason=reason)
-            return await ctx.approve(f'Successfully banned {user.mention} for {reason.split(' |')[0]}')
-        except:
-            return await ctx.deny(f'Failed to ban {user.mention}.')
+                return await ctx.send(f"You're unable to ban a user with a **higher role** than **yourself**.")
+                
+        await ctx.guild.ban(user, reason=reason)
+        return await ctx.send(f'Successfully banned {user.mention} for {reason.split(" |")[0]}')
         
     @commands.command(name='mute', description='mute a user in your server', brief='-mute <user> <time> <reason>')
     @commands.has_permissions(manage_messages=True)
