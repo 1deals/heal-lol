@@ -243,15 +243,6 @@ class Owner(Cog):
             embed = discord.Embed(description=f"Failed to ban **{member}** globally.", color=Colors.BASE_COLOR)
             await initial_message.edit(embed=embed)
 
-    @command(
-        name = "usage",
-        description = "Checks how many commands the bot has run."
-    )
-    @commands.is_owner()
-    async def usage(self, ctx: Context):
-        check = await self.bot.pool.fetchval("SELECT amount FROM usage")
-        return await ctx.neutral(f"{check} commands have been ran.")
-
 
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Owner(bot))
