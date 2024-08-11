@@ -15,7 +15,9 @@ import asyncio
 from typing import Union
 from collections import defaultdict
 import typing
+import json
 from humanfriendly import format_timespan
+import os
 
 class Moderation(commands.Cog):
     """
@@ -25,6 +27,7 @@ class Moderation(commands.Cog):
         self.bot = bot
         self.locks = defaultdict(asyncio.Lock)
         self.role_lock = defaultdict(asyncio.Lock)
+        self.file_path = '/tools/data/restoreRoles.json'
 
     @command(
         name = "lock",
@@ -249,14 +252,37 @@ class Moderation(commands.Cog):
     @commands.has_permissions(manage_roles=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def role_restore(self, ctx: Context, member: discord.Member):
-        roles = await self.bot.pool.fetch('SELECT role FROM restore WHERE user_id = $1 AND guild_id = $2', member.id, ctx.guild.id)
+        if not os.path.exists(self.file_path):
+            return await ctx.deny("The roles data file does not exist.")
 
-        if not roles:
-            return await ctx.warn("There are no roles to restore.")
-        roles = [ctx.guild.get_role(role) for role in roles]
-        await member.edit(roles=[role for role in roles if role])
-        return await ctx.approve(f"**Restored** all of {member.mention}'s roles")
-    
+        with open(self.file_path, 'r') as f:
+            data = json.load(f)
+
+        user_data = next((entry for entry in data if entry["user_id"] == member.id), None)
+
+        if user_data is None:
+            return await ctx.send(f"No roles found to restore for {member.mention}.")
+
+        roles_to_give = user_data["roles"]
+
+        roles_assigned = []
+        for role_id in roles_to_give:
+            role = discord.utils.get(ctx.guild.roles, id=role_id)
+            if role and role.id != ctx.guild.default_role.id: 
+                try:
+                    await member.add_roles(role)
+                    roles_assigned.append(role.name)
+                except discord.Forbidden:
+                    await ctx.warn(f"Missing permissions to assign role: {role.name}")
+                except discord.HTTPException:
+                    await ctx.warn(f"Failed to assign role: {role.name}")
+
+        if roles_assigned:
+            await ctx.approve(f"Restored roles to {member.mention}: {', '.join(roles_assigned)}")
+        else:
+            await ctx.deny(f"No roles were restored to {member.mention}.")
+
+
     @commands.command(description="Adds an emoji to your server", usage="steal [emoji] <name>", aliases = ["steal"])
     @commands.has_permissions(manage_expressions = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
