@@ -43,8 +43,8 @@ class Information(commands.Cog):
                 total_channels += len(guild.channels)
             uptime = self.bot.uptime
             embed = discord.Embed(timestamp=ctx.message.created_at, colour=Colors.BASE_COLOR)
-            embed.add_field(name = f"**{self.bot.user.name}'s statistics**", value = f"**{len(self.bot.guilds)}** guilds \n**{sum(g.member_count for g in self.bot.guilds)}** users \n**{total_channels}** channels", inline = False)
-            embed.add_field(name = "**Bot**", value = f"**{len(set(command for command in self.bot.walk_commands()if not command.cog_name == 'Jishaku'))}** commands \nwebsocket latency: **{round(self.bot.latency * 1000)} ms** \nuptime: **{uptime}**", inline = False)
+            embed.add_field(name = f"**{self.bot.user.name}'s statistics**", value = f"**{len(self.bot.guilds)}** guilds \n**{sum(g.member_count for g in self.bot.guilds): ,}** users \n**{total_channels}** channels", inline = False)
+            embed.add_field(name = "**Bot**", value = f"**{len(set(command for command in self.bot.walk_commands()if not command.cog_name == 'Jishaku')): ,}** commands \nwebsocket latency: **{round(self.bot.latency * 1000)} ms** \nuptime: **{uptime}**", inline = False)
             embed.set_author(name = self.bot.user.display_name, icon_url = self.bot.user.avatar)
             embed.set_thumbnail(url = self.bot.user.avatar)
             await ctx.send(embed=embed)
