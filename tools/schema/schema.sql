@@ -78,5 +78,5 @@ CREATE TABLE IF NOT EXISTS globalban (
 );
 
 CREATE TABLE IF NOT EXISTS usage (
-    amount BIGINT
+    amount BIGINT DEFAULT 0
 );
