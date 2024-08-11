@@ -20,7 +20,7 @@ import traceback
 from tools.heal import Heal
 from tools.managers.context import Context, Emojis, Colors
 
-class Owner(Cog):
+class member(Cog):
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
 
@@ -34,4 +34,4 @@ class Owner(Cog):
             await self.bot.pool.execute('INSERT INTO restore (guild_id, user_id, role) VALUES ($1, $2, $3)', user.guild.id, user.id, role.id)
 
 async def setup(bot: Heal):
-    await bot.add_cog(Member(bot))
+    await bot.add_cog(member(bot))
