@@ -255,7 +255,7 @@ class Moderation(commands.Cog):
             return await ctx.warn("There are no roles to restore.")
         roles = [ctx.guild.get_role(role) for role in roles]
         await member.edit(roles=[role for role in roles if role])
-        return await ctx.approve(f"successfully **restored** all of {member.mention}'s roles")
+        return await ctx.approve(f"**Restored** all of {member.mention}'s roles")
     
     @commands.command(description="Adds an emoji to your server", usage="steal [emoji] <name>", aliases = ["steal"])
     @commands.has_permissions(manage_expressions = True)
