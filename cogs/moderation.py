@@ -220,20 +220,42 @@ class Moderation(commands.Cog):
         await asyncio.sleep(2)
         await purgemsg.delete()
 
-    @commands.command(name = "role", aliases = ["r"], description = "Adds a role to mentioned user.", usage = "Syntax: role <user> <role> \nExample: role @psutil owner")
-    @commands.has_permissions(manage_roles = True)
+    @group(
+        name = "role",
+        description = "Add / remove a role from a user.",
+        invoke_without_command=True
+    )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def role(self, ctx:Context, member: discord.Member = None, *, role: discord.Role = None):
-        if member is None or role is None:
-            await ctx.send_help(ctx.command)
-            return
+    @commands.has_permissions(manage_roles=True)
+    async def role(self, ctx: Context, member: discord.Member, *, role: Union[discord.Role, str]):
+
+        if isinstance(role, str):
+            role = ctx.guild.get_role(role)
+        
+        if role is None:
+            return await ctx.warn('please provide a **valid** role.')
 
         if role in member.roles:
             await member.remove_roles(role)
-            await ctx.approve(f"**Removed** {role.mention} from **{member.name}**")
+            await ctx.approve(f"Removed {role.mention} from {member.name}")
         else:
             await member.add_roles(role)
-            await ctx.approve(f"**Added** {role.mention} to **{member.name}**")
+            await ctx.approve(f"Added {role.mention} to {member.name}")
+
+    @role.command(
+        name = "restore",
+        description = "Restore a user's role after they leave and rejoin."
+    )
+    @commands.has_permissions(manage_roles=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def role_restore(self, ctx: Context, member: discord.Member):
+        roles = await self.bot.pool.fetch('SELECT role FROM restore WHERE user_id = $1 AND guild_id = $2', member.id, ctx.guild.id)
+
+        if not roles:
+            return await ctx.warn("There are no roles to restore.")
+        roles = [ctx.guild.get_role(role) for role in roles]
+        await member.edit(roles=[role for role in roles if role])
+        return await ctx.approve(f"successfully **restored** all of {member.mention}'s roles")
     
     @commands.command(description="Adds an emoji to your server", usage="steal [emoji] <name>", aliases = ["steal"])
     @commands.has_permissions(manage_expressions = True)

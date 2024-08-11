@@ -80,3 +80,10 @@ CREATE TABLE IF NOT EXISTS globalban (
 CREATE TABLE IF NOT EXISTS usage (
     amount BIGINT NOT NULL DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS restore (
+    guild_id BIGINT,
+    user_id BIGINT,
+    role BIGINT,
+    PRIMARY KEY (guild_id, user_id)
+);
