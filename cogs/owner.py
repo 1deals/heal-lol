@@ -202,37 +202,46 @@ class Owner(Cog):
         description = "Global bans a user."
     )
     @commands.is_owner()
-    async def globalban(self, ctx: Context, *, member: discord.User): 
-    
+    async def globalban(self, ctx: Context, *, member: discord.User):
         if member.id in self.bot.owner_ids:
-            return await ctx.deny("You can't global ban a bot owner, retard.")
+            return await ctx.deny("You can't global ban a bot owner.")
         if member.id == self.bot.user.id:
             return await ctx.deny(f"Bro tried global banning me from {len(self.bot.guilds)} 💀")
-        
-        check = await self.bot.pool.fetchrow("SELECT * FROM globalban WHERE user_id = $1", member.id) 
-        if check is not None: 
-            return await ctx.warn(f"{member.mention} is already globalbanned.")
-        
-        guild_ids = [guild.id for guild in self.bot.guilds]
-        guild = discord.Guild
 
+       
+        check = await self.bot.pool.fetchrow("SELECT * FROM globalban WHERE user_id = $1", member.id)
+        if check is not None:
+            return await ctx.warn(f"{member.mention} is already globalbanned.")
+
+       
+        guild_ids = [guild.id for guild in self.bot.guilds]
+
+       
+        initial_message = await ctx.neutral(f"Globally banning {member.mention}...")
+
+   
         ban_count = 0
 
+      
         for guild in member.mutual_guilds:
-            if guild.id in guild_ids: 
+            if guild.id not in guild_ids:
                 continue
+
             try:
-                await guild.ban(member, reason=f'Globally banned by a bot owner.')
+                await guild.ban(member, reason='Globally banned by a bot owner.')
                 ban_count += 1
-            
             except Exception as e:
-                return await ctx.deny(f"Uh Oh! An error occured: {e}")
-            
-            if ban_count > 0:
-                await self.bot.pool.execute("INSERT INTO globalban (user_id) VALUES ($1)", member.id)
-                return await ctx.approve(f"Global banned {member.mention} in {ban_count} guild(s).")
-            else:
-                return await ctx.warn(f"No bans were executed for {member.mention}.")
+                await ctx.warn(f"Failed to ban in {guild.name}: {e}")
+
+
+        if ban_count > 0:
+            await self.bot.pool.execute("INSERT INTO globalban (user_id) VALUES ($1)", member.id)
+            embed = discord.Embed(description = f"Globally banned *{member}** in **{ban_count} guild(s)**!", color = Colors.BASE_COLOR)
+            await initial_message.edit(embed=embed)
+        else:
+            embed = discord.Embed(description=f"Failed to ban **{member}** globally.")
+            await initial_message.edit(embed=embed)
+
 
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Owner(bot))
