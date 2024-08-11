@@ -27,7 +27,6 @@ class Moderation(commands.Cog):
         self.bot = bot
         self.locks = defaultdict(asyncio.Lock)
         self.role_lock = defaultdict(asyncio.Lock)
-        self.file_path = '/root/healbot.lol/tools/data/restoreRoles.json'
 
     @command(
         name = "lock",
@@ -245,42 +244,6 @@ class Moderation(commands.Cog):
             await member.add_roles(role)
             await ctx.approve(f"Added {role.mention} to {member.name}")
 
-    @role.command(
-        name = "restore",
-        description = "Restore a user's role after they leave and rejoin."
-    )
-    @commands.has_permissions(manage_roles=True)
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def role_restore(self, ctx: Context, member: discord.Member):
-        if not os.path.exists(self.file_path):
-            return await ctx.deny("The roles data file does not exist.")
-
-        with open(self.file_path, 'r') as f:
-            data = json.load(f)
-
-        user_data = next((entry for entry in data if entry["user_id"] == member.id), None)
-
-        if user_data is None:
-            return await ctx.send(f"No roles found to restore for {member.mention}.")
-
-        roles_to_give = user_data["roles"]
-
-        roles_assigned = []
-        for role_id in roles_to_give:
-            role = discord.utils.get(ctx.guild.roles, id=role_id)
-            if role and role.id != ctx.guild.default_role.id: 
-                try:
-                    await member.add_roles(role)
-                    roles_assigned.append(role.name)
-                except discord.Forbidden:
-                    await ctx.warn(f"Missing permissions to assign role: {role.name}")
-                except discord.HTTPException:
-                    await ctx.warn(f"Failed to assign role: {role.name}")
-
-        if roles_assigned:
-            await ctx.approve(f"Restored roles to {member.mention}: {', '.join(roles_assigned)}")
-        else:
-            await ctx.deny(f"No roles were restored to {member.mention}.")
 
 
     @commands.command(description="Adds an emoji to your server", usage="steal [emoji] <name>", aliases = ["steal"])
