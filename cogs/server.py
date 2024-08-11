@@ -41,6 +41,7 @@ class Server(Cog):
         ]
     )
     @commands.has_permissions(administrator=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def prefix_edit(self, ctx: Context, prefix: str) -> Message:
         await self.bot.pool.execute(
             """

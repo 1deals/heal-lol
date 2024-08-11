@@ -15,6 +15,7 @@ from typing import Union
 from discord.ext.tasks import loop
 from discord import Member, Guild, Object, User
 from asyncio import gather
+import traceback
 
 from tools.heal import Heal
 from tools.managers.context import Context, Emojis, Colors
@@ -242,23 +243,6 @@ class Owner(Cog):
             embed = discord.Embed(description=f"Failed to ban **{member}** globally.", color=Colors.BASE_COLOR)
             await initial_message.edit(embed=embed)
 
-    @commands.command(
-        name = "eval",
-        aliases = ["py"],
-        description = "Evaluate some code."
-    )
-    @commands.is_owner()
-    async def eval(self, ctx: Context, *, argument: str):
-        return await ctx.invoke(self.bot.get_command("jsk py"), argument=argument)
-    
-    @commands.command(
-        name = "pull",
-        aliases = ["gitpull"],
-        description = "Pull code from the repo."
-    )
-    @commands.is_owner()
-    async def pull(self, ctx: Context):
-        return await ctx.invoke(self.bot.get_command("jsk git pull"))
 
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Owner(bot))
