@@ -76,3 +76,7 @@ CREATE TABLE IF NOT EXISTS selfprefix (
 CREATE TABLE IF NOT EXISTS globalban (
     user_id BIGINT
 );
+
+CREATE TABLE IF NOT EXISTS usage (
+    amount BIGINT
+);
