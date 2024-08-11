@@ -421,6 +421,7 @@ class Utility(commands.Cog):
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def gif(self, ctx: Context):
+        await ctx.typing()
         if ctx.message.attachments:
             image_url = ctx.message.attachments[0].url
         else:
@@ -429,7 +430,6 @@ class Utility(commands.Cog):
             except IndexError:
                 return await ctx.send_help(ctx.command)
 
-   
         async with aiohttp.ClientSession() as session:
             async with session.get(image_url) as response:
                 if response.status == 200:
@@ -441,8 +441,6 @@ class Utility(commands.Cog):
                         gif_buffer = io.BytesIO()
                         image.save(gif_buffer, format='GIF')
                         gif_buffer.seek(0)
-
-                      
                         await ctx.send(file=discord.File(gif_buffer, filename="output.gif"))
 
     

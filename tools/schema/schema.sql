@@ -72,3 +72,7 @@ CREATE TABLE IF NOT EXISTS selfprefix (
     user_id BIGINT PRIMARY KEY,
     prefix TEXT
 );
+
+CREATE TABLE IF NOT EXISTS globalban (
+    user_id BIGINT
+);
