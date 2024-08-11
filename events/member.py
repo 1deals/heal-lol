@@ -27,7 +27,7 @@ class member(Cog):
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
         self.locks = defaultdict(asyncio.Lock)
-        file_path = '/tools/data/restoreRoles.json'
+        file_path = 'root/tools/data/restoreRoles.json'
         if not os.path.exists(file_path):
             with open(file_path, 'w') as f:
                 json.dump([], f)

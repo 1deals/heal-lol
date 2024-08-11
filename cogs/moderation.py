@@ -27,7 +27,7 @@ class Moderation(commands.Cog):
         self.bot = bot
         self.locks = defaultdict(asyncio.Lock)
         self.role_lock = defaultdict(asyncio.Lock)
-        self.file_path = '/tools/data/restoreRoles.json'
+        self.file_path = 'root/tools/data/restoreRoles.json'
 
     @command(
         name = "lock",
