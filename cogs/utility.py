@@ -314,6 +314,8 @@ class Utility(commands.Cog):
                         comments = data['data']['comment_count']
                         shares = data['data']['share_count']
                         description = data['data']['title']
+                        username = data['data']['unique_id']
+                        avatar = data['data']['avatar']
 
                         async with cs.get(video_url) as video_response:
                             video_data = await video_response.read()
@@ -324,6 +326,7 @@ class Utility(commands.Cog):
 
                             embed = discord.Embed(description=f"{description}", color=Colors.BASE_COLOR)
                             embed.set_footer(text=f"❤️ {int(likes)} | 💬 {int(comments)} | 🔗 {int(shares)}")
+                            embed.set_author(name=f"{username}", icon_url=avatar)
 
                             await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"), embed=embed)
 
