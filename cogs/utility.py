@@ -386,6 +386,7 @@ class Utility(commands.Cog):
         usage = "tiktok <command>",
         invoke_without_command=True
     )
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def tiktok(self, ctx: Context):
         await ctx.send_help(ctx.command)
 
@@ -395,6 +396,7 @@ class Utility(commands.Cog):
         aliases = ["creator"],
         description="get info about a tiktok creator",
     )
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def tiktok_user(self, ctx: Context, *, user=None):
         if user is None: 
            return await ctx.send_help(ctx.command)
@@ -417,6 +419,7 @@ class Utility(commands.Cog):
         name = "gif",
         description = "Turns an image into a gif."
     )
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def gif(self, ctx: Context):
         if ctx.message.attachments:
 
