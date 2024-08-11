@@ -224,7 +224,7 @@ class Owner(Cog):
         ban_count = 0
 
       
-        for guild in member.mutual_guilds:
+        for guild in self.bot.guilds:
             if guild.id not in guild_ids:
                 continue
 
