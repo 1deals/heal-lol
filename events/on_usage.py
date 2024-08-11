@@ -18,15 +18,9 @@ class on_usage(Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
-        if message.author.bot:
-            return
+    async def on_command(self, ctx: Context):
 
-        ctx = await self.bot.get_context(message)
-
-        if ctx.command is not None:
-            await self.bot.pool.execute("UPDATE usage SET amount = amount + 1")
-            await self.bot.process_commands(message)
+        await self.bot.pool.execute('UPDATE commands SET count = count+1')
 
 async def setup(bot: Heal):
     await bot.add_cog(on_usage(bot))
