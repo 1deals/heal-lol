@@ -322,8 +322,8 @@ class Utility(commands.Cog):
 
                             await message.delete()
 
-                            embed = discord.Embed(description=f"{description}", color=discord.Color.blue())
-                            embed.set_footer(text=f":heart: {int(likes)} | :speech_balloon: {int(comments)} | :link: {int(shares)}")
+                            embed = discord.Embed(description=f"{description}", color=Colors.BASE_COLOR)
+                            embed.set_footer(text=f"❤️ {int(likes)} | 💬 {int(comments)} | 🔗 {int(shares)}")
 
                             await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"), embed=embed)
 
