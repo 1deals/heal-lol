@@ -19,8 +19,10 @@ class on_usage(Cog):
 
     @commands.Cog.listener()
     async def on_command(self, ctx: Context):
+        check = await self.bot.pool.fetchrow("SELECT * FROM usage")
+        amount = check["amount"]
 
-        await self.bot.pool.execute('UPDATE usage SET amount = amount+1')
+        await self.bot.pool.execute('UPDATE usage SET amount = $1', amount+1)
 
 async def setup(bot: Heal):
     await bot.add_cog(on_usage(bot))
