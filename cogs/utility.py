@@ -301,26 +301,30 @@ class Utility(commands.Cog):
 
         # TIKTOK 
         if message.content.lower().startswith('heal '):
-            tiktok_link = message.content[5:].strip()  
+            tiktok_link = message.content[5:].strip()
             if self.TIKTOK_URL_PATTERN.match(tiktok_link):
                 api_url = f"https://tikwm.com/api/?url={tiktok_link}"
 
                 async with aiohttp.ClientSession() as cs:
                     async with cs.get(api_url) as r:
                         data = await r.json()
+
                         video_url = data['data']['play']
-                        likes = ['data']['digg_count']
-                        comments = ['data']['comment_count']
-                        shares = ['data']['share_count']
-                        description = ['data']['title']
+                        likes = data['data']['digg_count']
+                        comments = data['data']['comment_count']
+                        shares = data['data']['share_count']
+                        description = data['data']['title']
 
                         async with cs.get(video_url) as video_response:
                             video_data = await video_response.read()
-                            
+
                             video_file = io.BytesIO(video_data)
+
                             await message.delete()
-                            embed = discord.Embed(description=f"{description}", color= Colors.BASE_COLOR)
+
+                            embed = discord.Embed(description=f"{description}", color=discord.Color.blue())
                             embed.set_footer(text=f":heart: {int(likes)} | :speech_balloon: {int(comments)} | :link: {int(shares)}")
+
                             await message.channel.send(file=discord.File(fp=video_file, filename="video.mp4"), embed=embed)
 
             
