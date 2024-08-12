@@ -453,6 +453,9 @@ class Utility(commands.Cog):
         if url is None:
             return await ctx.send_help(ctx.command)
         
+        if url == "https://fulcrum.lol/static/large.txt" or "https://scare.life/static/large.txt":
+            return await ctx.deny(f"I cannot take a screenshot of this site.")
+        
         await ctx.typing()
 
         if not url.startswith("https://"):
