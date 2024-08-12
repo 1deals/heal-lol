@@ -453,6 +453,9 @@ class Utility(commands.Cog):
         if url is None:
             return await ctx.send_help(ctx.command)
         
+        if not url.startswith("https://"):
+            url = "https://" + url
+        
         api_key = "576a848d351b4b2493efab4e5393f835"
         api_url = f"https://api.apiflash.com/v1/urltoimage?access_key={api_key}&wait_until=page_loaded&url={url}"
 
