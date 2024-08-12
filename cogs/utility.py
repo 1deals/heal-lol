@@ -453,6 +453,8 @@ class Utility(commands.Cog):
         if url is None:
             return await ctx.send_help(ctx.command)
         
+        await ctx.typing()
+
         if not url.startswith("https://"):
             url = "https://" + url
         
@@ -473,7 +475,7 @@ class Utility(commands.Cog):
 
                     await ctx.send(embed=embed)
                 else:
-                    await ctx.send("Failed to capture screenshot. Please check the URL and try again.")
+                    await ctx.warn("Failed to screenshot. Try again later.")
         
 
 
