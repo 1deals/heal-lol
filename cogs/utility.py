@@ -443,6 +443,37 @@ class Utility(commands.Cog):
                         gif_buffer.seek(0)
                         await ctx.send(file=discord.File(gif_buffer, filename="output.gif"))
 
+    @command(
+        name = "screenshot",
+        aliases = ["ss"],
+        description = "Screenshot a website."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def screenshot(self, ctx: Context, *, url: str = None):
+        if url is None:
+            return await ctx.send_help(ctx.command)
+        
+        api_key = "576a848d351b4b2493efab4e5393f835"
+        api_url = f"https://api.apiflash.com/v1/urltoimage?access_key={api_key}&wait_until=page_loaded&url={url}"
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url) as response:
+                if response.status == 200:
+                    screenshot_url = response.url
+                    embed = discord.Embed(
+                        title=f"{url}",
+                        description=f"",
+                        color=Colors.BASE_COLOR
+                    )
+                    embed.set_image(url=str(screenshot_url))
+                    embed.set_footer(text=f"Requested by {ctx.author}")
+
+                    await ctx.send(embed=embed)
+                else:
+                    await ctx.send("Failed to capture screenshot. Please check the URL and try again.")
+        
+
+
     
 
 async def setup(bot: Heal):
