@@ -17,6 +17,8 @@ import datetime
 import requests
 import io, re
 from PIL import Image, ImageDraw, ImageFont
+import random 
+from random import choice
 
 class Utility(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -461,8 +463,11 @@ class Utility(commands.Cog):
 
         if not url.startswith("https://"):
             url = "https://" + url
+
+        lis = ["2db5008df2764e7ea7f6fd79697fd4b0", "576a848d351b4b2493efab4e5393f835"]
+        APIKEY = choice(lis)
         
-        api_key = "576a848d351b4b2493efab4e5393f835"
+        api_key = APIKEY
         api_url = f"https://api.apiflash.com/v1/urltoimage?access_key={api_key}&wait_until=page_loaded&url={url}"
 
         async with aiohttp.ClientSession() as session:
