@@ -452,11 +452,12 @@ class Utility(commands.Cog):
     async def screenshot(self, ctx: Context, *, url: str = None):
         if url is None:
             return await ctx.send_help(ctx.command)
-        
-        if url == "https://fulcrum.lol/static/large.txt" or "https://scare.life/static/large.txt":
-            return await ctx.deny(f"I cannot take a screenshot of this site.")
+    
+        if url in ["https://fulcrum.lol/static/large.txt", "https://scare.life/static/large.txt", "https://pornhub.com"]:
+            return await ctx.deny("I cannot take a screenshot of this site.")
         
         await ctx.typing()
+
 
         if not url.startswith("https://"):
             url = "https://" + url
@@ -470,7 +471,7 @@ class Utility(commands.Cog):
                     screenshot_url = response.url
                     embed = discord.Embed(
                         title=f"{url}",
-                        description=f"",
+                        description="",
                         color=Colors.BASE_COLOR
                     )
                     embed.set_image(url=str(screenshot_url))
