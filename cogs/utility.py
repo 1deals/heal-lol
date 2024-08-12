@@ -453,7 +453,7 @@ class Utility(commands.Cog):
         if url is None:
             return await ctx.send_help(ctx.command)
     
-        if url in ["https://fulcrum.lol/static/large.txt", "https://scare.life/static/large.txt", "https://pornhub.com"]:
+        if url in ["https://fulcrum.lol/static/large.txt", "https://scare.life/static/large.txt", "https://pornhub.com", "pornhub.com", "scare.life/static/large.txt", "fulcrum.lol/static/large.txt"]:
             return await ctx.deny("I cannot take a screenshot of this site.")
         
         await ctx.typing()
