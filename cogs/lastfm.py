@@ -64,12 +64,13 @@ class LastFM(Cog):
             """,
             ctx.author.id, lfuser
         )
-        embed = Embed(description = f"{Emojis.APPROVE} {ctx.author.mention}: Set your **LastFM** user to **{lfuser}**.", color = Colors.LAST_FM)
+        embed = Embed(description = f"{Emojis.LASTFM} {ctx.author.mention}: Set your **LastFM** user to **{lfuser}**.", color = Colors.LAST_FM)
         await msg.edit(embed=embed)
 
     @lastfm.command(
         name = "nowplaying",
-        description = "Get your LastFM now playing."
+        description = "Get your LastFM now playing.",
+        aliases = ["np"]
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def lastfm_nowplaying(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
@@ -78,7 +79,7 @@ class LastFM(Cog):
 
         data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", user.id)
         if not data:
-            return await ctx.warn(f"No LastFM account linked for {user.display_name}. Use the login command to link your account.")
+            return await ctx.lastfm(f"**{user.name}** hasn't got their LastFM account linked.")
 
         lastfm_username = data["lfuser"]
         
@@ -109,9 +110,10 @@ class LastFM(Cog):
                 album_art = track_info['image'][-1]['#text']
 
                 embed = discord.Embed(
-                    description=f"**Track:** [{track_name}]({track_url})\n**Artist:** {artist_name}",
-                    color=Colors.LAST_FM
+                    color=Colors.BASE_COLOR
                 )
+                embed.add_field(name = "**Track**", value = f"[{track_name}]({track_url})", inline  = True)
+                embed.add_field(name = "**Artist**", value = f"{artist_name}", inline = True)
                 embed.set_author(name=f"{lastfm_username}")
                 if album_art:
                     embed.set_thumbnail(url=album_art)
