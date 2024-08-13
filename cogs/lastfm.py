@@ -27,7 +27,7 @@ class LastFM(Cog):
         self.bot = bot
         self.handler = FMHandler
 
-    @hy.group(
+    @hybrid_group.group(
         name = "lastfm",
         aliases = ["lf", "fm"],
         description = "Interact with LastFM through heal.",
