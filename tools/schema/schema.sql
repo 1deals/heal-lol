@@ -87,3 +87,10 @@ CREATE TABLE IF NOT EXISTS restore (
     role BIGINT,
     PRIMARY KEY (guild_id, user_id)
 );
+
+CREATE TABLE IF NOT EXISTS lastfm(
+    user_id BIGINT PRIMARY KEY,
+    lfuser TEXT,
+    mode TEXT,
+    command TEXT
+)

@@ -25,3 +25,6 @@ class Emojis:
 class Colors:
     BASE_COLOR   = 0xcdc1b4
     LAST_FM      = 0xcdc1b4
+
+class api:
+    lastfm: str = "bc8082588489f949216859abba6e52be"

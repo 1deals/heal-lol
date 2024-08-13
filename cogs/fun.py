@@ -10,6 +10,7 @@ from discord.ext.commands       import command, group, BucketType, cooldown, has
 
 from tools.managers.context import Context, Colors
 from tools.heal import Heal
+from typing import Union
 
 class Fun(commands.Cog):
     """
@@ -285,6 +286,20 @@ class Fun(commands.Cog):
                         await ctx.send(f"API request failed with status code: {r.status}")
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}")
+
+    @command(
+        name = "ship",
+        description = "Ship two users together."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def ship(self, ctx: Context, user1: Union[discord.Member, discord.User] = None, *, user2: Union[discord.Member, discord.User] = None):
+        if user1 is None:
+            user1 = ctx.author
+        
+        if user2 is None:
+            return await ctx.warn("You cannot ship yourself, with yourself.")
+        
+        
 
 async def setup(bot: Heal):
     return await bot.add_cog(Fun(bot))
