@@ -22,7 +22,7 @@ from collections import defaultdict
 
 from tools.managers.help import HealHelp
 from tools.managers.context import Context
-from tools.managers.lastfm import Handler
+from tools.managers.lastfm import FMHandler
 from tools.configuration import Colors, Emojis
 from discord.ext import commands
 from discord import Message, Embed
