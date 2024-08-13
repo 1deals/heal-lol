@@ -72,8 +72,16 @@ class LastFM(Cog):
         description = "Get your LastFM now playing."
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def lastfm_nowplaying(self, ctx: Context):
-        return None
+    async def lastfm_nowplaying(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
+        if user is None:
+            user = ctx.author
+
+        data = await self.bot.pool.fetchval("SELECT * FROM lastfm WHERE user_id", user.id)
+        profile = await self.handler.profile("lastfm_username")
+        if self.handler.now_playing:
+            return await ctx.lastfm(f"{user.mention} is listening to {self.handler.now_playing}")
+        else:
+            return await ctx.lastfm(f"{user.mention} is not listening to anything.")
 
 async def setup(bot: Heal):
     await bot.add_cog(LastFM(bot))

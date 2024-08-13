@@ -9,6 +9,7 @@ class Emojis:
     APPROVE = '<:1267453852295102495:1270312226816921610>'
     DENY    = '<:1267453851087274096:1270312228331196437>'
     WARN    = '<:1267454139592347721:1270312225449447465>'
+    LASTFM = '<:LastFM:1272980316079788063>'
 
     # voice master
     VOICEMASTER_PERSON = "<:person:1253696972221583370>"
@@ -24,7 +25,7 @@ class Emojis:
 
 class Colors:
     BASE_COLOR   = 0xcdc1b4
-    LAST_FM      = 0xcdc1b4
+    LAST_FM      = 0xd3222a
 
 class api:
     lastfm: str = "bc8082588489f949216859abba6e52be"

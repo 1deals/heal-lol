@@ -17,6 +17,7 @@ class Profile(BaseModel):
     registered: int
     pro: bool
     scrobbles: int
+    nowplaying: Optional[str] = None
 
 class FMHandler():
 
@@ -52,5 +53,21 @@ class FMHandler():
             scrobbles=int(data.playcount),
             registered=int(data.registered.unixtime),
             pro=data.subscriber == "1",
+            nowplaying=data.getRecentTracks
         )
-        
+    
+
+    async def now_playing(self, username: str) -> Optional[str]:
+        data = await self.request(
+            method="user.getRecentTracks",
+            username=username,
+            limit=1
+        )
+        track_info = data.recenttracks.track[0] if 'recenttracks' in data and 'track' in data.recenttracks else None
+
+        if track_info and track_info.get('@attr', {}).get('nowplaying') == 'true':
+            track_name = track_info['name']
+            artist_name = track_info['artist']['#text']
+            return f"{track_name} by - {artist_name}"
+
+        return None
