@@ -20,11 +20,7 @@ class Profile(BaseModel):
 
 class FMHandler():
 
-    async def request(
-        self: "FMHandler", 
-        slug: Optional[str] = None, 
-        **params: Any
-    ) -> Munch:
+    async def request(self, slug: Optional[str] = None, **params: Any) -> Munch:
         data: Munch = await aiohttp.ClientSession().request(
             "http://ws.audioscrobbler.com/2.0/",
             params={
@@ -36,10 +32,7 @@ class FMHandler():
         )
         return data
 
-    async def profile(
-        self: "FMHandler",
-        username: str,
-    ) -> Profile:
+    async def profile(self, username: str) -> Profile:
     
         data = await self.request(
             method="user.getinfo",

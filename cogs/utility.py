@@ -474,15 +474,8 @@ class Utility(commands.Cog):
             async with session.get(api_url) as response:
                 if response.status == 200:
                     screenshot_url = response.url
-                    embed = discord.Embed(
-                        title=f"{url}",
-                        description="",
-                        color=Colors.BASE_COLOR
-                    )
-                    embed.set_image(url=str(screenshot_url))
-                    embed.set_footer(text=f"Requested by {ctx.author}")
 
-                    await ctx.send(embed=embed)
+                    await ctx.send(f"{screenshot_url}")
                 else:
                     await ctx.warn("Failed to screenshot. Try again later.")
         

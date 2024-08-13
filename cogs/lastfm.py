@@ -67,5 +67,13 @@ class LastFM(Cog):
         embed = Embed(description = f"{Emojis.APPROVE} {ctx.author.mention}: Set your **LastFM** user to **{lfuser}**.", color = Colors.LAST_FM)
         await msg.edit(embed=embed)
 
+    @lastfm.command(
+        name = "nowplaying",
+        description = "Get your LastFM now playing."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def lastfm_nowplaying(self, ctx: Context):
+        return None
+
 async def setup(bot: Heal):
     await bot.add_cog(LastFM(bot))
