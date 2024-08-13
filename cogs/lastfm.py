@@ -46,10 +46,13 @@ class LastFM(Cog):
         if lfuser is None:
             return await ctx.send_help(ctx.command)
         
-        data = await self.bot.pool.fetchval("SELECT lfuser FROM lastfm WHERE lfuser = $1",lfuser)
+        data = await self.bot.pool.fetchrow("SELECT user_id, lfuser FROM lastfm WHERE lfuser = $1",lfuser)
+
 
         if data:
-            return await ctx.deny(f"**{lfuser}** has already registered.")
+            user_id = data['user_id']
+            user = self.bot.get_user(user_id) or await self.bot.fetch_user(user_id)
+            return await ctx.deny(f"**{lfuser}** has been registered by {user.mention}")
         
         msg = await ctx.neutral("⚙️ Connecting to LastFM..")
         await self.bot.pool.execute(
