@@ -76,13 +76,12 @@ class LastFM(Cog):
     async def lastfm_nowplaying(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
         if user is None:
             user = ctx.author
-
+        await ctx.typing()
         data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", user.id)
         if not data:
             return await ctx.lastfm(f"**{user.name}** hasn't got their LastFM account linked.")
 
         lastfm_username = data["lfuser"]
-        
         async with aiohttp.ClientSession() as session:
             params = {
                 'method': 'user.getRecentTracks',
