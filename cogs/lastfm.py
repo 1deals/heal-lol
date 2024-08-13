@@ -86,7 +86,7 @@ class LastFM(Cog):
             params = {
                 'method': 'user.getRecentTracks',
                 'user': lastfm_username,
-                'api_key': self.handler,
+                'api_key': FMHandler,
                 'format': 'json',
                 'limit': 1
             }
