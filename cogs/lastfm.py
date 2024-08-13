@@ -109,10 +109,10 @@ class LastFM(Cog):
                 album_art = track_info['image'][-1]['#text']
 
                 embed = discord.Embed(
-                    title=f"Now Playing on LastFM" if now_playing else f"Recently Played on LastFM",
                     description=f"**Track:** [{track_name}]({track_url})\n**Artist:** {artist_name}",
                     color=Colors.LAST_FM
                 )
+                embed.set_author(name=f"{lastfm_username}")
                 if album_art:
                     embed.set_thumbnail(url=album_art)
 
