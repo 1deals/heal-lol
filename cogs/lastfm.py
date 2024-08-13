@@ -76,8 +76,12 @@ class LastFM(Cog):
         if user is None:
             user = ctx.author
 
-        data = await self.bot.pool.fetchval("SELECT * FROM lastfm WHERE user_id = $1", user.id)
+        data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", user.id)
+        if not data:
+            return await ctx.warn(f"No LastFM account linked for {user.display_name}. Use the login command to link your account.")
+
         lastfm_username = data["lfuser"]
+        
         async with aiohttp.ClientSession() as session:
             params = {
                 'method': 'user.getRecentTracks',
@@ -94,27 +98,25 @@ class LastFM(Cog):
                 if 'recenttracks' not in data or 'track' not in data['recenttracks']:
                     return await ctx.warn(f"Could not retrieve data for user: {lastfm_username}")
 
-                track_info = data['recenttracks']['track'][0]  
+                track_info = data['recenttracks']['track'][0]
 
-                
                 now_playing = track_info.get('@attr', {}).get('nowplaying') == 'true'
 
                 track_name = track_info['name']
                 artist_name = track_info['artist']['#text']
                 album_name = track_info.get('album', {}).get('#text', 'Unknown Album')
                 track_url = track_info['url']
-                album_art = track_info['image'][-1]['#text']  
+                album_art = track_info['image'][-1]['#text']
 
                 embed = discord.Embed(
-                    title=f"",
-                    description=f"**Track** \n[{track_name}]({track_url}) \n**Artist \n{artist_name}",
-                    color= Colors.LAST_FM  
+                    title=f"Now Playing on LastFM" if now_playing else f"Recently Played on LastFM",
+                    description=f"**Track:** [{track_name}]({track_url})\n**Artist:** {artist_name}",
+                    color=Colors.LAST_FM
                 )
-                embed.set_footer(text = f"Album name: {album_name}")
                 if album_art:
                     embed.set_thumbnail(url=album_art)
 
-                embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
+                embed.set_footer(text=f"Album: {album_name}")
                 await ctx.send(embed=embed)
 
 async def setup(bot: Heal):
