@@ -9,6 +9,7 @@ from discord.ext.commands import (
     Cog,
     command,
     hybrid_command,
+    hybrid_group,
     is_owner
 )
 from typing import Union
@@ -26,7 +27,7 @@ class LastFM(Cog):
         self.bot = bot
         self.handler = FMHandler
 
-    @commands.group(
+    @hy.group(
         name = "lastfm",
         aliases = ["lf", "fm"],
         description = "Interact with LastFM through heal.",
