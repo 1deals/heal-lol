@@ -77,12 +77,45 @@ class LastFM(Cog):
             user = ctx.author
 
         data = await self.bot.pool.fetchval("SELECT * FROM lastfm WHERE user_id = $1", user.id)
-        username = data["lfuser"]
-        profile = await self.handler.profile(username)
-        if self.handler.now_playing:
-            return await ctx.lastfm(f"{user.mention} is listening to {self.handler.now_playing}")
-        else:
-            return await ctx.lastfm(f"{user.mention} is not listening to anything.")
+        lastfm_username = data["lfuser"]
+        async with aiohttp.ClientSession() as session:
+            params = {
+                'method': 'user.getRecentTracks',
+                'user': lastfm_username,
+                'api_key': self.handler,
+                'format': 'json',
+                'limit': 1
+            }
+            async with session.get('http://ws.audioscrobbler.com/2.0/', params=params) as response:
+                if response.status != 200:
+                    return await ctx.deny("Failed to connect to LastFM API.")
+
+                data = await response.json()
+                if 'recenttracks' not in data or 'track' not in data['recenttracks']:
+                    return await ctx.warn(f"Could not retrieve data for user: {lastfm_username}")
+
+                track_info = data['recenttracks']['track'][0]  
+
+                
+                now_playing = track_info.get('@attr', {}).get('nowplaying') == 'true'
+
+                track_name = track_info['name']
+                artist_name = track_info['artist']['#text']
+                album_name = track_info.get('album', {}).get('#text', 'Unknown Album')
+                track_url = track_info['url']
+                album_art = track_info['image'][-1]['#text']  
+
+                embed = discord.Embed(
+                    title=f"",
+                    description=f"**Track** \n[{track_name}]({track_url}) \n**Artist \n{artist_name}",
+                    color= Colors.LAST_FM  
+                )
+                embed.set_footer(text = f"Album name: {album_name}")
+                if album_art:
+                    embed.set_thumbnail(url=album_art)
+
+                embed.set_footer(text=f"Requested by {ctx.author.display_name}", icon_url=ctx.author.avatar.url)
+                await ctx.send(embed=embed)
 
 async def setup(bot: Heal):
     await bot.add_cog(LastFM(bot))
