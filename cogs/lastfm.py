@@ -76,7 +76,7 @@ class LastFM(Cog):
         if user is None:
             user = ctx.author
 
-        data = await self.bot.pool.fetchval("SELECT * FROM lastfm WHERE user_id", user.id)
+        data = await self.bot.pool.fetchval("SELECT * FROM lastfm WHERE user_id = $1", user.id)
         profile = await self.handler.profile("lastfm_username")
         if self.handler.now_playing:
             return await ctx.lastfm(f"{user.mention} is listening to {self.handler.now_playing}")
