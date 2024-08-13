@@ -121,5 +121,14 @@ class LastFM(Cog):
                 embed.set_footer(text=f"Album: {album_name}")
                 await ctx.send(embed=embed)
 
+    @command(
+        name = "nowplaying",
+        aliases = ["np"]
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def nowplaying(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
+        return await ctx.invoke(self.bot.get_command('lf np'))
+
+
 async def setup(bot: Heal):
     await bot.add_cog(LastFM(bot))
