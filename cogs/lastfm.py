@@ -33,6 +33,8 @@ class LastFM(Cog):
         description = "Interact with LastFM through heal.",
         invoke_without_command = True
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def lastfm(self, ctx: Context):
         return await ctx.send_help(ctx.command)
@@ -43,8 +45,7 @@ class LastFM(Cog):
         description = "Set your LastFM account."
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    @discord.app_commands.allowed_installs(guilds=True, users=True)
-    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    
     async def lastfm_login(self, ctx: Context, *, lfuser: str = None):
         if lfuser is None:
             return await ctx.send_help(ctx.command)
@@ -76,8 +77,6 @@ class LastFM(Cog):
         aliases = ["np"]
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    @discord.app_commands.allowed_installs(guilds=True, users=True)
-    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def lastfm_nowplaying(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
         if user is None:
             user = ctx.author
@@ -143,8 +142,6 @@ class LastFM(Cog):
         description = "Unlink your LastFM account from heal."
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    @discord.app_commands.allowed_installs(guilds=True, users=True)
-    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def lastfm_logout(self, ctx: Context):
         data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", ctx.author.id)
         lfuser = data["lfuser"]
