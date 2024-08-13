@@ -119,7 +119,9 @@ class LastFM(Cog):
                     embed.set_thumbnail(url=album_art)
 
                 embed.set_footer(text=f"Album: {album_name}")
-                await ctx.send(embed=embed)
+                message = await ctx.send(embed=embed)
+                await message.add_reaction("👍")
+                await message.add_reaction("👎")
 
     @command(
         name = "nowplaying",
@@ -128,6 +130,21 @@ class LastFM(Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def nowplaying(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
         return await ctx.invoke(self.bot.get_command('lf np'))
+    
+    @lastfm.command(
+        name = "logout",
+        aliases = ["remove", "unlink"],
+        description = "Unlink your LastFM account from heal."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def lastfm_logout(self, ctx: Context):
+        data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", ctx.author.id)
+        lfuser = data["lfuser"]
+        if not lfuser:
+            return await ctx.lastfm(f"You do not have a **LastFM** account linked.")
+        
+        await self.bot.pool.execute("DELETE FROM lastfm WHERE user_id = $1", ctx.author.id)
+        return await ctx.lastfm(f"**Unlinked** your LastFM account successfully")
 
 
 async def setup(bot: Heal):
