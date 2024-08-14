@@ -245,7 +245,8 @@ class Owner(Cog):
 
     @commands.group(
         name = "premium",
-        description = "Gives / revokes a users premium."
+        description = "Gives / revokes a users premium.",
+        invoke_without_command = True
     )
     @is_owner()
     async def premium(self, ctx: Context):
