@@ -1,6 +1,6 @@
 import aiohttp
 
-class Handler(object): 
+class FMHandler(object): 
   def __init__(self, api_key: str):
    self.apikey = "bc8082588489f949216859abba6e52be"
    self.baseurl = "https://ws.audioscrobbler.com/2.0/"
