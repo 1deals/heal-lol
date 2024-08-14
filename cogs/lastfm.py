@@ -128,6 +128,8 @@ class LastFM(Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.author.bot:
+            return
 
         customcmd=await self.bot.pool.execute('SELECT command FROM lastfm WHERE user_id = $1', message.author.id)
         if customcmd:
