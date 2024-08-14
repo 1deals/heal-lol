@@ -38,7 +38,7 @@ def has_perks():
 class LastFM(Cog):
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
-        self.handler = FMHandler
+        self.handler = FMHandler("bc8082588489f949216859abba6e52be")
 
     async def lastfm_replacement(self, user: str, params: str) -> str: 
         a = await self.handler.get_tracks_recent(user, 1) 
@@ -245,34 +245,6 @@ class LastFM(Cog):
         description = "Setup your custom LastFM mode embed.",
         invoke_without_command = True
     )
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    @has_perks()
-    async def lastfm_mode(self, ctx: Context):
-        return await ctx.send_help(ctx.command)
-
-    @lastfm_mode.command(
-        name = "set",
-        description = "Set your custom embed for LastFM"
-    )
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    @has_perks()
-    async def lastfm_mode_set(self, ctx: Context, *, code: EmbedScript = None):
-        if code is None:
-            return await ctx.deny(f"You need to input **[embed code](https://healbot.lol/embed)**.")
-        
-        await self.bot.pool.execute("INSERT INTO lastfm (user_id, mode) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET mode = $2", ctx.author.id, code)
-        return await ctx.lastfm(f"Set your **LastFM mode** to \n```{code}```")
-    
-    @lastfm_mode.command(
-        name = "view",
-        description = "View your LastFM mode."
-    )
-    async def lastfm_mode_view(self, ctx: Context):
-        check = await self.bot.pool.fetchrow("SELECT * FROM lfmode WHERE user_id = $1", ctx.author.id)
-        if not check: 
-            return await ctx.lastfm("You do not have a **last.fm** mode set") 
-        embed = discord.Embed(color=Colors.BASE_COLOR, description=f"```{check['mode']}```")
-        return await ctx.reply(embed=embed)    
 
 
 async def setup(bot: Heal):
