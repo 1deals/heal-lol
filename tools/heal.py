@@ -49,7 +49,7 @@ class Heal(commands.Bot):
                 replied_user=False
             ),
             case_insensitive=True,
-            owner_ids=[187747524646404105, 461914901624127489, 392300135323009024]
+            owner_ids=[187747524646404105, 461914901624127489, 392300135323009024, 1074668481867419758]
         )
 
         self.message_cache = defaultdict(list)
