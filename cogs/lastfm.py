@@ -24,7 +24,7 @@ from tools.managers.context import Context, Emojis, Colors
 
 def has_perks():
   async def predicate(ctx: Context):
-    check = await ctx.bot.db.fetchrow(
+    check = await ctx.bot.pool.fetchrow(
       "SELECT * FROM premium WHERE user_id = $1",
       ctx.author.id
     )
