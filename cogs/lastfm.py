@@ -77,7 +77,7 @@ class LastFM(Cog):
         aliases = ["np"]
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def lastfm_nowplaying(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
+    async def lastfm_nowplaying(self, ctx: Context, *, user: discord.Member= None):
         if user is None:
             user = ctx.author
         await ctx.typing()
@@ -127,18 +127,13 @@ class LastFM(Cog):
                 await message.add_reaction("👎")
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
-        if message.author.bot:
-            return
+    async def on_message(self, message):
 
-       
-        data = await self.bot.pool.fetchrow("SELECT command FROM lastfm WHERE user_id = $1", message.author.id)
-        
-        if data:
-            alias = data
-            if message.content.strip().lower() == alias:
-                ctx = await self.bot.get_context(message)
-                return await ctx.invoke(self.bot.get_command('lf np'))
+        customcmd=await self.bot.pool.execute('SELECT command FROM lastfm WHERE user_id = $1', message.author.id)
+        if customcmd:
+            async with message.channel.typing():
+                context = await self.bot.get_context(message)
+                await context.invoke(self.bot.get_command("fm np"))
                 
 
     @command(
