@@ -116,7 +116,7 @@ class LastFM(Cog):
                     color=Colors.BASE_COLOR
                 )
                 embed.add_field(name = "**Track**", value = f"[{track_name}]({track_url})", inline  = True)
-                embed.add_field(name = "**Artist**", value = f"{artist_name}", inline = True)
+                embed.add_field(name = "**Artist**", value = f"{artist_name}", inline = False)
                 embed.set_author(name=f"{lastfm_username}")
                 if album_art:
                     embed.set_thumbnail(url=album_art)
