@@ -208,6 +208,22 @@ class LastFM(Cog):
         
         await self.bot.pool.execute("INSERT INTO lastfm (user_id, command) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET command = $2", ctx.author.id , customcommand)
         return await ctx.lastfm(f"Set your **custom command** to **`{customcommand}`**")
+    
+    @lastfm_customcommand.command(
+        name = "remove",
+        description = "Remove your LastFM custom command."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @has_perks()
+    async def lastfm_customcommand_remove(self, ctx: Context):
+        data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", ctx.author.id)
+        customcommand = data["command"]
+
+        if not customcommand:
+            return await ctx.deny(f"You do not have a **custom command** set.")
+        
+        await self.bot.pool.execute("UPDATE lastfm SET command = $1 WHERE user_id = $2", None, ctx.author.id)
+        return await ctx.approve("**Deleted** your LastFM **custom command.**")
 
 
 async def setup(bot: Heal):
