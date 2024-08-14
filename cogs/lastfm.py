@@ -127,7 +127,7 @@ class LastFM(Cog):
                 await message.add_reaction("👎")
 
     @commands.Cog.listener()
-    async def on_message(self, message):
+    async def on_message(self, message: discord.Message) -> Message:
         if message.author.bot:
             return
 
