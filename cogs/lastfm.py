@@ -127,15 +127,12 @@ class LastFM(Cog):
                 await message.add_reaction("👎")
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.Message) -> Message:
+    async def on_message(self, message):
         if message.author.bot:
             return
 
-
-        customcmd = await self.bot.pool.fetchval('SELECT command FROM lastfm WHERE user_id = $1', message.author.id)
-
-
-        if customcmd and message.content.strip().lower() == customcmd.strip().lower():
+        customcmd=await self.bot.pool.execute('SELECT command FROM lastfm WHERE user_id = $1', message.author.id)
+        if customcmd:
             async with message.channel.typing():
                 context = await self.bot.get_context(message)
                 await context.invoke(self.bot.get_command("fm np"))
