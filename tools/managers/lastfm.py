@@ -1,9 +1,8 @@
 import aiohttp
-from tools.configuration import api
 
 class Handler(object): 
   def __init__(self, api_key: str):
-   self.apikey = api.lastfm 
+   self.apikey = "bc8082588489f949216859abba6e52be"
    self.baseurl = "https://ws.audioscrobbler.com/2.0/"
 
   async def do_request(self, data: dict):  
