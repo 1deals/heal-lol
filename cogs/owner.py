@@ -261,7 +261,7 @@ class Owner(Cog):
         if user is None:
             return await ctx.warn(f"User cannot be none.")
         
-        await self.bot.pool.execute("INSERT INTO premium WHERE user_id = $1", user.id)
+        await self.bot.pool.execute("INSERT INTO premium (user_id) VALUES ($1)", user.id)
         return await ctx.approve(f"**{user.name}** has been **granted** premium.")
     
     @premium.command(
@@ -274,7 +274,7 @@ class Owner(Cog):
         if user is None:
             return await ctx.warn(f"User cannot be none.")
         
-        await self.bot.pool.execute("DELETE FROM premium WHERE user_id = $1", user.id)
+        await self.bot.pool.execute("DELETE FROM premium (user_id) VALUES ($1)", user.id)
         return await ctx.approve(f"**{user.name}'s** premium has been **revoked**.")
 
 
