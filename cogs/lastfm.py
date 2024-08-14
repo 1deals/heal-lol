@@ -83,7 +83,7 @@ class LastFM(Cog):
         
         await ctx.typing()
 
-        alias_data = await self.bot.pool.fetchrow("SELECT lfuser FROM command WHERE user_id = $1 AND command = $2", ctx.author.id, user.name)
+        alias_data = await self.bot.pool.fetchrow("SELECT lfuser FROM lastfm WHERE user_id = $1 AND command = $2", ctx.author.id, user.name)
         
         if alias_data:
             lastfm_username = alias_data['lastfm_username']
