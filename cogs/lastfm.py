@@ -131,7 +131,8 @@ class LastFM(Cog):
         if message.author.bot:
             return
 
-        customcmd = await self.bot.pool.fetchrow('SELECT * FROM lastfm WHERE command = $1 AND user_id = $2', message.clean_content, message.author.id)
+        data = await self.bot.pool.fetchrow('SELECT * FROM lastfm WHERE command = $1 AND user_id = $2', message.clean_content, message.author.id)
+        customcmd = data["command"]
         if customcmd:
             async with message.channel.typing():
                 ctx = await self.bot.get_context(message)
