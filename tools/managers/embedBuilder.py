@@ -1,6 +1,7 @@
 import sys, os, discord
 from discord.ext import commands
 from typing import Union
+from tools.managers.lastfm import FMHandler
 
 
 class EmbedBuilder:
@@ -18,7 +19,7 @@ class EmbedBuilder:
     params=params.replace('{embed}', '')
     return [p[1:][:-1] for p in params.split('$v')]
 
- def embed_replacement(user: discord.Member, params: str=None):
+ def embed_replacement(self, user: discord.Member, params: str=None):
     if params is None: return None
     if '{user}' in params:
         params=params.replace('{user}', str(user.name) + "#" + str(user.discriminator))
@@ -64,7 +65,9 @@ class EmbedBuilder:
       if user.guild.icon:
         params=params.replace('{guild.icon}', user.guild.icon.url)
       else: 
-        params=params.replace('{guild.icon}', "https://none.none")        
+        params=params.replace('{guild.icon}', "https://none.none")       
+    if '{track.name}' in params:
+        params=params.replace('{track.name}', f"{self.FMHandeler.get_track}")
 
     return params
 

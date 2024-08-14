@@ -261,7 +261,18 @@ class LastFM(Cog):
             return await ctx.deny(f"You need to input **[embed code](https://healbot.lol/embed)**.")
         
         await self.bot.pool.execute("INSERT INTO lastfm (user_id, mode) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET mode = $2", ctx.author.id, code)
-        return await ctx.lastfm("Set your **LastFM mode**.")
+        return await ctx.lastfm(f"Set your **LastFM mode** to \n```{code}```")
+    
+    @lastfm_mode.command(
+        name = "view",
+        description = "View your LastFM mode."
+    )
+    async def lastfm_mode_view(self, ctx: Context):
+        check = await self.bot.pool.fetchrow("SELECT * FROM lfmode WHERE user_id = $1", ctx.author.id)
+        if not check: 
+            return await ctx.lastfm("You do not have a **last.fm** mode set") 
+        embed = discord.Embed(color=Colors.BASE_COLOR, description=f"```{check['mode']}```")
+        return await ctx.reply(embed=embed)    
 
 
 async def setup(bot: Heal):

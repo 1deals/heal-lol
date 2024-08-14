@@ -14,6 +14,7 @@ from discord.ext                import commands
 from tools.heal                 import Heal
 from typing import Union
 import aiohttp
+from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 
 def get_ordinal(number):
         if 10 <= number % 100 <= 20:
