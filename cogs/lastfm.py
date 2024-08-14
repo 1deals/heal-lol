@@ -223,7 +223,7 @@ class LastFM(Cog):
             return await ctx.deny(f"You do not have a **custom command** set.")
         
         await self.bot.pool.execute("UPDATE lastfm SET command = $1 WHERE user_id = $2", None, ctx.author.id)
-        return await ctx.approve("**Deleted** your LastFM **custom command.**")
+        return await ctx.lastfm("**Deleted** your LastFM **custom command.**")
 
 
 async def setup(bot: Heal):
