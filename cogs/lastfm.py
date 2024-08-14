@@ -130,10 +130,12 @@ class LastFM(Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
+
+
         customcmd = await self.bot.pool.fetchval('SELECT command FROM lastfm WHERE user_id = $1', message.author.id)
 
 
-        if customcmd in message:
+        if customcmd and message.content.strip().lower() == customcmd.strip().lower():
             async with message.channel.typing():
                 context = await self.bot.get_context(message)
                 await context.invoke(self.bot.get_command("fm np"))
