@@ -40,6 +40,19 @@ class LastFM(Cog):
         self.bot = bot
         self.handler = FMHandler
 
+    async def lastfm_replacement(self, user: str, params: str) -> str: 
+        a = await self.handler.get_tracks_recent(user, 1) 
+        userinfo = await self.handler.get_user_info(user)
+        userpfp = userinfo["user"]["image"][2]["#text"]
+        artist = a['recenttracks']['track'][0]['artist']['#text']
+        albumplays = await self.handler.get_album_playcount(user, a['recenttracks']['track'][0]) or "N/A"
+        artistplays = await self.handler.get_artist_playcount(user, artist) 
+        trackplays = await self.handler.get_track_playcount(user, a['recenttracks']['track'][0]) or "N/A"
+        album = a["recenttracks"]['track'][0]['album']['#text'].replace(" ", "+") or "N/A"     
+        params = params.replace('{track}', a['recenttracks']['track'][0]['name']).replace('{trackurl}', a['recenttracks']['track'][0]['url']).replace('{artist}', a['recenttracks']['track'][0]['artist']['#text']).replace('{artisturl}', f"https://last.fm/music/{artist.replace(' ', '+')}").replace('{trackimage}', str((a['recenttracks']['track'][0])['image'][3]['#text']).replace('{https', "https")).replace('{artistplays}', str(artistplays)).replace('{albumplays}', str(albumplays)).replace('{trackplays}', str(trackplays)).replace('{album}', a['recenttracks']['track'][0]['album']['#text'] or "N/A").replace('{albumurl}', f"https://www.last.fm/music/{artist.replace(' ', '+')}/{album.replace(' ', '+')}" or "https://none.none").replace('{username}', user).replace('{scrobbles}', a['recenttracks']['@attr']['total']).replace('{useravatar}', userpfp)    
+        return params
+
+
     @hybrid_group(
         name = "lastfm",
         aliases = ["lf", "fm"],
@@ -236,6 +249,19 @@ class LastFM(Cog):
     @has_perks()
     async def lastfm_mode(self, ctx: Context):
         return await ctx.send_help(ctx.command)
+
+    @lastfm_mode.command(
+        name = "set",
+        description = "Set your custom embed for LastFM"
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @has_perks()
+    async def lastfm_mode_set(self, ctx: Context, *, code: EmbedScript = None):
+        if code is None:
+            return await ctx.deny(f"You need to input **[embed code](https://healbot.lol/embed)**.")
+        
+        await self.bot.pool.execute("INSERT INTO lastfm (user_id, mode) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET mode = $2", ctx.author.id, code)
+        return await ctx.lastfm("Set your **LastFM mode**.")
 
 
 async def setup(bot: Heal):

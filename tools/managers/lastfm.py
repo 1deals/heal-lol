@@ -1,73 +1,115 @@
-from tools.configuration import api
-from typing import Any, Optional
-
-from munch import Munch
-from pydantic import BaseModel
 import aiohttp
+from tools.configuration import api
 
-class Profile(BaseModel):
-    url: str
-    username: str
-    display_name: Optional[str]
-    avatar: str
-    country: Optional[str] = "Unknown"
-    tracks: int
-    artists: int
-    albums: int
-    registered: int
-    pro: bool
-    scrobbles: int
-    nowplaying: Optional[str] = None
+class Handler(object): 
+  def __init__(self, api_key: str):
+   self.apikey = api.lastfm 
+   self.baseurl = "https://ws.audioscrobbler.com/2.0/"
 
-class FMHandler():
+  async def do_request(self, data: dict):  
+   async with aiohttp.ClientSession() as cs: 
+    async with cs.get(self.baseurl, params=data) as r: 
+      return await r.json() 
 
-    async def request(self, slug: Optional[str] = None, **params: Any) -> Munch:
-        data: Munch = await aiohttp.ClientSession().request(
-            "http://ws.audioscrobbler.com/2.0/",
-            params={
-                "api_key": api.lastfm,
-                "format": "json",
-                **params,
-            },
-            slug=slug,
-        )
-        return data
+  async def get_track_playcount(self, user: str, track: dict) -> int:
+   data = { 
+    'method': 'track.getInfo',
+    'api_key': self.apikey,
+    'artist': track['artist']['#text'],
+    'track': track['name'],
+    'format': 'json',
+    'username': user 
+   }
+   return (await self.do_request(data))['track']['userplaycount']
 
-    async def profile(self, username: str) -> Profile:
-    
-        data = await self.request(
-            method="user.getinfo",
-            username=username,
-            slug="user",
-        )
+  async def get_album_playcount(self, user: str, track: dict) -> int:
+   data = {
+    'method': 'album.getInfo',
+    'api_key': self.apikey,
+    'artist': track['artist']['#text'],
+    'album': track['album']['#text'],
+    'format': 'json',
+    'username': user 
+   }
+   return (await self.do_request(data))['album']['userplaycount']
 
-        return Profile(
-            url=data.url,
-            username=data.name,
-            display_name=data.realname,
-            country=data.country if data.country != "None" else "Unknown",
-            avatar=data.image[-1]["#text"],
-            tracks=int(data.track_count),
-            albums=int(data.album_count),
-            artists=int(data.artist_count),
-            scrobbles=int(data.playcount),
-            registered=int(data.registered.unixtime),
-            pro=data.subscriber == "1",
-            nowplaying=data.getRecentTracks
-        )
-    
+  async def get_artist_playcount(self, user: str, artist: str) -> int:
+   data = {
+    'method': 'artist.getInfo',
+    'api_key': self.apikey,
+    'artist': artist,
+    'format': 'json', 
+    'username': user
+    }
+   return (await self.do_request(data))['artist']['stats']['userplaycount']
 
-    async def now_playing(self, username: str) -> Optional[str]:
-        data = await self.request(
-            method="user.getRecentTracks",
-            username=username,
-            limit=1
-        )
-        track_info = data.recenttracks.track[0] if 'recenttracks' in data and 'track' in data.recenttracks else None
+  async def get_album(self, track: dict) -> dict:
+    data = {
+      'method': 'album.getInfo',
+      'api_key': self.apikey, 
+      'artist': track['artist']['#text'],
+      'album': track['album']['#text'],
+      'format': 'json'
+    }
+    return (await self.do_request(data))['album']
 
-        if track_info and track_info.get('@attr', {}).get('nowplaying') == 'true':
-            track_name = track_info['name']
-            artist_name = track_info['artist']['#text']
-            return f"{track_name} by - {artist_name}"
+  async def get_track(self, track: dict) -> dict:
+    data = {
+      'method': 'album.getInfo',
+      'api_key': self.apikey, 
+      'artist': track['artist']['#text'],
+      'track': track['track']['#text'],
+      'format': 'json'
+    }
+    return await self.do_request(data)
 
-        return None
+  async def get_user_info(self, user: str) -> dict:
+    data = {
+      'method': 'user.getinfo',
+      'user': user,
+      'api_key': self.apikey,
+      'format': 'json'
+    } 
+    return await self.do_request(data)
+
+  async def get_top_artists(self, user: str, count: int) -> dict:
+    data = {
+      'method': 'user.getTopArtists',
+      'user': user, 
+      'api_key': self.apikey,
+      'format': 'json',
+      'limit': count
+    }
+    return await self.do_request(data)
+
+  async def get_top_tracks(self, user: str, count: int) -> dict:
+    data = {
+      'method': 'user.getTopTracks',
+      'user': user, 
+      'api_key': self.apikey,
+      'format': 'json',
+      "period" : "overall",
+      'limit': count
+    }
+    return await self.do_request(data)
+  
+  async def get_top_albums(self, user: str, count: int) -> dict: 
+    params= {
+      "api_key" : self.apikey,
+      "user" : user,
+      "period" : "overall",
+      "limit" : count,
+      "method":"user.getTopAlbums",
+      "format":"json"
+      }
+    return await self.do_request(params)
+
+  async def get_tracks_recent(self, user: str, count: int) -> dict:
+    data = {
+      'method': 'user.getrecenttracks',
+      'user': user,
+      'api_key': self.apikey,
+      'format': 'json',
+      'limit': count
+    } 
+    return await self.do_request(data)
