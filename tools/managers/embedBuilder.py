@@ -72,7 +72,7 @@ class EmbedBuilder:
       else: 
         params=params.replace('{guild.icon}', "https://none.none")     
     if '{track.name}' in params:
-        params=params.replace('{track.name}', f"{self.FMHandler.get_track}")
+        params=params.replace('{track.name}', f"{FMHandler.get_track}")
 
     return params
 
