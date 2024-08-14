@@ -138,9 +138,8 @@ class LastFM(Cog):
             alias = data['command']
             if message.content.strip().lower() == alias:
                 ctx = await self.bot.get_context(message)
-                await ctx.invoke(self.bot.get_command('lf np'))
-                await self.bot.process_commands(message)
-                return
+                return await ctx.invoke(self.bot.get_command('lf np'))
+                
 
     @command(
         name = "nowplaying",
