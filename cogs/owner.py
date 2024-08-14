@@ -243,6 +243,40 @@ class Owner(Cog):
             embed = discord.Embed(description=f"Failed to ban **{member}** globally.", color=Colors.BASE_COLOR)
             await initial_message.edit(embed=embed)
 
+    @commands.group(
+        name = "premium",
+        description = "Gives / revokes a users premium."
+    )
+    @is_owner()
+    async def premium(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+    
+    @premium.command(
+        name = "add",
+        aliases = ["give"],
+        description = "Give a user premium."
+    )
+    @is_owner()
+    async def premium_give(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
+        if user is None:
+            return await ctx.warn(f"User cannot be none.")
+        
+        await self.bot.pool.execute("INSERT INTO premium WHERE user_id = $1", user.id)
+        return await ctx.approve(f"**{user.name}** has been **granted** premium.")
+    
+    @premium.command(
+        name = "remove",
+        aliases = ["take", "revoke"],
+        description = "Revokes a user premium."
+    )
+    @is_owner()
+    async def premium_give(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
+        if user is None:
+            return await ctx.warn(f"User cannot be none.")
+        
+        await self.bot.pool.execute("DELETE FROM premium WHERE user_id = $1", user.id)
+        return await ctx.approve(f"**{user.name}'s** premium has been **revoked**.")
+
 
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Owner(bot))
