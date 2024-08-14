@@ -239,12 +239,7 @@ class LastFM(Cog):
         await self.bot.pool.execute("UPDATE lastfm SET command = $1 WHERE user_id = $2", None, ctx.author.id)
         return await ctx.lastfm("**Deleted** your LastFM **custom command.**")
 
-    @lastfm.group(
-        name = "mode",
-        aliases = ["embed"],
-        description = "Setup your custom LastFM mode embed.",
-        invoke_without_command = True
-    )
+
 
 
 async def setup(bot: Heal):
