@@ -135,7 +135,7 @@ class LastFM(Cog):
         data = await self.bot.pool.fetchrow("SELECT command FROM lastfm WHERE user_id = $1", message.author.id)
         
         if data:
-            alias = data['alias_name'].strip().lower()
+            alias = data['command'].strip().lower()
             if message.content.strip().lower() == alias:
                 ctx = await self.bot.get_context(message)
                 await ctx.invoke(self.bot.get_command('lf np'))
