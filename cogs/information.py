@@ -101,7 +101,6 @@ class Information(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def userinfo(self, ctx: Context, *, user: Union[discord.Member, discord.User] = None):
 
-
         if isinstance(user, int):
             try:
                 user = await self.bot.fetch_user(user)
@@ -110,39 +109,12 @@ class Information(commands.Cog):
         else:
             user = user or ctx.author
 
+
         data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", user.id)
-        if not data:
-            return None
-
-        lastfm_username = data["lfuser"]
-        async with aiohttp.ClientSession() as session:
-            params = {
-                'method': 'user.getRecentTracks',
-                'user': lastfm_username,
-                'api_key': "bc8082588489f949216859abba6e52be",
-                'format': 'json',
-                'limit': 1
-            }
-            async with session.get('http://ws.audioscrobbler.com/2.0/', params=params) as response:
-                if response.status != 200:
-                    return await ctx.deny("Failed to connect to LastFM API.")
-
-                data = await response.json()
-                if 'recenttracks' not in data or 'track' not in data['recenttracks']:
-                    return await ctx.warn(f"Could not retrieve data for user: {lastfm_username}")
-
-                track_info = data['recenttracks']['track'][0]
-
-                now_playing = track_info.get('@attr', {}).get('nowplaying') == 'true'
-
-                track_name = track_info['name']
-                artist_name = track_info['artist']['#text']
-                album_name = track_info.get('album', {}).get('#text', 'Unknown Album')
-                track_url = track_info['url']
-                album_art = track_info['image'][-1]['#text']
-
+        
         title = f"{user.name}"
-        description=""
+        description = ""
+
 
         if user.id == 187747524646404105:  # me
             title += " <:owner:1270728554388394086> <:staff:1270729949686534206> <:dev:1270730817458405468> "
@@ -153,21 +125,13 @@ class Information(commands.Cog):
         if user.id == 1261756025275547719:  # neca
             title += " <:staff:1270729949686534206>"
         if user.id == 1211110597345812501:
-                title += " <:staff:1270729949686534206>"
-        
-        if now_playing:
-            description += f"{Emojis.LASTFM} **Listening to [{track_name}]({track_url}) by {artist_name}**"
-        else:
-            description = ""
-            
+            title += " <:staff:1270729949686534206>"
 
         embed = discord.Embed(
             title=title,
-            description = description,
             color=Colors.BASE_COLOR
         )
         embed.add_field(name="Created", value=format_dt(user.created_at, style='f'), inline=True)
-
 
         if isinstance(user, discord.Member) and user.joined_at:
             all_members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
@@ -179,10 +143,34 @@ class Information(commands.Cog):
             join_position_ordinal = get_ordinal(position)
             embed.add_field(name=f"Joined {join_position_ordinal}", value=f"{format_dt(user.joined_at, style='f')}", inline=True)
             embed.add_field(name="Roles", value=roles_list, inline=False)
-        else:
-            pass
 
         embed.set_thumbnail(url=user.avatar.url)
+
+        if data:
+            lastfm_username = data["lfuser"]
+            async with aiohttp.ClientSession() as session:
+                params = {
+                    'method': 'user.getRecentTracks',
+                    'user': lastfm_username,
+                    'api_key': "bc8082588489f949216859abba6e52be",
+                    'format': 'json',
+                    'limit': 1
+                }
+                async with session.get('http://ws.audioscrobbler.com/2.0/', params=params) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        if 'recenttracks' in data and 'track' in data['recenttracks']:
+                            track_info = data['recenttracks']['track'][0]
+                            now_playing = track_info.get('@attr', {}).get('nowplaying') == 'true'
+                            if now_playing:
+                                track_name = track_info['name']
+                                artist_name = track_info['artist']['#text']
+                                track_url = track_info['url']
+                                description += f"> {Emojis.LASTFM} **Listening to [{track_name}]({track_url}) by {artist_name}**"
+                                embed.description = description
+                                album_art = track_info['image'][-1]['#text']
+                                if album_art:
+                                    embed.set_thumbnail(url=album_art)
 
         await ctx.send(embed=embed)
 
