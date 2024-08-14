@@ -77,49 +77,46 @@ class LastFM(Cog):
         aliases = ["np"]
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def lastfm_nowplaying(self, ctx: Context, *, user: Union[discord.Member, discord.User] = None):
+    async def lastfm_nowplaying(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
         if user is None:
             user = ctx.author
-        
         await ctx.typing()
+        data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", user.id)
+        if not data:
+            return await ctx.lastfm(f"**{user.name}** hasn't got their LastFM account linked.")
 
-        alias_data = await self.bot.pool.fetchrow("SELECT lfuser FROM lastfm WHERE user_id = $1 AND command = $2", ctx.author.id, user.name)
-        
-        if alias_data:
-            lastfm_username = alias_data['lastfm_username']
-        else:
-            data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", user.id)
-            if not data:
-                return await ctx.lastfm(f"**{user.name}** hasn't got their LastFM account linked.")
-            lastfm_username = data["lfuser"]
-
+        lastfm_username = data["lfuser"]
         async with aiohttp.ClientSession() as session:
             params = {
                 'method': 'user.getRecentTracks',
                 'user': lastfm_username,
-                'api_key': "bc8082588489f949216859abba6e52be", 
+                'api_key': "bc8082588489f949216859abba6e52be",
                 'format': 'json',
                 'limit': 1
             }
             async with session.get('http://ws.audioscrobbler.com/2.0/', params=params) as response:
                 if response.status != 200:
-                    return await ctx.send("Failed to connect to LastFM API.")
+                    return await ctx.deny("Failed to connect to LastFM API.")
 
                 data = await response.json()
                 if 'recenttracks' not in data or 'track' not in data['recenttracks']:
-                    return await ctx.send(f"Could not retrieve data for user: {lastfm_username}")
+                    return await ctx.warn(f"Could not retrieve data for user: {lastfm_username}")
 
                 track_info = data['recenttracks']['track'][0]
+
                 now_playing = track_info.get('@attr', {}).get('nowplaying') == 'true'
+
                 track_name = track_info['name']
                 artist_name = track_info['artist']['#text']
                 album_name = track_info.get('album', {}).get('#text', 'Unknown Album')
                 track_url = track_info['url']
-                album_art = track_info['image'][-1]['#text'] if track_info['image'] else None
+                album_art = track_info['image'][-1]['#text']
 
-                embed = discord.Embed(color=Colors.BASE_COLOR)
-                embed.add_field(name="**Track**", value=f"[{track_name}]({track_url})", inline=True)
-                embed.add_field(name="**Artist**", value=artist_name, inline=False)
+                embed = discord.Embed(
+                    color=Colors.BASE_COLOR
+                )
+                embed.add_field(name = "**Track**", value = f"[{track_name}]({track_url})", inline  = True)
+                embed.add_field(name = "**Artist**", value = f"{artist_name}", inline = False)
                 embed.set_author(name=f"{lastfm_username}")
                 if album_art:
                     embed.set_thumbnail(url=album_art)
@@ -128,6 +125,17 @@ class LastFM(Cog):
                 message = await ctx.send(embed=embed)
                 await message.add_reaction("👍")
                 await message.add_reaction("👎")
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message) -> Message:
+        if message.author.bot:
+            return
+        data = await self.bot.pool.fetchrow("SELECT command FROM lastfm WHERE user_id = $1", message.author.id)
+        if data:
+            alias = data['command']
+            if message.content.strip().lower() == alias.lower():
+                ctx = await self.bot.get_context(message)
+                await self.lastfm_nowplaying(ctx, user=message.author)
 
     @command(
         name = "nowplaying",
