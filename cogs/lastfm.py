@@ -201,6 +201,7 @@ class LastFM(Cog):
         description = "Set your customcommand"
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
+    @has_perks()
     async def lastfm_customcommand_set(self, ctx: Context, *, customcommand: str = None):
         if customcommand is None:
             return await ctx.send_help(ctx.command)
