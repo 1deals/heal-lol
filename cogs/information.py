@@ -100,6 +100,16 @@ class Information(commands.Cog):
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def userinfo(self, ctx: Context, *, user: Union[discord.Member, discord.User] = None):
+
+
+        if isinstance(user, int):
+            try:
+                user = await self.bot.fetch_user(user)
+            except discord.NotFound:
+                return await ctx.warn("User not found.")
+        else:
+            user = user or ctx.author
+
         data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", user.id)
         if not data:
             return None
@@ -130,15 +140,6 @@ class Information(commands.Cog):
                 album_name = track_info.get('album', {}).get('#text', 'Unknown Album')
                 track_url = track_info['url']
                 album_art = track_info['image'][-1]['#text']
-
-
-        if isinstance(user, int):
-            try:
-                user = await self.bot.fetch_user(user)
-            except discord.NotFound:
-                return await ctx.send("User not found.")
-        else:
-            user = user or ctx.author
 
         title = f"{user.name}"
         description=""
