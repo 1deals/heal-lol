@@ -127,15 +127,20 @@ class LastFM(Cog):
                 await message.add_reaction("👎")
 
     @commands.Cog.listener()
-    async def on_message(self, message: discord.Message) -> Message:
+    async def on_message(self, message: discord.Message):
         if message.author.bot:
             return
+
+       
         data = await self.bot.pool.fetchrow("SELECT command FROM lastfm WHERE user_id = $1", message.author.id)
+        
         if data:
-            alias = data['command']
+            alias = data['alias_name'].strip().lower()
             if message.content.strip().lower() == alias:
                 ctx = await self.bot.get_context(message)
-                await self.lastfm_nowplaying(ctx, user=message.author)
+                await ctx.invoke(self.bot.get_command('lf np'))
+                await self.bot.process_commands(message)
+                return
 
     @command(
         name = "nowplaying",
