@@ -192,7 +192,7 @@ class LastFM(Cog):
         if customcommand is None:
             return await ctx.send_help(ctx.command)
         
-        await self.bot.pool.execute("INSERT INTO lastfm (user_id, command) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET command = $1", ctx.author.id ,customcommand)
+        await self.bot.pool.execute("INSERT INTO lastfm (user_id, command) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET command = $2", ctx.author.id , customcommand)
         return await ctx.lastfm(f"Set your **custom command** to **`{customcommand}`**")
 
 
