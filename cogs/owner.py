@@ -270,7 +270,7 @@ class Owner(Cog):
         description = "Revokes a user premium."
     )
     @is_owner()
-    async def premium_give(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
+    async def premium_revoke(self, ctx: Context, *, user: Union[discord.Member, discord.User]= None):
         if user is None:
             return await ctx.warn(f"User cannot be none.")
         
