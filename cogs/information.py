@@ -100,6 +100,38 @@ class Information(commands.Cog):
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def userinfo(self, ctx: Context, *, user: Union[discord.Member, discord.User] = None):
+        data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", user.id)
+        if not data:
+            return None
+
+        lastfm_username = data["lfuser"]
+        async with aiohttp.ClientSession() as session:
+            params = {
+                'method': 'user.getRecentTracks',
+                'user': lastfm_username,
+                'api_key': "bc8082588489f949216859abba6e52be",
+                'format': 'json',
+                'limit': 1
+            }
+            async with session.get('http://ws.audioscrobbler.com/2.0/', params=params) as response:
+                if response.status != 200:
+                    return await ctx.deny("Failed to connect to LastFM API.")
+
+                data = await response.json()
+                if 'recenttracks' not in data or 'track' not in data['recenttracks']:
+                    return await ctx.warn(f"Could not retrieve data for user: {lastfm_username}")
+
+                track_info = data['recenttracks']['track'][0]
+
+                now_playing = track_info.get('@attr', {}).get('nowplaying') == 'true'
+
+                track_name = track_info['name']
+                artist_name = track_info['artist']['#text']
+                album_name = track_info.get('album', {}).get('#text', 'Unknown Album')
+                track_url = track_info['url']
+                album_art = track_info['image'][-1]['#text']
+
+
         if isinstance(user, int):
             try:
                 user = await self.bot.fetch_user(user)
@@ -109,7 +141,7 @@ class Information(commands.Cog):
             user = user or ctx.author
 
         title = f"{user.name}"
-
+        description=""
 
         if user.id == 187747524646404105:  # me
             title += " <:owner:1270728554388394086> <:staff:1270729949686534206> <:dev:1270730817458405468> "
@@ -121,10 +153,14 @@ class Information(commands.Cog):
             title += " <:staff:1270729949686534206>"
         if user.id == 1211110597345812501:
                 title += " <:staff:1270729949686534206>"
+        
+        if now_playing:
+            description += f"{Emojis.LASTFM} **Listening to [{track_name}]({track_url}) by {artist_name}**"
+            
 
         embed = discord.Embed(
             title=title,
-            description="",
+            description = description,
             color=Colors.BASE_COLOR
         )
         embed.add_field(name="Created", value=format_dt(user.created_at, style='f'), inline=True)
