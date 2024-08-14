@@ -19,6 +19,7 @@ import io, re
 from PIL import Image, ImageDraw, ImageFont
 import random 
 from random import choice
+from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 
 class Utility(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -480,7 +481,14 @@ class Utility(commands.Cog):
                     await ctx.warn("Failed to screenshot. Try again later.")
         
 
-
+    @commands.command(
+        name = "createembed",
+        aliases = ["ce"],
+        description = "Create an embed."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def createembed(self, ctx: Context,  *, code: EmbedScript):
+        await ctx.send(**code)
     
 
 async def setup(bot: Heal):

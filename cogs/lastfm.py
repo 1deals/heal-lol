@@ -21,6 +21,7 @@ import traceback
 from tools.heal import Heal
 from tools.managers.lastfm import FMHandler
 from tools.managers.context import Context, Emojis, Colors
+from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 
 def has_perks():
   async def predicate(ctx: Context):
@@ -224,6 +225,17 @@ class LastFM(Cog):
         
         await self.bot.pool.execute("UPDATE lastfm SET command = $1 WHERE user_id = $2", None, ctx.author.id)
         return await ctx.lastfm("**Deleted** your LastFM **custom command.**")
+
+    @lastfm.group(
+        name = "mode",
+        aliases = ["embed"],
+        description = "Setup your custom LastFM mode embed.",
+        invoke_without_command = True
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @has_perks()
+    async def lastfm_mode(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
 
 
 async def setup(bot: Heal):
