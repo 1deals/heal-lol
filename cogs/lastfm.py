@@ -133,7 +133,7 @@ class LastFM(Cog):
         data = await self.bot.pool.fetchrow("SELECT command FROM lastfm WHERE user_id = $1", message.author.id)
         if data:
             alias = data['command']
-            if message.content.strip().lower() == alias.lower():
+            if message.content.strip().lower() == alias:
                 ctx = await self.bot.get_context(message)
                 await self.lastfm_nowplaying(ctx, user=message.author)
 

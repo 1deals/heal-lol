@@ -93,4 +93,4 @@ CREATE TABLE IF NOT EXISTS lastfm(
     lfuser TEXT,
     mode TEXT,
     command TEXT
-)
+);
