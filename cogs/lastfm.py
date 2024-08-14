@@ -140,7 +140,7 @@ class LastFM(Cog):
                 context = await self.bot.get_context(message)
                 await context.invoke(self.bot.get_command("fm np"))
         else:
-            await self.bot.process_commands(message)
+            pass
                 
 
     @command(
