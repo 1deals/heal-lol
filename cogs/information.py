@@ -157,6 +157,8 @@ class Information(commands.Cog):
         
         if now_playing:
             description += f"{Emojis.LASTFM} **Listening to [{track_name}]({track_url}) by {artist_name}**"
+        else:
+            description = ""
             
 
         embed = discord.Embed(
