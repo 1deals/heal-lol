@@ -112,3 +112,15 @@ class FMHandler(object):
       'limit': count
     } 
     return await self.do_request(data)
+  
+  async def get_now_playing(self, user: str) -> dict:
+        data = {
+            'method': 'user.getrecenttracks',
+            'user': user,
+            'api_key': self.apikey,
+            'format': 'json',
+            'limit': 1
+        }
+        result = await self.do_request(data)
+        track = result.get('recenttracks', {}).get('track', [None])[0]
+        return track if track and '@attr' in track and 'nowplaying' in track['@attr'] else None

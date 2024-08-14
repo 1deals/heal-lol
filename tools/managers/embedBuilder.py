@@ -5,6 +5,7 @@ from tools.managers.lastfm import FMHandler
 
 
 class EmbedBuilder:
+ FMHandler = FMHandler
  def ordinal(self, num: int) -> str:
    """Convert from number to ordinal (10 - 10th)""" 
    numb = str(num) 
@@ -13,7 +14,11 @@ class EmbedBuilder:
    if numb.endswith("1"): return numb + "st"
    elif numb.endswith("2"):  return numb + "nd"
    elif numb.endswith("3"): return numb + "rd"
-   else: return numb + "th"    
+   else: return numb + "th"   
+
+ async def lfuser(self, message: discord.Message):
+    lfuser = await self.pool.fetchval("SELECT lfuser FROM lastfm WHERE user_id = $1", message.author.id)
+    return lfuser 
 
  def get_parts(params):
     params=params.replace('{embed}', '')
@@ -65,9 +70,9 @@ class EmbedBuilder:
       if user.guild.icon:
         params=params.replace('{guild.icon}', user.guild.icon.url)
       else: 
-        params=params.replace('{guild.icon}', "https://none.none")       
+        params=params.replace('{guild.icon}', "https://none.none")     
     if '{track.name}' in params:
-        params=params.replace('{track.name}', f"{self.FMHandeler.get_track}")
+        params=params.replace('{track.name}', f"{self.FMHandler.get_track}")
 
     return params
 
