@@ -90,7 +90,6 @@ class Server(Cog):
     @commands.has_permissions(manage_messages = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def welcome_set(self, ctx: Context, channel: discord.TextChannel = None, *, message: str = None):
-
         if channel or message is None:
             return await ctx.send_help(ctx.command)
         
@@ -114,6 +113,35 @@ class Server(Cog):
                 await ctx.send(content=content, embed=embed, view=view)
             else:
                 await ctx.send(content=processed_message)
+
+    @welcome.command(
+            name = "message",
+            description = "Set a welcome message for the guild."
+    )
+    @commands.has_permissions(manage_messages = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def welcome_message(self, ctx: Context, *, message: EmbedScript = None):
+        if message is None:
+            return await ctx.send_help(ctx.command)
+        
+        await self.bot.pool.execute(
+                """
+                INSERT INTO welcome (guild_id, message)
+                VALUES ($1,$2)
+                ON CONFLICT (guild_id)
+                DO UPDATE SET message = $3
+                """,
+                ctx.guild.id, message
+            )
+
+        processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+        content, embed, view = await EmbedBuilder.to_object(processed_message)
+            
+        await ctx.approve(f"Set the **welcome** message to:")
+        if content or embed:
+            await ctx.send(content=content, embed=embed, view=view)
+        else:
+            await ctx.send(content=processed_message)
 
     @welcome.command(
         name = "remove",
