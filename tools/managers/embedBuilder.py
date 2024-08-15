@@ -1,11 +1,9 @@
 import sys, os, discord
 from discord.ext import commands
 from typing import Union
-from tools.managers.lastfm import FMHandler
 
 
 class EmbedBuilder:
- FMHandler = FMHandler
  def ordinal(self, num: int) -> str:
    """Convert from number to ordinal (10 - 10th)""" 
    numb = str(num) 
@@ -14,17 +12,13 @@ class EmbedBuilder:
    if numb.endswith("1"): return numb + "st"
    elif numb.endswith("2"):  return numb + "nd"
    elif numb.endswith("3"): return numb + "rd"
-   else: return numb + "th"   
-
- async def lfuser(self, message: discord.Message):
-    lfuser = await self.pool.fetchval("SELECT lfuser FROM lastfm WHERE user_id = $1", message.author.id)
-    return lfuser 
+   else: return numb + "th"    
 
  def get_parts(params):
     params=params.replace('{embed}', '')
     return [p[1:][:-1] for p in params.split('$v')]
 
- def embed_replacement(self, user: discord.Member, params: str=None):
+ def embed_replacement(user: discord.Member, params: str=None):
     if params is None: return None
     if '{user}' in params:
         params=params.replace('{user}', str(user.name) + "#" + str(user.discriminator))
@@ -70,7 +64,7 @@ class EmbedBuilder:
       if user.guild.icon:
         params=params.replace('{guild.icon}', user.guild.icon.url)
       else: 
-        params=params.replace('{guild.icon}', "https://none.none")     
+        params=params.replace('{guild.icon}', "https://none.none")        
 
     return params
 
