@@ -72,7 +72,7 @@ class Information(commands.Cog):
     
             for _ in range(4):
                     start_time = datetime.datetime.utcnow()
-                    await ctx.trigger_typing()  #
+                    await ctx.typing()  #
                     end_time = datetime.datetime.utcnow()
         
 
