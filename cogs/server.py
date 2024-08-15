@@ -120,7 +120,7 @@ class Server(Cog):
     )
     @commands.has_permissions(manage_messages = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_message(self, ctx: Context, *, message: EmbedScript = None):
+    async def welcome_message(self, ctx: Context, *, message: str = None):
         if message is None:
             return await ctx.send_help(ctx.command)
         
