@@ -83,52 +83,33 @@ class Server(Cog):
         return await ctx.send_help(ctx.command)
 
     @welcome.command(
-        name = "channel",
-        aliases = ["chan", "chnl"],
-        description = "Add the welcome channel."
+        name = "set",
+        aliases = ["add", "config"],
+        description = "Setup a welcome channel and message."
     )
     @commands.has_permissions(manage_messages = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_channel(self, ctx: Context, *, channel: discord.TextChannel = None):
-        if channel is None:
+    async def welcome_set(self, ctx: Context, channel: discord.TextChannel = None, *, message: str = None):
+
+        if channel or message is None:
             return await ctx.send_help(ctx.command)
         
-        await self.bot.pool.execute(
-            """
-            INSERT INTO welcome (guild_id, channel_id) 
-            VALUES ($1, $2) 
-            ON CONFLICT (guild_id) 
-            DO UPDATE SET channel_id = EXCLUDED.channel_id
-            """,
-            ctx.guild.id, channel.id
-        )
-        await ctx.approve(f"**Welcome** channel has been configured to: {channel.mention}")
-
-    @welcome.command(
-        name = "message",
-        aliases = ["msg", "mes"],
-        description = "Set the welcome message."
-    )
-    @commands.has_permissions(manage_messages = True)
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_message(self, ctx: Context, *, message: str = None):
-        if message is None:
-            return await ctx.warn(f"A **message** is required.")
         else:
+
             await self.bot.pool.execute(
                 """
-                INSERT INTO welcome (guild_id, message)
-                VALUES ($1, $2)
-                ON CONFLICT (guild_id)
-                DO UPDATE SET message = $2
+                INSERT INTO welcome (guild_id, channel_id, message)
+                VALUES ($1,$2,$3)
+                ON CONFLICT (guild_id, channel_id)
+                DO UPDATE SET message = $3
                 """,
-                ctx.guild.id, message
+                ctx.guild.id, channel.id, message
             )
 
-            processed_message = await EmbedBuilder().embed_replacement(ctx.author, message)
+            processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
             content, embed, view = await EmbedBuilder.to_object(processed_message)
             
-            await ctx.approve(f"Set the **welcome** message to:")
+            await ctx.approve(f"Set the **welcome** message in {channel.mention} to:")
             if content or embed:
                 await ctx.send(content=content, embed=embed, view=view)
             else:
