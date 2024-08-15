@@ -357,6 +357,9 @@ class Utility(commands.Cog):
         if len(prefix) > 10:
             return await ctx.deny(f"Your **selfprefix** cannot be more than `10` characters long.")
 
+        if prefix == '':
+            await self.bot.pool.execute("INSERT INTO selfprefix (user_id, prefix) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET prefix = $2", ctx.author.id, '')
+
         await self.bot.pool.execute(
             """
             INSERT INTO selfprefix (user_id, prefix)
