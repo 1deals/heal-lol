@@ -67,12 +67,12 @@ class Information(commands.Cog):
             'onlyfans.com', '911', 'no one', 'tiktok', 'github', 'lucky bro', 
             'a connection to the server']
     
-        latencies = []
+            latencies = []
     
-        for _ in range(4):
-                start_time = datetime.datetime.utcnow()
-                await ctx.trigger_typing()  # Simulate a request without actually sending a messag
-                end_time = datetime.datetime.utcnow()
+            for _ in range(4):
+                    start_time = datetime.datetime.utcnow()
+                    await ctx.trigger_typing()  # Simulate a request without actually sending a messag
+                    end_time = datetime.datetime.utcnow()
         
         # Calculate the latency in milliseconds
         latency_ms = (end_time - start_time).total_seconds() * 1000
