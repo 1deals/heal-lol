@@ -33,7 +33,7 @@ logging.basicConfig(level=logging.INFO)
 intents = discord.Intents.all()
 intents.presences = False
 
-class Heal(commands.Bot):
+class Heal(commands.AutoShardedBot):
     def __init__(self):
         self.errors = Dict[str, commands.CommandError]
         self._uptime = time.time()
@@ -42,7 +42,6 @@ class Heal(commands.Bot):
             command_prefix=';',
             help_command=HealHelp(),
             intents=intents,
-            shards = "2",
             allowed_mentions=discord.AllowedMentions(
                 everyone=False,
                 users=True,
