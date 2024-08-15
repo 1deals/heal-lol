@@ -113,22 +113,19 @@ class Server(Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def welcome_message(self, ctx: Context, *, message: str = None):
         if message is None:
-
             return await ctx.warn(f"A **message** is required.")
-        
         else:
-
             await self.bot.pool.execute(
                 """
                 INSERT INTO welcome (guild_id, message)
-                VALUES ($1,$2)
+                VALUES ($1, $2)
                 ON CONFLICT (guild_id)
-                DO UPDATE SET message = $3
+                DO UPDATE SET message = $2
                 """,
                 ctx.guild.id, message
             )
 
-            processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+            processed_message = await EmbedBuilder().embed_replacement(ctx.author, message)
             content, embed, view = await EmbedBuilder.to_object(processed_message)
             
             await ctx.approve(f"Set the **welcome** message to:")
