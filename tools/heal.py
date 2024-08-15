@@ -42,6 +42,7 @@ class Heal(commands.Bot):
             command_prefix=';',
             help_command=HealHelp(),
             intents=intents,
+            shards = "2",
             allowed_mentions=discord.AllowedMentions(
                 everyone=False,
                 users=True,
