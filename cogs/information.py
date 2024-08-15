@@ -70,9 +70,9 @@ class Information(commands.Cog):
     
             latencies = []
     
-            for _ in range(4):
+            for _ in range(1):
                     start_time = datetime.datetime.utcnow()
-                    await ctx.typing()  #
+                    message = await ctx.send("ping..")
                     end_time = datetime.datetime.utcnow()
         
 
@@ -85,11 +85,8 @@ class Information(commands.Cog):
 
             websocket_latency = int(self.bot.latency * 1000)
 
-
-            await ctx.send(
-                content=f"it took `{websocket_latency}ms` to ping **{random.choice(list)}** "
-                        f"(Rest: `{average_latency:.2f}ms`)"
-                        )
+            await message.edit( content=f"it took `{websocket_latency}ms` to ping **{random.choice(list)}** "
+                        f"(Rest: `{average_latency:.2f}ms`)")
             
 
     @hybrid_command(
