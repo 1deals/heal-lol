@@ -121,7 +121,7 @@ class Server(Cog):
             await self.bot.pool.execute(
                 """
                 INSERT INTO welcome (guild_id, message)
-                VALUES ($1,$2,$3)
+                VALUES ($1,$2)
                 ON CONFLICT (guild_id)
                 DO UPDATE SET message = $3
                 """,
