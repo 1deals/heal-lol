@@ -489,6 +489,24 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def createembed(self, ctx: Context,  *, code: EmbedScript):
         await ctx.send(**code)
+
+    @command(
+        name = "firstmsg",
+        description = "Get the first message in the channel."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def firstmessage(self, ctx: Context):
+        await ctx.typing()
+        async for message in ctx.channel.history(limit=1, oldest_first=True):
+            await ctx.reply(
+                view=discord.ui.View().add_item(
+                    discord.ui.Button(
+                        style=discord.ButtonStyle.link,
+                        label="first message",
+                        url=message.jump_url,
+                    )
+                )
+            )
     
 
 async def setup(bot: Heal):
