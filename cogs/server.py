@@ -173,7 +173,7 @@ class Server(Cog):
             if channel is None:
                 return
             
-            message = res["msg"]
+            message = res["message"]
             processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
             content, embed, view = await EmbedBuilder.to_object(processed_message)
             
