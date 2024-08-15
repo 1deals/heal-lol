@@ -83,36 +83,25 @@ class Server(Cog):
         return await ctx.send_help(ctx.command)
 
     @welcome.command(
-        name = "set",
-        aliases = ["add", "config"],
-        description = "Setup a welcome channel and message."
+            name = "channel",
+            description = "Set a welcome channel for the guild."
     )
     @commands.has_permissions(manage_messages = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_set(self, ctx: Context, channel: discord.TextChannel = None, *, message: str = None):
-        if channel or message is None:
+    async def welcome_channel(self, ctx: Context, *, channel: discord.TextChannel = None):
+        if channel is None:
             return await ctx.send_help(ctx.command)
         
-        else:
-
-            await self.bot.pool.execute(
-                """
-                INSERT INTO welcome (guild_id, channel_id, message)
-                VALUES ($1,$2,$3)
-                ON CONFLICT (guild_id, channel_id)
-                DO UPDATE SET message = $3
-                """,
-                ctx.guild.id, channel.id, message
-            )
-
-            processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
-            content, embed, view = await EmbedBuilder.to_object(processed_message)
-            
-            await ctx.approve(f"Set the **welcome** message in {channel.mention} to:")
-            if content or embed:
-                await ctx.send(content=content, embed=embed, view=view)
-            else:
-                await ctx.send(content=processed_message)
+        await self.bot.pool.execute(
+            """
+            INSERT INTO welcome (guild_id, channel_id)
+            VALUES ($1, $2)
+            ON CONFLICT (guild_id)
+            DO UPDATE SET channel_id = $2
+            """,
+            ctx.guild.id, channel.id
+        )
+        await ctx.approve(f"Set the **welcome channel** to {channel.mention}")
 
     @welcome.command(
             name = "message",
