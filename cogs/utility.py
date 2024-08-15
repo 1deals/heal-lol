@@ -350,7 +350,7 @@ class Utility(commands.Cog):
         description = "Set your selfprefix"
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def selfprefix_set(self, ctx: Context, *, prefix: str = None):
+    async def selfprefix_set(self, ctx: Context, *, prefix = None):
         if prefix is None:
             return await ctx.send_help(ctx.command)
 
