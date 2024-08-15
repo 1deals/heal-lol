@@ -53,23 +53,42 @@ class Information(commands.Cog):
             print(e) 
 
     @hybrid_command(
-        name = "ping",
-        aliases = ["heartbeat", "latency", "websocket"],
-        usage = "ping"
+    name="ping",
+    aliases=["heartbeat", "latency", "websocket"],
+    usage="ping"
+
     )
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    @cooldown(1, 5, commands.BucketType.user)
+    @cooldown(1, 5, BucketType.user)
     async def ping(self, ctx: Context):
-        list = ["china", "north korea", "your ip", "localhost", "heal", "discord", "your mom", 'horny asian women', 'discord.com', 'google.com', 'healbot.lol', 'instagram', 'onlyfans.com', '911', 'no one', 'tiktok', 'github', 'lucky bro', 'a connection to the server']
-
-        start = time.time()
-        message = await ctx.send(content="pong!")
-        finished = time.time() - start
-
-        return await message.edit(
-            content=f"it took `{int(self.bot.latency * 1000)}ms` to ping **{choice(list)}** (edit: `{finished:.2f}ms`)"
-        )
+            list = ["china", "north korea", "your ip", "localhost", "heal", "discord", "your mom", 
+            'horny asian women', 'discord.com', 'google.com', 'healbot.lol', 'instagram', 
+            'onlyfans.com', '911', 'no one', 'tiktok', 'github', 'lucky bro', 
+            'a connection to the server']
+    
+        latencies = []
+    
+        for _ in range(4):
+                start_time = datetime.datetime.utcnow()
+                await ctx.trigger_typing()  # Simulate a request without actually sending a messag
+                end_time = datetime.datetime.utcnow()
+        
+        # Calculate the latency in milliseconds
+        latency_ms = (end_time - start_time).total_seconds() * 1000
+        latencies.append(latency_ms)
+    
+    # Calculate the average latency
+    average_latency = sum(latencies) / len(latencies)
+    
+    # Get the bot's latency (this is for websocket latency, not the message latency)
+    websocket_latency = int(self.bot.latency * 1000)
+    
+    # Send the "pong" message once, with the calculated latencies
+    message = await ctx.send(
+        content=f"it took `{websocket_latency}ms` to ping **{random.choice(list)}** "
+                f"(edit: `{average_latency:.2f}ms`)"
+    )
 
     @hybrid_command(
         name = "invite",
