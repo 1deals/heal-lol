@@ -63,30 +63,7 @@ class Information(commands.Cog):
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @cooldown(1, 5, BucketType.user)
     async def ping(self, ctx: Context):
-            list = ["china", "north korea", "your ip", "localhost", "heal", "discord", "your mom", 
-            'horny asian women', 'discord.com', 'google.com', 'healbot.lol', 'instagram', 
-            'onlyfans.com', '911', 'no one', 'tiktok', 'github', 'lucky bro', 
-            'a connection to the server']
-    
-            latencies = []
-    
-            for _ in range(1):
-                    start_time = datetime.datetime.utcnow()
-                    message = await ctx.send("ping..")
-                    end_time = datetime.datetime.utcnow()
-        
-
-            latency_ms = (end_time - start_time).total_seconds() * 1000
-            latencies.append(latency_ms)
-    
-
-            average_latency = sum(latencies) / len(latencies)
-    
-
-            websocket_latency = int(self.bot.latency * 1000)
-
-            await message.edit( content=f"it took `{websocket_latency}ms` to ping **{random.choice(list)}** "
-                        f"(Rest: `{average_latency:.2f}ms`)")
+            return await ctx.neutral(f"> :satellite: **Ping:** {int(self.bot.latency * 1000)}ms")
             
 
     @hybrid_command(
