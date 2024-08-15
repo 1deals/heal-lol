@@ -88,7 +88,7 @@ class Information(commands.Cog):
 
             await ctx.send(
                 content=f"it took `{websocket_latency}ms` to ping **{random.choice(list)}** "
-                        f"(edit: `{average_latency:.2f}ms`)"
+                        f"(Rest: `{average_latency:.2f}ms`)"
                         )
             
 
