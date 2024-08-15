@@ -13,6 +13,7 @@ from discord.utils              import format_dt
 from discord.ext                import commands
 from tools.heal                 import Heal
 from typing import Union
+import datetime
 import aiohttp
 from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 
@@ -71,24 +72,25 @@ class Information(commands.Cog):
     
             for _ in range(4):
                     start_time = datetime.datetime.utcnow()
-                    await ctx.trigger_typing()  # Simulate a request without actually sending a messag
+                    await ctx.trigger_typing()  #
                     end_time = datetime.datetime.utcnow()
         
-             # Calculate the latency in milliseconds
-             latency_ms = (end_time - start_time).total_seconds() * 1000
-             latencies.append(latency_ms)
-    
-         #   Calculate the average latency
-             average_latency = sum(latencies) / len(latencies)
-    
-             # Get the bot's latency (this is for websocket latency, not the message latency)
-             websocket_latency = int(self.bot.latency * 1000)
 
-             # Send the "pong" message once, with the calculated latencies
-             message = await ctx.send(
-                 content=f"it took `{websocket_latency}ms` to ping **{random.choice(list)}** "
-                          f"(edit: `{average_latency:.2f}ms`)"
-    )
+            latency_ms = (end_time - start_time).total_seconds() * 1000
+            latencies.append(latency_ms)
+    
+
+            average_latency = sum(latencies) / len(latencies)
+    
+
+            websocket_latency = int(self.bot.latency * 1000)
+
+
+            message = await ctx.send(
+                content=f"it took `{websocket_latency}ms` to ping **{random.choice(list)}** "
+                        f"(edit: `{average_latency:.2f}ms`)"
+                        )
+            return await ctx.send(message)
 
     @hybrid_command(
         name = "invite",
