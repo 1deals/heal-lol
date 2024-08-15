@@ -86,11 +86,11 @@ class Information(commands.Cog):
             websocket_latency = int(self.bot.latency * 1000)
 
 
-            message = await ctx.send(
+            await ctx.send(
                 content=f"it took `{websocket_latency}ms` to ping **{random.choice(list)}** "
                         f"(edit: `{average_latency:.2f}ms`)"
                         )
-            return await ctx.send(message)
+            
 
     @hybrid_command(
         name = "invite",
