@@ -74,20 +74,20 @@ class Information(commands.Cog):
                     await ctx.trigger_typing()  # Simulate a request without actually sending a messag
                     end_time = datetime.datetime.utcnow()
         
-        # Calculate the latency in milliseconds
-        latency_ms = (end_time - start_time).total_seconds() * 1000
-        latencies.append(latency_ms)
+             # Calculate the latency in milliseconds
+             latency_ms = (end_time - start_time).total_seconds() * 1000
+             latencies.append(latency_ms)
     
-    # Calculate the average latency
-    average_latency = sum(latencies) / len(latencies)
+         #   Calculate the average latency
+             average_latency = sum(latencies) / len(latencies)
     
-    # Get the bot's latency (this is for websocket latency, not the message latency)
-    websocket_latency = int(self.bot.latency * 1000)
-    
-    # Send the "pong" message once, with the calculated latencies
-    message = await ctx.send(
-        content=f"it took `{websocket_latency}ms` to ping **{random.choice(list)}** "
-                f"(edit: `{average_latency:.2f}ms`)"
+             # Get the bot's latency (this is for websocket latency, not the message latency)
+             websocket_latency = int(self.bot.latency * 1000)
+
+             # Send the "pong" message once, with the calculated latencies
+             message = await ctx.send(
+                 content=f"it took `{websocket_latency}ms` to ping **{random.choice(list)}** "
+                          f"(edit: `{average_latency:.2f}ms`)"
     )
 
     @hybrid_command(
