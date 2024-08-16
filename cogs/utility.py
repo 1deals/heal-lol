@@ -517,16 +517,22 @@ class Utility(commands.Cog):
         attachment = ctx.message.attachments[0]
         audio_data = await attachment.read()
         shazam = Shazam()
-        song = await shazam.recognize(audio_data)
-        if 'track' not in song or 'share' not in song['track']:
-            return await ctx.send("Could not recognize the track")
-        song_cover_url = song['track']['images'].get('coverart', '')
-        embed = discord.Embed(
-            color=0x31333b,
-            description=f"> <:shazam:1273688697753047070> **[{song['track']['share']['text']}]({song['track']['share']['href']})**"
-        )
-        embed.set_author(name=f"{ctx.author}", icon_url=ctx.author.avatar.url)
-        await msg.edit(embed=embed)
+
+        try:
+            song = await shazam.recognize(audio_data)
+            if 'track' not in song or 'share' not in song['track']:
+                return await ctx.send("Could not recognize the track")
+            song_cover_url = song['track']['images'].get('coverart', '')
+            embed = discord.Embed(
+                color=0x31333b,
+                description=f"> <:shazam:1273688697753047070> **[{song['track']['share']['text']}]({song['track']['share']['href']})**"
+            )
+            embed.set_author(name=f"{ctx.author}", icon_url=ctx.author.avatar.url)
+            await msg.edit(embed=embed)
+        
+        finally:
+            if hasattr(shazam, '_session') and shazam._session:
+                await shazam._session.close()
 
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))
