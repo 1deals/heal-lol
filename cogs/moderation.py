@@ -225,6 +225,7 @@ class Moderation(commands.Cog):
     @group(
         name = "role",
         description = "Add / remove a role from a user.",
+        aliases = ["r"],
         invoke_without_command=True
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
