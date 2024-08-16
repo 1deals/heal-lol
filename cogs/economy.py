@@ -11,6 +11,7 @@ from discord.ext.commands       import command, group, BucketType, cooldown, has
 from tools.managers.context import Context, Colors
 from tools.heal import Heal
 from typing import Union
+from random import choice
 
 class Economy(commands.Cog):
     def __init__(self, bot: Heal):
@@ -32,11 +33,28 @@ class Economy(commands.Cog):
         total = cash + bank
 
         embed = discord.Embed(title = f"{user.name}'s balance.", description = f"", color = Colors.BASE_COLOR)
-        embed.add_field(name = "Total:", value = f"${total}", inline = True)
+        embed.add_field(name = "Total", value = f"${total}", inline = True)
         embed.add_field(name = "Cash", value = f"${cash}", inline = True)
         embed.add_field(name = "Bank", value= f"${bank}", inline = True)
 
         await ctx.send(embed=embed)
+
+    @command(
+        name = "work",
+        description = "Work to gain money.",
+    )
+    @cooldown(1, 60, commands.BucketType.user)
+    async def work(self, ctx: Context):
+        jobs = ["mcdonalds", "kfc", "pizzahut", "secretary", "fire fighter", "police man", "nurse", "coder", "teacher"]
+        randomjob = choice(jobs)
+        data = await self.bot.pool.fetchval("SELECT * FROM economy WHERE user_id = $1", ctx.author.id)
+        cash = data['cash'] if data and data['cash'] is not None else 0
+        earnt = random.randint(10, 250)
+        newbal = cash + earnt
+
+        await self.bot.pool.execute("UPDATE economy SET cash = $1 WHERE user_id = $2", newbal, ctx.author.id)
+
+        return await ctx.neutral(f"You earnt **{earnt}** working as a **{randomjob}**. Your new balance is **{newbal}**")
 
 async def setup(bot: Heal):
     return await bot.add_cog(Economy(bot))
