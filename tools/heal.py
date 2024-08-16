@@ -115,7 +115,7 @@ class Heal(commands.AutoShardedBot):
         if self_prefix is None:
             self_prefix = guild_prefix  
 
-        return (self_prefix)
+        return (self_prefix, guild_prefix)
 
     async def on_ready(self) -> None:
         log.info(f'Logged in as {self.user.name}#{self.user.discriminator} ({self.user.id})')
