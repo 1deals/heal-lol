@@ -94,3 +94,9 @@ CREATE TABLE IF NOT EXISTS lastfm(
     mode TEXT,
     command TEXT
 );
+
+CREATE TABLE IF NOT EXISTS economy(
+    user_id BIGINT PRIMARY KEY,
+    cash BIGINT,
+    bank BIGINT
+);
