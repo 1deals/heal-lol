@@ -32,9 +32,9 @@ class Economy(commands.Cog):
         total = cash + bank
 
         embed = discord.Embed(title = f"{user.name}'s balance.", description = f"", color = Colors.BASE_COLOR)
-        embed.add_field(name = "Total:", value = "$" + total, inline = True)
-        embed.add_field(name = "Cash", value = "$" + cash, inline = True)
-        embed.add_field(name = "Bank", value= "$" + bank, inline = True)
+        embed.add_field(name = "Total:", value = f"${total}", inline = True)
+        embed.add_field(name = "Cash", value = f"${cash}", inline = True)
+        embed.add_field(name = "Bank", value= f"${bank}", inline = True)
 
         await ctx.send(embed=embed)
 
