@@ -29,3 +29,4 @@ class Colors:
 
 class api:
     lastfm: str = "bc8082588489f949216859abba6e52be"
+    luma: str = "SfHY8HukqUATXUwm"

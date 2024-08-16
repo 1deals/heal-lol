@@ -22,6 +22,7 @@ from PIL import Image, ImageDraw, ImageFont
 import random 
 from random import choice
 from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
+from tools.configuration import api
 
 class Utility(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -458,8 +459,9 @@ class Utility(commands.Cog):
         if url is None:
             return await ctx.send_help(ctx.command)
     
-        if url in ["https://pornhub.com", "pornhub.com"]:
-            return await ctx.deny("I cannot take a screenshot of this site.")
+        url = "https://api.fulcrum.lol/screenshot?url="
+        params = {"url": url}
+        headers = {"Authorization": APIKEY} 
         
         await ctx.typing()
 
@@ -467,14 +469,12 @@ class Utility(commands.Cog):
         if not url.startswith("https://"):
             url = "https://" + url
 
-        lis = ["2db5008df2764e7ea7f6fd79697fd4b0", "576a848d351b4b2493efab4e5393f835"]
-        APIKEY = choice(lis)
+        APIKEY = api.luma
         
-        api_key = APIKEY
-        api_url = f"https://api.apiflash.com/v1/urltoimage?access_key={api_key}&wait_until=page_loaded&url={url}"
+        API = f"https://api.fulcrum.lol/screenshot?url={url}"
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(api_url) as response:
+            async with session.get(API, params=params, headers=headers) as response:
                 if response.status == 200:
                     screenshot_url = response.url
 
