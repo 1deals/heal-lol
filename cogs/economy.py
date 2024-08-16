@@ -27,7 +27,7 @@ class Economy(commands.Cog):
         if user is None:
             user = ctx.author
 
-        data = await self.bot.pool.fetchval("SELECT * FROM economy WHERE user_id = $1", user.id)
+        data = await self.bot.pool.fetchrow("SELECT cash, bank FROM economy WHERE user_id = $1", user.id)
         cash = data['cash'] if data and data['cash'] is not None else 0
         bank = data['bank'] if data and data['bank'] is not None else 0
         total = cash + bank
@@ -54,7 +54,7 @@ class Economy(commands.Cog):
 
         await self.bot.pool.execute("UPDATE economy SET cash = $1 WHERE user_id = $2", newbal, ctx.author.id)
 
-        return await ctx.neutral(f"You earnt **{earnt}** working as a **{randomjob}**. Your new balance is **{newbal}**")
+        return await ctx.neutral(f"You earnt **${earnt}** working as a **{randomjob}**. Your new balance is **${newbal}**")
 
 async def setup(bot: Heal):
     return await bot.add_cog(Economy(bot))
