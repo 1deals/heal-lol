@@ -207,7 +207,7 @@ class Fun(commands.Cog):
         flavor = data ["flavor"]
 
         if data is None:
-            return await ctx.deny(f"You don't have a **vape**. Use `{ctx.clean_prefix}vape flavor <flavor` to get a vape.")
+            return await ctx.deny(f"You don't have a **vape**. Use `{ctx.clean_prefix}vape flavor <flavor> to get a vape.")
 
         if data:
 
@@ -242,7 +242,7 @@ class Fun(commands.Cog):
         
         flavor = flavor.title() 
         if flavor not in self.valid_flavors:
-            return await ctx.deny(f"Invalid flavor. Use `{ctx.prefix}flavors` to see the list of available flavors.")
+            return await ctx.deny(f"Invalid flavor. Use `{ctx.prefix}vape flavors` to see the list of available flavors.")
         
         await self.bot.pool.execute(
             """
