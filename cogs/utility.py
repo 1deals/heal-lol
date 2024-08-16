@@ -471,11 +471,9 @@ class Utility(commands.Cog):
         if not url.startswith("https://"):
             url = "https://" + url
 
-        
-        API = f"https://api.fulcrum.lol/screenshot?url={url}"
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(API, params=params, headers=headers) as response:
+            async with session.get(url, params=params, headers=headers) as response:
                 if response.status == 200:
                     screenshot_url = response.url
 
