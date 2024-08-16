@@ -16,6 +16,7 @@ from typing import Union
 import datetime
 import aiohttp
 from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
+from tools.configuration import api
 
 def get_ordinal(number):
         if 10 <= number % 100 <= 20:
@@ -181,7 +182,7 @@ class Information(commands.Cog):
     async def instagram(self, ctx:Context, username: str):
         url = "https://api.fulcrum.lol/instagram"
         params = {"username": username}
-        headers = {"Authorization": "SfHY8HukqUATXUwm"} 
+        headers = {"Authorization": api.luma} 
 
         def humanize_number(value: int) -> str:
             if value >= 1_000_000:
