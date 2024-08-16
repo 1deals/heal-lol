@@ -459,27 +459,27 @@ class Utility(commands.Cog):
         if url is None:
             return await ctx.send_help(ctx.command)
         
-        APIKEY = api.luma
-    
-        url = "https://api.fulcrum.lol/screenshot?url="
+        APIKEY = api.luma  
+        api_url = "https://api.fulcrum.lol/screenshot"
+
         params = {"url": url}
         headers = {"Authorization": APIKEY} 
-        
+
         await ctx.typing()
 
-
-        if not url.startswith("https://"):
-            url = "https://" + url
-
-
         async with aiohttp.ClientSession() as session:
-            async with session.get(url, params=params, headers=headers) as response:
+            async with session.get(api_url, params=params, headers=headers) as response:
                 if response.status == 200:
-                    screenshot_url = response.url
+                    screenshot_bytes = await response.read()
 
-                    await ctx.send(f"{screenshot_url}")
+                    file = discord.File(
+                        io.BytesIO(screenshot_bytes), 
+                        filename="screenshot.png"
+                    )
+
+                    await ctx.send(file=file)
                 else:
-                    await ctx.warn("Failed to screenshot. Try again later.")
+                    await ctx.deny("Failed to screenshot. Try again later.")
         
 
     @commands.command(
