@@ -100,3 +100,8 @@ CREATE TABLE IF NOT EXISTS economy(
     cash BIGINT,
     bank BIGINT
 );
+
+CREATE TABLE IF NOT EXISTS autorole (
+    guild_id BIGINT PRIMARY KEY,
+    role_id BIGINT
+)

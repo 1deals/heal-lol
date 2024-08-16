@@ -221,11 +221,13 @@ class Server(Cog):
         invoke_without_command=True,
         description = "Add join pings to your server!"
     )
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def joinping(self, ctx):
         return await ctx.send_help(ctx.command)
         
     @joinping.command(name="channel", description="Adds or removes a joinping from your guild.", aliases=["chan"])
     @commands.has_permissions(manage_channels = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def joinpingchannel(self, ctx: Context, channel: discord.TextChannel = None):
         if channel is None:
             return await ctx.send_help(ctx.command)
@@ -240,6 +242,7 @@ class Server(Cog):
 
     @joinping.command(name="list", description="Get a list of channels which have joinping enabled.")
     @commands.has_permissions(manage_channels = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def joinpinglist(self, ctx: Context):
         data = await self.bot.pool.fetch("SELECT channel_id FROM joinping WHERE guild_id = $1", ctx.guild.id)
         channels = [ctx.guild.get_channel(record['channel_id']).mention for record in data]
@@ -249,7 +252,45 @@ class Server(Cog):
         else:
             await ctx.warn(f"Joinping is not set up.")
 
+    @group(
+        name = "autorole",
+        description = "Enable / disable autorole in your guild.",
+        invoke_without_command = True
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_roles = True)
+    async def autorole(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+    
+    @autorole.command(
+        name = "enable",
+        aliases = ["set", "add"],
+        description = "Set an autorole in your guild."
+    )
+    @commands.has_permissions(manage_roles = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def autorole_enable(self, ctx: Context, *, role: discord.Role = None):
+        if role is None:
+            return await ctx.send_help(ctx.command)
+        
+        await self.bot.pool.execute("INSERT INTO autorole (guild_id, role_id) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET role_id = $2", ctx.guild.id, role.id)
+        return await ctx.approve(f"{role.mention} will now be **assigned** upon joining.")
 
+    @autorole.command(
+        name = "disable",
+        aliases = ["remove", "delete"],
+        description = "Disable autorole in your guild."
+    )
+    @commands.has_permissions(manage_roles = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def autorole_disable(self, ctx: Context, *, role: discord.Role = None):
+        if role is None:
+            return await ctx.send_help(ctx.command)
+        
+        await self.bot.pool.execute("DELETE FROM autorole WHERE guild_id = $1 AND role_id = $2", ctx.guild.id, role.id)
+        return await ctx.approve(f"{role.mention} will no longer be assigned upon joining.")
+    
+    
     
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Server(bot))
