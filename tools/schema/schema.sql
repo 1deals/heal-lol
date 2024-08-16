@@ -104,4 +104,11 @@ CREATE TABLE IF NOT EXISTS economy(
 CREATE TABLE IF NOT EXISTS autorole (
     guild_id BIGINT PRIMARY KEY,
     role_id BIGINT
-)
+);
+
+CREATE TABLE IF NOT EXISTS vanityroles (
+    guild_id BIGINT PRIMARY KEY,
+    channel_id BIGINT UNIQUE ,
+    text TEXT,
+    role_id BIGINT UNIQUE 
+);
