@@ -458,6 +458,8 @@ class Utility(commands.Cog):
     async def screenshot(self, ctx: Context, *, url: str = None):
         if url is None:
             return await ctx.send_help(ctx.command)
+        
+        APIKEY = api.luma
     
         url = "https://api.fulcrum.lol/screenshot?url="
         params = {"url": url}
@@ -469,7 +471,6 @@ class Utility(commands.Cog):
         if not url.startswith("https://"):
             url = "https://" + url
 
-        APIKEY = api.luma
         
         API = f"https://api.fulcrum.lol/screenshot?url={url}"
 
