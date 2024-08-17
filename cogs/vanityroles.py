@@ -48,17 +48,6 @@ class Vanityroles(commands.Cog):
         except Exception as e:
             logging.error(f"Error in send: {e}")
 
-    @commands.Cog.listener()
-    async def on_guild_join(self, g):
-        try:
-            if g.id not in self.whitelist and g.premium_tier < 3:
-                try:
-                    await g.owner.send(embed=discord.Embed(color=Colors.BASE_COLOR, description=f'{Emojis.DENY} {g.owner.mention}: You cannot add this bot without level three. Find out more [here](https://discord.gg/jCPYXFQekB)'))
-                except:
-                    pass
-                await g.leave()
-        except Exception as e:
-            logging.error(f"Error in on_guild_join: {e}")
 
     @hybrid_group(
         name = 'vanityroles',
