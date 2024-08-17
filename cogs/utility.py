@@ -546,8 +546,8 @@ class Utility(commands.Cog):
         emb = discord.Embed(description=question, color = Colors.BASE_COLOR)
         emb.set_author(name=f"{ctx.author.name}")
         message = await ctx.send(embed=emb)
-        message.add_reaction("👍")
-        message.add_reaction("👎")
+        await message.add_reaction("👍")
+        await message.add_reaction("👎")
 
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))
