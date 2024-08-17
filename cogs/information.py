@@ -17,6 +17,7 @@ import datetime
 import aiohttp
 from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 from tools.configuration import api
+from tools.models.statistics import BotStatistics
 
 def get_ordinal(number):
         if 10 <= number % 100 <= 20:
@@ -39,20 +40,14 @@ class Information(commands.Cog):
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @cooldown(1, 5, commands.BucketType.user)
     async def botinfo(self, ctx: Context):
-        try:
-            total_channels = 0
-            for guild in self.bot.guilds:
+        total_channels = 0
+        for guild in self.bot.guilds:
                     
-                total_channels += len(guild.channels)
-            uptime = self.bot.uptime
-            embed = discord.Embed(timestamp=ctx.message.created_at, colour=Colors.BASE_COLOR)
-            embed.add_field(name = f"**{self.bot.user.name}'s statistics**", value = f"**{len(self.bot.guilds)}** guilds \n**{sum(g.member_count for g in self.bot.guilds): ,}** users \n**{total_channels}** channels", inline = False)
-            embed.add_field(name = "**Bot**", value = f"**{len(set(command for command in self.bot.walk_commands()if not command.cog_name == 'Jishaku')): ,}** commands \nwebsocket latency: **{round(self.bot.latency * 1000)} ms** \nuptime: **{uptime}**", inline = False)
-            embed.set_author(name = self.bot.user.display_name, icon_url = self.bot.user.avatar)
-            embed.set_thumbnail(url = self.bot.user.avatar)
-            await ctx.send(embed=embed)
-        except Exception as e:
-            print(e) 
+            total_channels += len(guild.channels)
+        embed = discord.Embed(description =f"An all-in-one, aesthetically pleasing multipurpose bot, aimed to keep communities safe and thriving. Created by the [**Heal Team**](https://discord.gg/jCPYXFQekB)", color= Colors.BASE_COLOR)
+        embed.add_field(name= "__Statistics:__", value = f"**Guilds:** {len(self.bot.guilds)} \n**Users:** {len(self.bot.users)} \n**Channels:** {total_channels}", inline = True)
+        embed.add_field(name = "__Bot:__", value= f"**Uptime:** {self.bot.uptime} \n**Lines:** {BotStatistics.lines_used} \n**Files:** {BotStatistics.total_files}", inline = True)
+        return await ctx.send(embed=embed)
 
     @hybrid_command(
     name="ping",
@@ -120,8 +115,6 @@ class Information(commands.Cog):
         if user.id == 461914901624127489:  # logan
             title += " <:zzmilklove2:1270873236841693267> <:staff:1270729949686534206> <:dev:1270730817458405468>"
         if user.id == 1261756025275547719:  # neca
-            title += " <:staff:1270729949686534206>"
-        if user.id == 1211110597345812501:
             title += " <:staff:1270729949686534206>"
 
         embed = discord.Embed(
