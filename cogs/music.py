@@ -55,7 +55,6 @@ class Player(pomice.Player):
                 description=f"<:musicnote:1251992069468065905> {self.context.author.mention}: Now playing [**{track.title}**]({track.uri})",
             )
         )
-        await self.channel.edit(status=f"{track.title}")
 
         if self.awaiting:
             self.awaiting = False
