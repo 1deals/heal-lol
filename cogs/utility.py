@@ -510,6 +510,7 @@ class Utility(commands.Cog):
             )
     
     @commands.command(name="shazam", description="Get a track name from sound", aliases = ["sh", "shzm"])
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def shazam(self, ctx: Context):
         if not ctx.message.attachments:
             return await ctx.warn("Please provide a video")
@@ -533,6 +534,20 @@ class Utility(commands.Cog):
         finally:
             if hasattr(shazam, '_session') and shazam._session:
                 await shazam._session.close()
+
+    @command(
+        name = "poll",
+        aliases = ["quickpoll", "qp"],
+        description = "Create a poll."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def poll(self, ctx: Context, *, question: str = None):
+        await ctx.message.delete()
+        emb = discord.Embed(description=question, color = Colors.BASE_COLOR)
+        emb.set_author(name=f"{ctx.author.name}")
+        message = await ctx.send(embed=emb)
+        message.add_reaction("👍")
+        message.add_reaction("👎")
 
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))

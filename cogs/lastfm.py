@@ -149,7 +149,7 @@ class LastFM(Cog):
 
                 embed.set_footer(text=f"Album: {album_name}")
                 message = await ctx.send(embed=embed)
-                await message.add_reaction("👍")
+                await message.add_reaction("🔥")
                 await message.add_reaction("👎")
 
     @commands.Cog.listener()
