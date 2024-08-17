@@ -22,7 +22,10 @@ class healboost(Cog):
     @commands.Cog.listener("on_member_update")
     async def on_member_boost(self, before: discord.Member, after: discord.Member): 
         if before.guild.id == 1244403114447212564:
-            if before.guild.premium_subscriber_role not in before.roles and after.guild.premium_subscriber_role in after.roles:  
+            if before.guild.premium_subscriber_role not in before.roles and after.guild.premium_subscriber_role in after.roles: 
+                data = await self.bot.pool.fetchrow("SELECT user_id FROM premium WHERE user_id = $1", before.id)
+                if data:
+                    pass 
                 await self.bot.pool.execute("INSERT INTO premium (user_id) VALUES ($1)", before.id)
                 await before.add_roles(1273953446831325206)
                 embed= discord.Embed(description=f"> You have been granted premium for the duration of your boost(s), when you unboost your premium will be automatically removed.", color=Colors.BASE_COLOR)
