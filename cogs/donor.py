@@ -2,7 +2,7 @@ import discord
 import asyncio
 import random
 import aiohttp
-import uwuipy
+from uwuipy import uwuipy
 import requests
 
 from discord.ext import commands
