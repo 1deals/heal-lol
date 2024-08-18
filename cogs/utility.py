@@ -488,7 +488,9 @@ class Utility(commands.Cog):
         description = "Create an embed."
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def createembed(self, ctx: Context,  *, code: EmbedScript):
+    async def createembed(self, ctx: Context,  *, code: EmbedScript = None):
+        if code is None:
+            return await ctx.neutral(f"Create embed code [**here**](https://healbot.lol/embed)")
         await ctx.send(**code)
 
     @command(
