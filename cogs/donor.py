@@ -67,3 +67,6 @@ class Donor(commands.Cog):
         else:
             await self.bot.pool.execute("DELETE FROM uwulock WHERE user_id = $1 AND guild_id = $2", user.id, ctx.guild.id)
             return await ctx.approve(f"{user.mention} is no longer **uwulocked**.")
+        
+async def setup(bot: Heal):
+    return await bot.add_cog(Donor(bot))
