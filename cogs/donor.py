@@ -2,7 +2,7 @@ import discord
 import asyncio
 import random
 import aiohttp
-from uwuipy import uwuipy
+import uwuipy
 import requests
 
 from discord.ext import commands
@@ -50,14 +50,12 @@ class Donor(commands.Cog):
                 uwumsg = await uwulocktext(self.bot, message.clean_content)
                 await message.delete()  
 
-                
                 webhooks = await message.channel.webhooks()
                 if len(webhooks) == 0:
                     webhook = await message.channel.create_webhook(name="heal", reason="uwulock")
                 else:
                     webhook = webhooks[0]
 
-                
                 await webhook.send(
                     content=uwumsg, 
                     username=message.author.name, 
