@@ -13,7 +13,7 @@ from tools.heal import Heal
 from typing import Union
 
 async def uwulocktext(bot, text: str) -> str:
-    uwu = uwuipy.uwuipy()
+    uwu = uwuipy()
     return uwu.uwuify(text)
 
 def has_perks():
