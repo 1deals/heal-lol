@@ -126,11 +126,11 @@ class VoiceMaster(Cog):
                         await channel.delete()
                     if category: 
                         await category.delete()
-                    await ctx.send(f"Successfully deleted the **VoiceMaster** channel: {channel.name}")
+                    return await ctx.approve('Finished removing the **VoiceMaster** server configuration.')
                 except discord.Forbidden:
-                    await ctx.send(f"I do not have permission to delete the channel: {channel.name}")
+                    await ctx.deny(f"I do not have permissions to remove the voicemaster configuration.")
                 except discord.HTTPException as e:
-                    await ctx.send(f"Failed to delete the channel: {channel.name} ({e})")
+                    await ctx.send(f"Failed: {e}")
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
