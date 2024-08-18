@@ -230,6 +230,16 @@ class Information(commands.Cog):
                 else:
                     await ctx.warn("Failed to find info about that user, or API is down.")
 
+    @command(
+        name = "commandcount",
+        aliases = ["cc"],
+        description = "Gets the command count of the bot."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def commandcount(self, ctx: Context):
+        non_jishaku_commands = [cmd for cmd in self.bot.walk_commands() if cmd.cog_name != "Jishaku"]
+        command_count = len(non_jishaku_commands)
+        return await ctx.neutral(f"[+] I have **{command_count}** commands.")
 
 async def setup(bot: Heal):
     await bot.add_cog(Information(bot))
