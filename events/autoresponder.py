@@ -34,7 +34,7 @@ class autoresponder(Cog):
             response = entry["response"]
 
             
-            if trigger in message.content.lower():
+            if message.content.lower().startswith(trigger.lower()):
                 processed_message = EmbedBuilder.embed_replacement(message.author, response)
                 content, embed, view = await EmbedBuilder.to_object(processed_message)
 
