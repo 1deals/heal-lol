@@ -100,7 +100,7 @@ class VoiceMaster(Cog):
     async def voicemaster_remove(self, ctx: Context):
         channels = await self.bot.pool.fetch(
             """
-            SELECT channel_id FROM voicemaster.channels WHERE guild_id = $1
+            SELECT * FROM voicemaster.configuration WHERE guild_id = $1
             """,
             ctx.guild.id
         )
@@ -109,18 +109,23 @@ class VoiceMaster(Cog):
             return await ctx.deny(f"No **VoiceMaster** channels found to remove.")
         
         for record in channels:
-            channel_id = record['channel_id']
-            channel = ctx.guild.get_channel(channel_id)
+            category = ctx.guild.get_channel(record['category_id'])
+            interface = ctx.guild.get_channel(record['interface_id'])
+            channel = ctx.guild.get_channel(record['channel_id'])
             if channel:
                 await self.bot.pool.execute(
                     """
-                    DELETE FROM voicemaster.channels WHERE guild_id = $1 AND channel_id = $2
+                    DELETE FROM voicemaster.configuration WHERE guild_id = $1
                     """,
                     ctx.guild.id,
-                    channel_id
                 )
                 try:
-                    await channel.delete()
+                    if interface: 
+                        await interface.delete()
+                    if channel: 
+                        await channel.delete()
+                    if category: 
+                        await category.delete()
                     await ctx.send(f"Successfully deleted the **VoiceMaster** channel: {channel.name}")
                 except discord.Forbidden:
                     await ctx.send(f"I do not have permission to delete the channel: {channel.name}")
