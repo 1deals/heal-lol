@@ -34,21 +34,28 @@ class Donor(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def uwuwebhook(self, message: discord.Message):
-      if not message.guild: 
-        return
-      if isinstance(message.author, discord.User): return
-      check = await self.bot.pool.fetchrow("SELECT * FROM uwulock WHERE guild_id = $1 AND user_id = $2", message.guild.id, message.author.id)
-      if check:
-        try: 
-            await message.delete()
-            uwumsg = await uwulocktext(self.bot, message.clean_content)
-            webhooks = await message.channel.webhooks()
-            if len(webhooks) == 0: webhook = await message.channel.create_webhook(name="heal", reason="uwulock")
-            else:
-                webhook = webhooks[0] 
-            await webhook.send(content=uwumsg, username=message.author.name, avatar_url=message.author.display_avatar.url)
-        except: 
-            pass 
+        if not message.guild: 
+            return
+        if isinstance(message.author, discord.User):
+            return
+        
+        check = await self.bot.pool.fetchrow("SELECT * FROM uwulock WHERE guild_id = $1 AND user_id = $2", message.guild.id, message.author.id)
+        if check:
+            try: 
+                uwumsg = await uwulocktext(self.bot, message.clean_content)
+                await message.delete() 
+                
+                webhooks = await message.channel.webhooks()
+                if len(webhooks) == 0:
+                    webhook = await message.channel.create_webhook(name="heal", reason="uwulock")
+                else:
+                    webhook = webhooks[0]
+                
+                
+                await webhook.send(content=uwumsg, username=message.author.name, avatar_url=message.author.display_avatar.url)
+            
+            except Exception as e: 
+                print(f"Error in uwuwebhook: {e}")
 
     @command(
         name = "uwulock",
