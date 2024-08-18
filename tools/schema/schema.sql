@@ -112,3 +112,11 @@ CREATE TABLE IF NOT EXISTS vanityroles (
     text TEXT,
     role_id BIGINT UNIQUE 
 );
+
+CREATE TABLE IF NOT EXISTS autoresponder (
+    guild_id BIGINT,
+    trigger TEXT,
+    response TEXT,
+    id TEXT,
+    PRIMARY KEY (guild_id, trigger)
+);

@@ -14,6 +14,8 @@ from typing import Union
 import asyncio
 from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 import logging
+import random
+import string
 
 class Server(Cog):
     def __init__(self, bot: Heal):
@@ -290,7 +292,53 @@ class Server(Cog):
         await self.bot.pool.execute("DELETE FROM autorole WHERE guild_id = $1 AND role_id = $2", ctx.guild.id, role.id)
         return await ctx.approve(f"{role.mention} will no longer be assigned upon joining.")
     
+    @group(
+        name = "autoresponder",
+        aliases =["autorespond", "ar"],
+        description = "Configure autoresponders for your guild.",
+        invoke_without_command= True
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def autoresponder(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+
+    @autoresponder.command(
+        name = "add",
+        aliases = ["set"],
+        description = "Setup an autoresponder"
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def autoresponder_add(self, ctx: Context, *, input: str):
+        trigger, response = map(str.strip, input.split(",", 1))
+        
+        existing_entry = await self.bot.pool.fetchrow(
+            "SELECT * FROM autoresponder WHERE guild_id = $1 AND trigger = $2",
+            ctx.guild.id, trigger
+        )
+
+        if existing_entry:
+            await ctx.warn(f"An autoresponder for **{trigger}** already exists.")
+        else:
+            characters = string.ascii_letters
+            randomid = ''.join(random.choice(characters) for _ in range(10))
+            await self.bot.pool.execute(
+                "INSERT INTO autoresponder (guild_id, trigger, response, id) VALUES ($1, $2, $3, $4)",
+                ctx.guild.id, trigger, response, randomid
+            )
+        return await ctx.approve(f"I will respond to **{trigger}** with **{response}**")
     
+    @autoresponder.command(
+        name = "remove",
+        aliases = ["delete"],
+        description = "Removes an autoresponder."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def autoresponder_remove(self, ctx: Context, *, trigger: str):
+        await self.bot.pool.execute(
+            "DELETE FROM autoresponder WHERE guild_id = $1 AND trigger = $2",
+            ctx.guild.id, trigger
+        )
+        return await ctx.approve(f"I will no longer respond to **{trigger}**")
     
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Server(bot))
