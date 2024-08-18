@@ -298,6 +298,7 @@ class Server(Cog):
         description = "Configure autoresponders for your guild.",
         invoke_without_command= True
     )
+    @commands.has_permissions(manage_messages = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def autoresponder(self, ctx: Context):
         return await ctx.send_help(ctx.command)
@@ -307,6 +308,7 @@ class Server(Cog):
         aliases = ["set"],
         description = "Setup an autoresponder"
     )
+    @commands.has_permissions(manage_messages = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def autoresponder_add(self, ctx: Context, *, input: str):
         trigger, response = map(str.strip, input.split(",", 1))
@@ -332,6 +334,7 @@ class Server(Cog):
         aliases = ["delete"],
         description = "Removes an autoresponder."
     )
+    @commands.has_permissions(manage_messages = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def autoresponder_remove(self, ctx: Context, *, trigger: str):
         await self.bot.pool.execute(
