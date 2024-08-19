@@ -49,7 +49,7 @@ class Information(commands.Cog):
         embed = discord.Embed(description =f"An all-in-one, aesthetically pleasing multipurpose bot, aimed to keep communities safe and thriving. Created by the [**Heal Team**](https://discord.gg/jCPYXFQekB)", color= Colors.BASE_COLOR)
         embed.add_field(name= "__Statistics:__", value = f"**Guilds:** {len(self.bot.guilds)} \n**Users:** {len(self.bot.users): ,} \n**Channels:** {total_channels}", inline = True)
         embed.add_field(name = "__Bot:__", value= f"**Uptime:** {self.bot.uptime} \n**Latency:** {round(self.bot.latency * 1000)}ms \n**Commands: {len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}", inline = False)
-        embed.add_field(name = "__Usage:__", value = f"**Memory: {psutil.virtual_memory().percent}% \n**Available:** {availableMem}% \n**CPU:** {psutil.cpu_percent()}%")
+        embed.add_field(name = "__Usage:__", value = f"**Memory:** {psutil.virtual_memory().percent}% \n**Available:** {availableMem}% \n**CPU:** {psutil.cpu_percent()}%", inline = False)
         embed.set_thumbnail(url= self.bot.user.avatar.url)
         return await ctx.send(embed=embed)
 
