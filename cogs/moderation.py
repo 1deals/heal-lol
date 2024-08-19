@@ -263,6 +263,7 @@ class Moderation(commands.Cog):
         description = "Pins the message you reply to."
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_messages = True)
     async def pin(self, ctx: Context, *, link: str = None):
         message = None
 
