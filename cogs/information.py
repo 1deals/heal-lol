@@ -61,7 +61,7 @@ class Information(commands.Cog):
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @cooldown(1, 5, BucketType.user)
     async def ping(self, ctx: Context):
-            return await ctx.neutral(f"> :satellite: **Ping:** {int(self.bot.latency * 1000)}ms")
+            return await ctx.neutral(f"> :satellite: **Ping:** `{int(self.bot.latency * 1000)}ms`")
             
 
     @hybrid_command(
