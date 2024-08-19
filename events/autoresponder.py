@@ -21,7 +21,7 @@ class autoresponder(Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    @ratelimit(key="{message.author}", limit=3, duration=10, retry=False)
+    @ratelimit(key="{message.author}", limit=3, duration=10, retry=False, check = check_author_is_bot)
     async def on_message(self, message: discord.Message) -> Message:
         if message.author.bot or not message.guild:
             return
