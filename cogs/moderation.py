@@ -101,11 +101,11 @@ class Moderation(commands.Cog):
         
         if isinstance(user, discord.Member):
             if user == ctx.guild.owner:
-                return await ctx.send(f"You're unable to ban the **server owner**.")
+                return await ctx.warn(f"You're unable to ban the **server owner**.")
             if user == ctx.author:
-                return await ctx.send(f"You're unable to ban **yourself**.")
+                return await ctx.warn(f"You're unable to ban **yourself**.")
             if ctx.author.top_role.position <= user.top_role.position:
-                return await ctx.send(f"You're unable to ban a user with a **higher role** than **yourself**.")
+                return await ctx.warn(f"You're unable to ban a user with a **higher role** than **yourself**.")
                 
         await ctx.guild.ban(user, reason=reason)
         return await ctx.approve(f'Successfully banned {user.mention} for {reason.split(" |")[0]}')
@@ -333,7 +333,7 @@ class Moderation(commands.Cog):
         Clone a channel
         """
         if channel is None:
-            return await ctx.send_help(ctx.command)
+            channel = ctx.channel
         new = await ctx.channel.clone()
         await new.edit(position=ctx.channel.position, topic=ctx.channel.topic, overwrites=ctx.channel.overwrites)
         await ctx.channel.delete()

@@ -120,3 +120,9 @@ CREATE TABLE IF NOT EXISTS autoresponder (
     id TEXT,
     PRIMARY KEY (guild_id, trigger)
 );
+
+CREATE TABLE IF NOT EXISTS names (
+    user_id BIGINT PRIMARY KEY,
+    oldnames TEXT,
+    time INTEGER
+)
