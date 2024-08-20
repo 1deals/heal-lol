@@ -259,6 +259,8 @@ class Heal(commands.AutoShardedBot):
             await self.process_commands(message)
 
     async def disabled_command(self, ctx: Context) -> bool:
+        if ctx.guild is None:
+            return True
         cmd = self.get_command(ctx.invoked_with)
         if not cmd:
             return True
