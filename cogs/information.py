@@ -463,6 +463,37 @@ class Information(commands.Cog):
 
         embed.set_author(name=user.name, icon_url=user.display_avatar.url)
         await ctx.send(embed=embed)
+
+    @commands.hybrid_command(name="serverinfo",aliases=["si"])
+    async def serverinfo(self, ctx: commands.Context):
+        """
+        Get info about the guild
+        """
+        guild = ctx.guild
+
+        embed = discord.Embed(
+            title = f"{guild.name}",
+            description = f"{f'> {guild.description}' if guild.description is not None else ''}\n> Created on <t:{int(guild.created_at.timestamp())}:F> <t:{int(guild.created_at.timestamp())}:R>",
+            color = Colors.BASE_COLOR
+        )
+        users = [m for m in guild.members if not m.bot]
+        bots  = [b for b in guild.members if b.bot]
+
+
+        embed.add_field(name="counts", value=f"> stickers: {len(guild.stickers)}/{guild.sticker_limit}\n> emojis: {len(guild.roles)}/{guild.emoji_limit}\n> roles: {len(guild.roles)}/250")
+        embed.add_field(name=f"channels ({len(guild.channels)})", value=f"> text: {len(guild.text_channels)}\n> voice: {len(guild.voice_channels)}\n> categories: {len(guild.categories)}")
+        embed.add_field(name="information", value=f"> vanity: {guild.vanity_url_code}\n> boosts: {guild.premium_subscription_count}\n> verification level: {guild.verification_level}")
+        embed.add_field(name="members", value=f"> users: {len(users)}\n> bots: {len(bots)}\n> total: {len(guild.members)}")
+        embed.add_field(name="design", value=f"> icon: {f'[here]({guild.icon.url})' if guild.icon else 'N/A'}\n> banner: {f'[here]({guild.banner.url})' if guild.banner else 'N/A'}\n> splash: {f'[here]({guild.splash.url})' if guild.splash else 'N/A'}")
+        embed.add_field(name="owner", value=f"{guild.owner.name} ({guild.owner.id})")
+        features = ', '.join(guild.features)
+        if guild.features:
+            embed.add_field(name="features", value=f'```\n{features}\n```')
+        embed.set_thumbnail(url=guild.icon.url if guild.icon else 'https://none.none')
+        embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar.url)
+        embed.set_footer(text=f"ID: {guild.id}")
+
+        return await ctx.send(embed=embed)
         
 
 async def setup(bot: Heal):

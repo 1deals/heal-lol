@@ -125,4 +125,10 @@ CREATE TABLE IF NOT EXISTS names (
     user_id BIGINT PRIMARY KEY,
     oldnames TEXT,
     time INTEGER
-)
+);
+
+CREATE TABLE IF NOT EXISTS disablecommand (
+    guild_id BIGINT,
+    command TEXT,
+    PRIMARY KEY (guild_id, command)
+);

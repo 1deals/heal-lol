@@ -54,6 +54,7 @@ class Heal(commands.AutoShardedBot):
 
         self.message_cache = defaultdict(list)
         self.cache_expiry_seconds = 30
+        self.add_check(self.disabled_command)
 
     async def load_modules(self, directory: str) -> None:
         for module in glob.glob(f'{directory}/**/*.py', recursive=True):
@@ -256,3 +257,15 @@ class Heal(commands.AutoShardedBot):
         else:
             self.message_cache[author_id].append(now)
             await self.process_commands(message)
+
+    async def disabled_command(self, ctx: Context) -> bool:
+        cmd = self.get_command(ctx.invoked_with)
+        if not cmd:
+            return True
+        
+        check = await self.pool.fetchrow('SELECT * FROM disablecommand WHERE command = $1 AND guild_id = $2', cmd.name, ctx.guild.id)
+        
+        if check:
+            await ctx.warn(f"The command **{cmd.name}** is **disabled** in this guild")
+        
+        return check is None

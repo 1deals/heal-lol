@@ -445,5 +445,50 @@ class Moderation(commands.Cog):
         await thread.edit(locked=False, reason=f"Unlocked by {ctx.author}")
         await ctx.approve(f"The **thread** has been **unlocked**.")
 
+    @command(
+        name = "disablecommand",
+        aliases = ["disablecmd"],
+        description = "Disables a command."
+    )
+    @has_permissions(administrator = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def disablecommand(self, ctx: Context, *, command: str):
+        cmd = self.bot.get_command(command)
+    
+        if not cmd:
+            return await ctx.warn(f"Command **`{command}`** is not found.")
+
+        if cmd.name in ["ping", "help", "uptime", "disablecommand", "disablecmd", "enablecommand", "enablecmd"]:
+            return await ctx.deny(f"You cannot **disable** `{cmd.name}`.")
+        
+        check = await self.bot.pool.fetchrow("SELECT * FROM disablecommand WHERE command = $1 AND guild_id = $2", cmd.name, ctx.guild.id)
+        if check:
+            return await ctx.warn(f"This command is already **disabled**.")
+
+        await self.bot.pool.execute("INSERT INTO disablecommand (guild_id, command) VALUES ($1, $2)", ctx.guild.id, cmd.name)
+        await ctx.approve(f"**Disabled** the command `{cmd.name}`.")
+
+    @command(
+        name = "enablecommand",
+        aliases = ["enablecmd"],
+        description = "Enable a command."
+    )
+    @has_permissions(administrator = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def enablecommand(self, ctx: Context, *, command: str):
+        cmd = self.bot.get_command(command)
+    
+        if not cmd:
+            return await ctx.warn(f"Command **`{command}`** is not found.")
+        
+        check = await self.bot.pool.fetchrow("SELECT * FROM disablecommand WHERE command = $1 AND guild_id = $2::bigint", cmd.name, ctx.guild.id)
+
+        if check:
+            await self.bot.pool.execute("DELETE FROM disablecommand WHERE command = $1 AND guild_id = $2::bigint", cmd.name, ctx.guild.id)
+            return await ctx.approve(f"**Enabled** the command `{cmd.name}`")
+        else:
+            return await ctx.warn(f"Command **`{cmd.name}`** is not disabled.")
+
+
 async def setup(bot: Heal):
     await bot.add_cog(Moderation(bot))
