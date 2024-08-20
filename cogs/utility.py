@@ -50,7 +50,7 @@ class Utility(commands.Cog):
         await ctx.typing()
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://api.kastg.xyz/api/ai/chatgpt?prompt={prompt}&key=Kastg_OEq0gEfVZzWhVBqV3ghm_free") as r:
+            async with session.get(f"https://api.kastg.xyz/api/ai/llamaV3-large?prompt={prompt}&key=Kastg_OEq0gEfVZzWhVBqV3ghm_free") as r:
                 response = await r.json()
                 em = discord.Embed(title = f"{prompt}", description = response["result"][0]["response"], color = Colors.BASE_COLOR)
                 await ctx.send(embed=em)

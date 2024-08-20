@@ -28,7 +28,7 @@ class memberupdate(Cog):
         timestamp = int(datetime.datetime.now().timestamp())
         
         await self.bot.pool.execute(
-            "INSERT INTO names (user_id, oldnames, timestamp) VALUES ($1, $2, $3)",
+            "INSERT INTO names (user_id, oldnames, time) VALUES ($1, $2, $3)",
             before.id, before.name, timestamp
         )
 
