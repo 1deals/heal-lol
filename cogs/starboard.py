@@ -129,7 +129,7 @@ class Starboard(Cog):
                 value=f"**[Jump to message]({reaction.message.jump_url})**",
                 inline=False
             )
-            embed.set_author(name = f"{reaction.message.author}")
+            embed.set_author(name = f"{reaction.message.author}", icon_url= reaction.message.author.avatar.url)
 
             try:
                 if message_id in self.skull_messages:
