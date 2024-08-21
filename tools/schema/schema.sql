@@ -132,3 +132,10 @@ CREATE TABLE IF NOT EXISTS disablecommand (
     command TEXT,
     PRIMARY KEY (guild_id, command)
 );
+
+CREATE TABLE IF NOT EXISTS starboard (
+    guild_id BIGINT PRIMARY KEY,
+    channel_id BIGINT,
+    emoji TEXT,
+    threshold BIGINT
+);

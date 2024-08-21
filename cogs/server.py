@@ -26,6 +26,7 @@ class Server(Cog):
         description='View guild prefix',
         invoke_without_command=False,
     )
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def prefix(self, ctx: Context) -> Message:
         return await ctx.neutral(f'**Server Prefix** is set to `{ctx.clean_prefix}`')
         
