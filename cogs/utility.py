@@ -373,6 +373,8 @@ class Utility(commands.Cog):
         description = "Screenshot a website."
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def screenshot(self, ctx: Context, *, url: str = None):
         if url is None:
             return await ctx.send_help(ctx.command)
@@ -431,6 +433,8 @@ class Utility(commands.Cog):
     
     @commands.command(name="shazam", description="Get a track name from sound", aliases = ["sh", "shzm"])
     @commands.cooldown(1, 5, commands.BucketType.user)
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def shazam(self, ctx: Context):
         if not ctx.message.attachments:
             return await ctx.warn("Please provide a video")
