@@ -10,7 +10,7 @@ from discord.utils              import format_dt
 from discord.ext                import commands
 from tools.heal                 import Heal
 from discord.ui import View, Button
-from typing import Union
+from typing import Union, List
 from datetime import datetime, timedelta
 import humanize
 import datetime
@@ -313,31 +313,44 @@ class Utility(commands.Cog):
     )
     async def tiktok_reposter(self, ctx: Context, *, url: str):
         if self.TIKTOK_URL_PATTERN.match(url):
-                api_url = f"https://tikwm.com/api/?url={url}"
+            api_url = f"https://tikwm.com/api/?url={url}"
 
-                async with aiohttp.ClientSession() as cs:
-                    async with cs.get(api_url) as r:
-                        data = await r.json()
+            async with aiohttp.ClientSession() as cs:
+                async with cs.get(api_url) as r:
+                    data = await r.json()
 
-                        video_url = data['data']['play']
-                        likes = data['data']['digg_count']
-                        comments = data['data']['comment_count']
-                        shares = data['data']['share_count']
-                        description = data['data']['title']
-                        username = data["data"]["author"]["unique_id"]
-                        avatar = data["data"]["author"]["avatar"]
+                    video_url = data['data']['play']
+                    likes = data['data']['digg_count']
+                    comments = data['data']['comment_count']
+                    shares = data['data']['share_count']
+                    description = data['data']['title']
+                    username = data["data"]["author"]["unique_id"]
+                    avatar = data["data"]["author"]["avatar"]
 
+                    if 'images' in data['data']:
+                        images = data['data']['images']
+                        embeds = self.create_slideshow_embeds(description, likes, comments, shares, username, avatar, images)
+                        await ctx.paginate(embeds) 
+                    else:
                         async with cs.get(video_url) as video_response:
                             video_data = await video_response.read()
 
                             video_file = io.BytesIO(video_data)
-
-
-                            embed = discord.Embed(description=f"{description}", color=Colors.BASE_COLOR)
+                            embed = discord.Embed(description=f"{description}", color=discord.Color.blue())
                             embed.set_footer(text=f"❤️ {int(likes)} | 💬 {int(comments)} | 🔗 {int(shares)}")
                             embed.set_author(name=f"{username}", icon_url=avatar)
 
                             await ctx.send(file=discord.File(fp=video_file, filename="video.mp4"), embed=embed)
+
+    def create_slideshow_embeds(self, description: str, likes: int, comments: int, shares: int, username: str, avatar: str, images: List[str]) -> List[discord.Embed]:
+        embeds = []
+        for image_url in images:
+            embed = discord.Embed(description=f"{description}", color=discord.Color.blue())
+            embed.set_footer(text=f"❤️ {int(likes)} | 💬 {int(comments)} | 🔗 {int(shares)}")
+            embed.set_author(name=f"{username}", icon_url=avatar)
+            embed.set_image(url=image_url)
+            embeds.append(embed)
+        return embeds
 
     @command(
         name = "gif",
