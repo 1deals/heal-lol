@@ -131,7 +131,7 @@ class Utility(commands.Cog):
         embed = discord.Embed(description= f":zzz: You are now **AFK** - `{status}`", color = Colors.BASE_COLOR)
         await ctx.reply(embed=embed)
 
-    TIKTOK_URL_PATTERN = re.compile(r'https://www\.tiktok\.com/t/[A-Za-z0-9_/]+')
+    TIKTOK_URL_PATTERN = re.compile(r'(https?://)?(www\.)?(vm\.tiktok\.com|t\.tiktok\.com|www\.tiktok\.com/@[A-Za-z0-9_.-]+/video|www\.tiktok\.com/t)/[A-Za-z0-9_/]+')
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -276,6 +276,8 @@ class Utility(commands.Cog):
         usage = "tiktok <command>",
         invoke_without_command=True
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def tiktok(self, ctx: Context):
         await ctx.send_help(ctx.command)
@@ -330,7 +332,6 @@ class Utility(commands.Cog):
 
                             video_file = io.BytesIO(video_data)
 
-                            await ctx.message.delete()
 
                             embed = discord.Embed(description=f"{description}", color=Colors.BASE_COLOR)
                             embed.set_footer(text=f"❤️ {int(likes)} | 💬 {int(comments)} | 🔗 {int(shares)}")
