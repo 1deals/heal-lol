@@ -3,7 +3,7 @@ import sys
 import aiohttp
 
 from tools.managers.context     import Context
-from discord.ext.commands       import command, group, BucketType, cooldown, has_permissions, hybrid_command
+from discord.ext.commands       import command, group, BucketType, cooldown, has_permissions, hybrid_command, hybrid_group
 from tools.configuration        import Emojis, Colors
 from tools.paginator            import Paginator
 from discord.utils              import format_dt
@@ -269,7 +269,7 @@ class Utility(commands.Cog):
             await self.bot.pool.execute("DELETE FROM selfprefix WHERE user_id = $1", ctx.author.id)
             return await ctx.approve("Removed your **selfprefix**.")
         
-    @commands.group(
+    @hybrid_group(
         name = "tiktok",
         aliases = ["tt"],
         description = "Tiktok commands",
@@ -304,6 +304,39 @@ class Utility(commands.Cog):
         )
         embed.set_thumbnail(url=user["avatar"])
         await ctx.send(embed=embed)
+
+    @tiktok.command(
+        name = "reposter",
+        description = "Repost a tiktok video"
+    )
+    async def tiktok_reposter(self, ctx: Context, *, url: str):
+        if self.TIKTOK_URL_PATTERN.match(url):
+                api_url = f"https://tikwm.com/api/?url={url}"
+
+                async with aiohttp.ClientSession() as cs:
+                    async with cs.get(api_url) as r:
+                        data = await r.json()
+
+                        video_url = data['data']['play']
+                        likes = data['data']['digg_count']
+                        comments = data['data']['comment_count']
+                        shares = data['data']['share_count']
+                        description = data['data']['title']
+                        username = data["data"]["author"]["unique_id"]
+                        avatar = data["data"]["author"]["avatar"]
+
+                        async with cs.get(video_url) as video_response:
+                            video_data = await video_response.read()
+
+                            video_file = io.BytesIO(video_data)
+
+                            await ctx.message.delete()
+
+                            embed = discord.Embed(description=f"{description}", color=Colors.BASE_COLOR)
+                            embed.set_footer(text=f"❤️ {int(likes)} | 💬 {int(comments)} | 🔗 {int(shares)}")
+                            embed.set_author(name=f"{username}", icon_url=avatar)
+
+                            await ctx.send(file=discord.File(fp=video_file, filename="video.mp4"), embed=embed)
 
     @command(
         name = "gif",
