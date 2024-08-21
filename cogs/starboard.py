@@ -125,7 +125,7 @@ class Starboard(Cog):
                 color=Colors.BASE_COLOR
             )
             embed.add_field(
-                name='', 
+                name=f'{reaction.message.channel}', 
                 value=f"**[Jump to message]({reaction.message.jump_url})**",
                 inline=False
             )
