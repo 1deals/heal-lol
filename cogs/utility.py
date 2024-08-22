@@ -336,7 +336,7 @@ class Utility(commands.Cog):
                             video_data = await video_response.read()
 
                             video_file = io.BytesIO(video_data)
-                            embed = discord.Embed(description=f"{description}", color=discord.Color.blue())
+                            embed = discord.Embed(description=f"{description}", color=Colors.BASE_COLOR)
                             embed.set_footer(text=f"❤️ {int(likes)} | 💬 {int(comments)} | 🔗 {int(shares)}")
                             embed.set_author(name=f"{username}", icon_url=avatar)
 
@@ -345,7 +345,7 @@ class Utility(commands.Cog):
     def create_slideshow_embeds(self, description: str, likes: int, comments: int, shares: int, username: str, avatar: str, images: List[str]) -> List[discord.Embed]:
         embeds = []
         for image_url in images:
-            embed = discord.Embed(description=f"{description}", color=discord.Color.blue())
+            embed = discord.Embed(description=f"{description}", color=Colors.BASE_COLOR)
             embed.set_footer(text=f"❤️ {int(likes)} | 💬 {int(comments)} | 🔗 {int(shares)}")
             embed.set_author(name=f"{username}", icon_url=avatar)
             embed.set_image(url=image_url)
