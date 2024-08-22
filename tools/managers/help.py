@@ -22,7 +22,7 @@ class HealHelp(HelpCommand):
             color = Colors.BASE_COLOR,
             description=f"> Use the select menu below to **navigate** throughout the help menu."
         ).set_author(name = self.context.author.display_name, icon_url = self.context.author.display_avatar.url).set_thumbnail(url = self.context.bot.user.display_avatar.url)
-        embed.add_field(name = "Need support", value = f"Join the [support server](https://discord.gg/jCPYXFQekB) if you get really stuck.")
+        embed.add_field(name = "Need support?", value = f"Join the [support server](https://discord.gg/jCPYXFQekB) if you get really stuck.")
 
 
         view = discord.ui.View(timeout = 3000)
