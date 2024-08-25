@@ -468,6 +468,8 @@ class Utility(commands.Cog):
         aliases = ["rembg", "transparent", "tp"],
         description = "Removes a background from an image."
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def removebg(self, ctx: Context, *, image: str = None):
         if ctx.message.attachments:
