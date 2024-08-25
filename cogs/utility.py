@@ -463,7 +463,7 @@ class Utility(commands.Cog):
         await message.add_reaction("👍")
         await message.add_reaction("👎")
 
-    @command(
+    @hybrid_command(
         name = "removebg",
         aliases = ["rembg", "transparent", "tp"],
         description = "Removes a background from an image."
@@ -497,7 +497,6 @@ class Utility(commands.Cog):
             await ctx.reply(file=discord.File(fp=output_image, filename="output.png"))
         except Exception as e:
             await ctx.deny(f"Failed to remove background: {e}")
-
 
 
 async def setup(bot: Heal):

@@ -15,7 +15,7 @@ class Context(Context):
     async def approve(self, message: str, **kwargs) -> Message:
         return await self.send(
             embed=Embed(
-                color = Colors.BASE_COLOR,
+                color = Colors.APPROVE,
                 description = f'{Emojis.APPROVE} {self.author.mention}: {message}'
             ),
             **kwargs
@@ -24,7 +24,7 @@ class Context(Context):
     async def warn(self, message: str, **kwargs) -> Message:
         return await self.send(
             embed=Embed(
-                color = Colors.BASE_COLOR,
+                color = Colors.WARN,
                 description = f'{Emojis.WARN} {self.author.mention}: {message}'
             ),
             **kwargs
@@ -33,7 +33,7 @@ class Context(Context):
     async def deny(self, message: str, **kwargs) -> Message:
         return await self.send(
             embed=Embed(
-                color = Colors.BASE_COLOR,
+                color = Colors.DENY,
                 description = f'{Emojis.DENY} {self.author.mention}: {message}'
             ),
             **kwargs
