@@ -24,6 +24,7 @@ from random import choice
 from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 from tools.configuration import api
 from io import BytesIO
+from rembg import remove
 
 class Utility(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -186,7 +187,7 @@ class Utility(commands.Cog):
             if self_prefix:
                 embed = discord.Embed(
                     title="",
-                    description=f"> Your **prefixes** are: `{guild_prefix}` & `{self_prefix}`",
+                    description=f"> Your **prefix** is: `{self_prefix}`",
                     color=Colors.BASE_COLOR)
                 await message.channel.send(embed=embed)
 
@@ -285,30 +286,6 @@ class Utility(commands.Cog):
     async def tiktok(self, ctx: Context):
         await ctx.send_help(ctx.command)
 
-
-    @tiktok.command(
-        name = "user",
-        aliases = ["creator"],
-        description="get info about a tiktok creator",
-    )
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def tiktok_user(self, ctx: Context, *, user=None):
-        if user is None: 
-           return await ctx.send_help(ctx.command)
-        
-        res = requests.get(url=f'https://edgabot.akiomae.com/api/tiktokAPI/index.php?user={user}')
-        data = res.json()
-        user = data["user"]
-        stats = data["stats"]
-
-        embed = discord.Embed(
-            title = f"@{user["username"]}",
-            url = f'https://tiktok.com/@{user["profileName"]}',
-            description = f"Followers: {stats["follower"]} \nFollowing: {stats["following"]} \nVideos posted: {stats["video"]} \nLikes: {stats["like"]}",
-            color = Colors.BASE_COLOR
-        )
-        embed.set_thumbnail(url=user["avatar"])
-        await ctx.send(embed=embed)
 
     @tiktok.command(
         name = "reposter",
@@ -485,6 +462,43 @@ class Utility(commands.Cog):
         message = await ctx.send(embed=emb)
         await message.add_reaction("👍")
         await message.add_reaction("👎")
+
+    @command(
+        name = "removebg",
+        aliases = ["rembg", "transparent", "tp"],
+        description = "Removes a background from an image."
+    )
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def removebg(self, ctx: Context, *, image: str = None):
+        if ctx.message.attachments:
+            image_url = ctx.message.attachments[0].url
+        elif image:
+            image_url = image
+        else:
+            return await ctx.warn("Please provide an image URL or upload an image.")
+        
+        await ctx.typing()
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(image_url) as resp:
+                if resp.status != 200:
+                    return await ctx.warn("Failed to fetch the image.")
+                image_data = await resp.read()
+
+        try:
+            input_image = BytesIO(image_data) 
+            input_image_bytes = input_image.getvalue() 
+
+            output_image_data = remove(input_image_bytes, force_return_bytes=True)
+
+            output_image = BytesIO(output_image_data)
+            output_image.seek(0)
+
+            await ctx.reply(file=discord.File(fp=output_image, filename="output.png"))
+        except Exception as e:
+            await ctx.deny(f"Failed to remove background: {e}")
+
+
 
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))

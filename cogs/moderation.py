@@ -335,11 +335,23 @@ class Moderation(commands.Cog):
         """
         if channel is None:
             channel = ctx.channel
-        new = await ctx.channel.clone()
-        await new.edit(position=ctx.channel.position, topic=ctx.channel.topic, overwrites=ctx.channel.overwrites)
-        await ctx.channel.delete()
-        embed = discord.Embed(description = f"**Nuked** by: **{ctx.author}**", color = self.bot.color)
-        await new.send(embed=embed)
+        new_channel = await channel.clone()
+
+        await new_channel.edit(
+            position=channel.position,
+            topic=channel.topic,
+            overwrites=channel.overwrites
+        )
+
+        await channel.delete()
+
+        embed = discord.Embed(
+            description="",
+            color=Colors.BASE_COLOR
+        )
+        embed.set_image(url = self.bot.user.avatar.url)
+        embed.set_footer(text = f"Nuked by {ctx.author}", icon_url = ctx.author.avatar.url)
+        await new_channel.send(embed=embed)
 
     @command(
         name = "imute",
