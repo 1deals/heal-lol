@@ -16,6 +16,8 @@ from discord.ext.tasks import loop
 from discord import Member, Guild, Object, User
 from asyncio import gather
 import traceback
+import secrets
+import config
 
 from tools.heal import Heal
 from tools.managers.context import Context, Emojis, Colors
@@ -277,6 +279,26 @@ class Owner(Cog):
         
         await self.bot.pool.execute("DELETE FROM premium WHERE user_id = $1", user.id)
         return await ctx.approve(f"**{user.name}'s** premium has been **revoked**.")
+
+    @commands.group(invoke_without_command=True, name="api")
+    async def api(self, ctx:Context):
+        await ctx.send_help(ctx.command)
+
+    @api.command(name="add", brief="bot owner", usage="[user] [role]\n[master] [bot_developer] [premium] [pro] [basic]", description="add an api key")
+    @commands.is_owner()
+    async def apikey_add(self, ctx: Context, user: discord.User, role: str):
+        key = secrets.token_urlsafe(32)  
+        url = "https://127.0.0.1"
+
+        check = await self.bot.pool.fetchrow("SELECT * FROM api_key WHERE user_id = $1", user.id)
+        if check is not None:
+            return await ctx.send(f"The user **{user.name}** already has a **valid** API key.")
+
+        embed = discord.Embed(description=f"Your API key for {url} is listed above.", color=Colors.BASE_COLOR)
+
+        await self.bot.pool.execute("INSERT INTO api_key (key, user_id, role) VALUES ($1, $2, $3)", key, user.id, role)
+        await ctx.approve(f"I have **successfully** added the API key **{key}** to {user.mention}.")
+        await user.send(f"{key}", embed=embed)
 
 
 async def setup(bot: Heal) -> None:

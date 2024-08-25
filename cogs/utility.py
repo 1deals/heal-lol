@@ -23,6 +23,7 @@ import random
 from random import choice
 from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 from tools.configuration import api
+from io import BytesIO
 
 class Utility(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -237,23 +238,25 @@ class Utility(commands.Cog):
         description = "Set your selfprefix"
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def selfprefix_set(self, ctx: Context, *, prefix = None):
-        if prefix is None:
-            return await ctx.send_help(ctx.command)
+    async def selfprefix_set(self, ctx: Context, *, prefix: str):
 
-        if len(prefix) > 10:
-            return await ctx.deny(f"Your **selfprefix** cannot be more than `10` characters long.")
+        if len(prefix) > 7:
+            return await ctx.deny("Prefix is too long!")
 
-        await self.bot.pool.execute(
-            """
-            INSERT INTO selfprefix (user_id, prefix)
-            VALUES ($1, $2)
-            ON CONFLICT (user_id)
-            DO UPDATE SET prefix = $2
-            """,
-            ctx.author.id, prefix
-        )
-        await ctx.approve(f"Your **selfprefix** has been set to **`{prefix}`**")
+        try:
+            await self.bot.pool.execute(
+                "INSERT INTO selfprefix VALUES ($1,$2)", ctx.author.id, prefix
+            )
+        except:
+            await self.bot.pool.execute(
+                "UPDATE selfprefix SET prefix = $1 WHERE user_id = $2",
+                prefix,
+                ctx.author.id,
+            )
+        finally:
+            return await ctx.approve(
+                f"Selfprefix **set** to `{prefix}`", reference=ctx.message
+            )
 
     @selfprefix.command(
         name = "remove",
@@ -380,7 +383,7 @@ class Utility(commands.Cog):
                         gif_buffer.seek(0)
                         await ctx.send(file=discord.File(gif_buffer, filename="output.gif"))
 
-    @command(
+    @hybrid_command(
         name = "screenshot",
         aliases = ["ss"],
         description = "Screenshot a website."
@@ -389,9 +392,6 @@ class Utility(commands.Cog):
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def screenshot(self, ctx: Context, *, url: str = None):
-        if url is None:
-            return await ctx.send_help(ctx.command)
-        
         APIKEY = api.luma  
         api_url = "https://api.fulcrum.lol/screenshot"
 

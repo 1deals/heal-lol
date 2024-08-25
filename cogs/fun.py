@@ -11,6 +11,7 @@ from discord.ext.commands       import command, group, BucketType, cooldown, has
 from tools.managers.context import Context, Colors
 from tools.heal import Heal
 from typing import Union
+from random import choice
 
 class Fun(commands.Cog):
     """
@@ -287,7 +288,18 @@ class Fun(commands.Cog):
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}")
 
-    
+    @hybrid_command(
+        name = "8ball",
+        description = "Ask 8ball a question."
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def eightball(self, ctx: Context, *, question: str):
+        responses = ["It is certain", "Reply hazy, try again", "Don't count on it", "It is decidedly so", "Ask again later", "My reply is no", "Without a doubt", "Better not tell you now", "My sources say no", "Yes definitely", "Cannot predict now", "Outlook not so good", "You may rely on it", "Concentrate and ask again", "Very doubtful", "As I see it, yes", "Most likely", "Outlook good", "Yes", "Signs point to yes"]
+        embed = discord.Embed(title = f"{question}", description = f"{choice(responses)}", color = Colors.BASE_COLOR)
+        embed.set_author(name = f"{ctx.author}", icon_url = ctx.author.avatar.url)
+        return await ctx.reply(embed=embed)
         
         
 

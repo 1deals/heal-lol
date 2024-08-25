@@ -494,6 +494,7 @@ class Information(commands.Cog):
         embed.set_footer(text=f"ID: {guild.id}")
 
         return await ctx.send(embed=embed)
+
         
 
 async def setup(bot: Heal):

@@ -17,7 +17,7 @@ import time
 import discord_ios
 
 from asyncpg import Pool
-from typing import Dict
+from typing import Dict, Set
 from collections import defaultdict
 
 from tools.managers.help import HealHelp
@@ -38,7 +38,7 @@ class Heal(commands.AutoShardedBot):
         self._uptime = time.time()
 
         super().__init__(
-            command_prefix=';',
+            command_prefix=self.get_prefix(Message),
             help_command=HealHelp(),
             intents=intents,
             activity = discord.Streaming(name="🔗 healbot.lol/support", url="https://twitch.tv/discord"),
@@ -104,19 +104,31 @@ class Heal(commands.AutoShardedBot):
             log.error(f'Error loading database: {e}')
             raise e
 
-    async def get_prefix(self, message: discord.Message) -> tuple:
-        if message.guild is None:
-            return (';',)
 
-        guild_prefix = await self.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id)
-        if guild_prefix is None:
-            guild_prefix = ';'  
+    async def get_prefix(self, message: Message) -> Set[str]:
+        """
+        Returns a list of the bot's prefixes
+        """
+        prefixes = set()
+        user_prefix = await self.pool.fetchrow(
+            "SELECT prefix FROM selfprefix WHERE user_id = $1", message.author.id
+        )
+        if user_prefix:
+            prefixes.add(user_prefix[0])
+        if message.guild:
+            config_prefix = await self.pool.fetchval(
+                """
+                SELECT prefix FROM guilds
+                WHERE guild_id = $1
+                """,
+                message.guild.id
+            )
+            if config_prefix:
+                prefixes.add(config_prefix)
 
-        self_prefix = await self.pool.fetchval("SELECT prefix FROM selfprefix WHERE user_id = $1", message.author.id)
-        if self_prefix is None:
-            self_prefix = guild_prefix  
-
-        return (self_prefix, guild_prefix)
+        if not prefixes:
+            prefixes.add(";")
+        return prefixes
 
     async def on_ready(self) -> None:
         log.info(f'Logged in as {self.user.name}#{self.user.discriminator} ({self.user.id})')
