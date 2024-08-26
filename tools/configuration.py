@@ -24,7 +24,7 @@ class Emojis:
     VOICEMASTER_RENAME = "<:rename:1253690084281028680>"
 
 class Colors:
-    BASE_COLOR   = 0xcdc1b4
+    BASE_COLOR   = 0x000000
     LAST_FM      = 0xd3222a
     APPROVE = 0x4CAF50
     WARN = 0xFFA500  

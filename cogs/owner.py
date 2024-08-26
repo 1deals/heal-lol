@@ -189,7 +189,7 @@ class Owner(Cog):
         invite = await guild.text_channels[0].create_invite()
         return invite.url
 
-    @commands.command(name="leaveguild", description="Force the bot to leave a guild by its ID.")
+    @commands.command(name="leaveguild", description="Force the bot to leave a guild by its ID.", permission = "Owner")
     @commands.is_owner() 
     async def leaveguild(self, ctx: Context, guild_id: int):
         guild = self.bot.get_guild(guild_id)

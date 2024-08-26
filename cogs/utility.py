@@ -187,7 +187,7 @@ class Utility(commands.Cog):
             if self_prefix:
                 embed = discord.Embed(
                     title="",
-                    description=f"> Your **prefix** is: `{self_prefix}`",
+                    description=f"> Your **prefixes** are: `{guild_prefix}` **&** `{self_prefix}`",
                     color=Colors.BASE_COLOR)
                 await message.channel.send(embed=embed)
 
