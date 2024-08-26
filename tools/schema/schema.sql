@@ -139,3 +139,11 @@ CREATE TABLE IF NOT EXISTS starboard (
     emoji TEXT,
     threshold BIGINT
 );
+
+CREATE TABLE IF NOT EXISTS logging (
+    guild_id BIGINT PRIMARY KEY,
+    joinlogschannel BIGINT,
+    leavelogschannel BIGINT,
+    messagelogschannel BIGINT,
+    voicelogschannel BIGINT
+);

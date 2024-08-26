@@ -339,7 +339,13 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def gif(self, ctx: Context):
         await ctx.typing()
-        if ctx.message.attachments:
+        if ctx.message.reference:
+            ref_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            if ref_message.attachments:
+                image_url = ref_message.attachments[0].url
+            else:
+                return await ctx.send("The replied-to message does not contain an image.")
+        elif ctx.message.attachments:
             image_url = ctx.message.attachments[0].url
         else:
             try:
@@ -353,12 +359,14 @@ class Utility(commands.Cog):
                     image_data = await response.read()
                     with io.BytesIO(image_data) as image_binary:
                         image = Image.open(image_binary)
-
-                    
+                        
+                        # Convert the image to GIF
                         gif_buffer = io.BytesIO()
                         image.save(gif_buffer, format='GIF')
                         gif_buffer.seek(0)
-                        await ctx.send(file=discord.File(gif_buffer, filename="output.gif"))
+                        await ctx.reply(file=discord.File(gif_buffer, filename="output.gif"))
+                else:
+                    await ctx.send("Failed to retrieve the image.")
 
     @hybrid_command(
         name = "screenshot",

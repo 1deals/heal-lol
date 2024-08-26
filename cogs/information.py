@@ -163,9 +163,6 @@ class Information(commands.Cog):
                                 track_url = track_info['url']
                                 description += f"> {Emojis.LASTFM} **Listening to [{track_name}]({track_url}) by {artist_name}**"
                                 embed.description = description
-                                album_art = track_info['image'][-1]['#text']
-                                if album_art:
-                                    embed.set_thumbnail(url=album_art)
 
         await ctx.send(embed=embed)
 

@@ -226,7 +226,7 @@ class Moderation(commands.Cog):
         name = "role",
         description = "Add / remove a role from a user.",
         aliases = ["r"],
-        invoke_without_command=True
+        invoke_without_command=False
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.has_permissions(manage_roles=True)
@@ -244,6 +244,7 @@ class Moderation(commands.Cog):
         else:
             await member.add_roles(role)
             await ctx.approve(f"Added {role.mention} to {member.name}")
+
 
 
 
