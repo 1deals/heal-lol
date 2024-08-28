@@ -502,6 +502,13 @@ class Moderation(commands.Cog):
         else:
             return await ctx.warn(f"Command **`{cmd.name}`** is not disabled.")
 
+    @command(
+        name = "unban",
+        description = "Unbans a user."
+    )
+    @has_permissions(moderate_members = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+
 
 async def setup(bot: Heal):
     await bot.add_cog(Moderation(bot))
