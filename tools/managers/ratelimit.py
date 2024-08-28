@@ -29,7 +29,8 @@ def ratelimit(key: str, limit: int, duration: int = 60, retry: bool = True):
             if rl < limit:
                 await cache.set(formatted_key, rl + 1, expire=duration)
             elif rl >= limit and not retry:
-                return None
+                logger.info(f"{func.__name__} rate limited. Not retrying")
+                return
             else:
                 logger.info(
                     f"{func.__name__} rate limited. Trying again in {duration} seconds."

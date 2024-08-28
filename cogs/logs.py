@@ -56,7 +56,6 @@ class Logs(commands.Cog):
         return await ctx.approve(f"Join logs will now be sent to {channel.mention}.")
 
     @commands.Cog.listener()
-    @ratelimit(key="{message.guild}", limit=3, duration=10, retry=False)
     async def on_member_join(self, member: discord.Member):
         res = await self.bot.pool.fetchrow("SELECT * from logging WHERE guild_id = $1", member.guild.id)
 
@@ -89,7 +88,6 @@ class Logs(commands.Cog):
         return await ctx.approve(f"Leave logs will now be sent to {channel.mention}.")
 
     @commands.Cog.listener()
-    @ratelimit(key="{message.guild}", limit=3, duration=10, retry=False)
     async def on_member_remove(self, member: discord.Member):
         res = await self.bot.pool.fetchrow("SELECT * from logging WHERE guild_id = $1", member.guild.id)
 
@@ -134,7 +132,6 @@ class Logs(commands.Cog):
                 await channel.send(embed=embed)
 
     @commands.Cog.listener()
-    @ratelimit(key="{message.guild}", limit=3, duration=10, retry=False)
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
         if before.content == after.content:
             return
@@ -170,7 +167,6 @@ class Logs(commands.Cog):
         return await ctx.approve(f"Voice chat logs will now be sent to {channel.mention}.")
 
     @commands.Cog.listener()
-    @ratelimit(key="{message.guild}", limit=3, duration=10, retry=False)
     async def on_voice_state_update(self, member: discord.Member, before: discord.VoiceState, after: discord.VoiceState):
         res = await self.bot.pool.fetchrow("SELECT * from logging WHERE guild_id = $1", member.guild.id)
 
