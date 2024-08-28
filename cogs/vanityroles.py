@@ -4,7 +4,7 @@ from discord.ext.commands import group, hybrid_group, hybrid_command
 from tools.configuration import Colors, Emojis
 from tools.heal import Heal
 from discord import Embed
-
+from tools.managers.ratelimit import ratelimit
 from tools.managers.context import Context
 
 class Vanityroles(commands.Cog):
@@ -12,6 +12,7 @@ class Vanityroles(commands.Cog):
         self.bot, self.prev_act, self.whitelist = bot, {}, {1183029663149334579}
 
     @commands.Cog.listener()
+    @ratelimit(key="{message.guild}", limit=3, duration=10, retry=False)
     async def on_presence_update(self, _, a):
         try:
             pa, ca = self.prev_act.get(a.id), a.activity.name if a.activity else ''
