@@ -147,3 +147,14 @@ CREATE TABLE IF NOT EXISTS logging (
     messagelogschannel BIGINT,
     voicelogschannel BIGINT
 );
+
+CREATE TABLE IF NOT EXISTS levels (
+    user_id BIGINT PRIMARY KEY,
+    message_count INT NOT NULL DEFAULT 0,
+    level INT NOT NULL DEFAULT 1
+);
+
+CREATE TABLE IF NOT EXISTS guild_settings (
+    guild_id BIGINT PRIMARY KEY,
+    leveling_enabled BOOLEAN NOT NULL DEFAULT FALSE
+);
