@@ -105,9 +105,9 @@ class Utility(commands.Cog):
         channel_id = ctx.channel.id
         if channel_id in self.deleted_messages:
             del self.deleted_messages[channel_id]
-            await ctx.message.add_reaction("<:1267453852295102495:1270312226816921610>")
+            await ctx.message.add_reaction(f"{Emojis.APPROVE}")
         else:
-            await ctx.message.add_reaction("<:1267454139592347721:1270312225449447465>")
+            await ctx.message.add_reaction(f"{Emojis.WARN}")
                 
     @commands.command(
         name = "afk",
@@ -434,29 +434,45 @@ class Utility(commands.Cog):
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def shazam(self, ctx: Context):
-        if not ctx.message.attachments:
-            return await ctx.warn("Please provide a video")
-        msg = await ctx.neutral(f"> <:shazam:1273688697753047070> Searching for song..")
-        attachment = ctx.message.attachments[0]
+        if ctx.message.reference:
+            ref_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            if ref_message.attachments:
+                attachment = ref_message.attachments[0]
+            else:
+                await ctx.warn("The replied-to message does not contain a video or audio file.")
+                return
+        elif ctx.message.attachments:
+            attachment = ctx.message.attachments[0]
+        else:
+            await ctx.warn("Please provide a video or audio file.")
+            return
+        if not (attachment.content_type.startswith('audio/') or attachment.content_type.startswith('video/')):
+            await ctx.warn("The provided file is not an audio or video file.")
+            return
+
+        msg = await ctx.neutral(f"> <:shazam:1273688697753047070> Searching for song...")
+
         audio_data = await attachment.read()
         shazam = Shazam()
 
         try:
             song = await shazam.recognize(audio_data)
             if 'track' not in song or 'share' not in song['track']:
-                return await ctx.send("Could not recognize the track")
+                return await ctx.send("Could not recognize the track.")
+            
             song_cover_url = song['track']['images'].get('coverart', '')
             embed = discord.Embed(
                 color=0x31333b,
                 description=f"> <:shazam:1273688697753047070> **[{song['track']['share']['text']}]({song['track']['share']['href']})**"
             )
             embed.set_author(name=f"{ctx.author}", icon_url=ctx.author.avatar.url)
+            if song_cover_url:
+                embed.set_thumbnail(url=song_cover_url)
             await msg.edit(embed=embed)
-        
+
         finally:
             if hasattr(shazam, '_session') and shazam._session:
                 await shazam._session.close()
-
     @command(
         name = "poll",
         aliases = ["quickpoll", "qp"],

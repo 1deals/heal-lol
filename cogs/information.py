@@ -95,6 +95,8 @@ class Information(commands.Cog):
     aliases=["ui", "whois"],
     description="Get info about a user."
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def userinfo(self, ctx: Context, *, user: Union[discord.Member, discord.User] = None):
 
@@ -114,13 +116,13 @@ class Information(commands.Cog):
 
 
         if user.id == 187747524646404105:  # me
-            title += " <:owner:1270728554388394086> <:staff:1270729949686534206> <:dev:1270730817458405468> "
+            title += " <:owner:1277914467270922320> <:staff:1277914880808063007> <:dev:1277915125482786816> "
         if user.id == 392300135323009024:  # xur
-            title += " <:staff:1270729949686534206> <:dev:1270730817458405468>"
+            title += " <:staff:1277914880808063007> <:dev:1277915125482786816>"
         if user.id == 461914901624127489:  # logan
-            title += " <:zzmilklove2:1270873236841693267> <:staff:1270729949686534206> <:dev:1270730817458405468>"
+            title += " <:zzmilklove2:1270873236841693267> <:staff:1277914880808063007> <:dev:1277915125482786816>"
         if user.id == 1261756025275547719:  # neca
-            title += " <:staff:1270729949686534206>"
+            title += " <:staff:1277914880808063007>"
 
         embed = discord.Embed(
             title=title,

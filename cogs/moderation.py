@@ -142,7 +142,7 @@ class Moderation(commands.Cog):
             await ctx.approve(f"Muted **{user}** for `{humanfriendly.format_timespan(time)}` - **{reason}**")
     
     @commands.command(name='unmute', description='ummute a user in your server', brief='-ummute <user> <reason>')
-    @commands.has_permissions(moderate_members=True)
+    @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def unmute(self, ctx: commands.Context, user: discord.Member, *, reason: str = "No reason provided"):
         

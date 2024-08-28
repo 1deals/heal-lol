@@ -18,6 +18,7 @@ from asyncio import gather
 import traceback
 import secrets
 import config
+import subprocess
 
 from tools.heal import Heal
 from tools.managers.context import Context, Emojis, Colors
@@ -300,6 +301,40 @@ class Owner(Cog):
         await ctx.approve(f"I have **successfully** added the API key **{key}** to {user.mention}.")
         await user.send(f"{key}", embed=embed)
 
+    @command(
+        name = "push",
+        description = "Push to the github repo."
+    )
+    @commands.is_owner()
+    async def push(self, ctx: Context):
+        try:
+            # Execute the shell command
+            result = subprocess.run(
+                ['git', 'add', '*'],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            commit_result = subprocess.run(
+                ['git', 'commit', '-m', 'lol'],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            push_result = subprocess.run(
+                ['git', 'push'],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+
+            await ctx.approve(f"```{result.stdout}{commit_result.stdout}{push_result.stdout}```")
+
+        except subprocess.CalledProcessError as e:
+            await ctx.warn(f"An error occurred:\n```{e.stderr}```")
 
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Owner(bot))
