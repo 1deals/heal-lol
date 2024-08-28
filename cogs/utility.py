@@ -16,6 +16,7 @@ import humanize
 import datetime
 import requests
 import io, re
+from discord import Message
 import shazamio
 from shazamio import Shazam, Serialize
 from PIL import Image, ImageDraw, ImageFont
@@ -239,25 +240,21 @@ class Utility(commands.Cog):
         description = "Set your selfprefix"
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def selfprefix_set(self, ctx: Context, *, prefix: str):
+    async def selfprefix_set(self, ctx: Context, prefix: str) -> Message:
 
         if len(prefix) > 7:
             return await ctx.deny("Prefix is too long!")
 
-        try:
-            await self.bot.pool.execute(
-                "INSERT INTO selfprefix VALUES ($1,$2)", ctx.author.id, prefix
-            )
-        except:
-            await self.bot.pool.execute(
-                "UPDATE selfprefix SET prefix = $1 WHERE user_id = $2",
-                prefix,
-                ctx.author.id,
-            )
-        finally:
-            return await ctx.approve(
-                f"Selfprefix **set** to `{prefix}`", reference=ctx.message
-            )
+        await self.bot.pool.execute(
+            """
+            INSERT INTO selfprefix (user_id, prefix)
+            VALUES ($1, $2)
+            ON CONFLICT (user_id)
+            DO UPDATE SET prefix = $2
+            """,
+            ctx.author.id, prefix
+        )
+        return await ctx.approve(f"**Self Prefix** updated to `{prefix}`")
 
     @selfprefix.command(
         name = "remove",
@@ -266,7 +263,7 @@ class Utility(commands.Cog):
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def selfprefix_remove(self, ctx: Context):
-        check = await self.bot.pool.fetchval("SELECT prefix FROM selfprefix WHERE user_id = $1", ctx.author.id)
+        check = await self.bot.pool.fetchval("SELECT * FROM selfprefix WHERE user_id = $1", ctx.author.id)
         if not check:
             return await ctx.deny(f"You dont have a **selfprefix** setup.")
         else:
