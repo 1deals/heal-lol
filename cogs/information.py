@@ -123,6 +123,10 @@ class Information(commands.Cog):
             title += " <:zzmilklove2:1270873236841693267> <:staff:1277914880808063007> <:dev:1277915125482786816>"
         if user.id == 1261756025275547719:  # neca
             title += " <:staff:1277914880808063007>"
+        if user.id == 809975522867412994:  #blahja
+            title += " <:staff:1277914880808063007> <:Boykisser:1278453222754877503>"
+        if user.id == 1250382435632418816:  #lina
+            title += " <:staff:1277914880808063007> <:mlp_fatflutter:1278453716818854021>"
 
         embed = discord.Embed(
             title=title,
