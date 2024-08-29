@@ -127,6 +127,12 @@ class Information(commands.Cog):
             title += " <:staff:1277914880808063007> <:Boykisser:1278453222754877503>"
         if user.id == 1250382435632418816:  #lina
             title += " <:staff:1277914880808063007> <:mlp_fatflutter:1278453716818854021>"
+        if user.id == 1035497951591673917:  #qilla
+             title += " <:staff:1277914880808063007> <a:menacemonkey:1271184769836912680>"
+
+        prem = await self.bot.pool.fetchval("SELECT * FROM premium WHERE user_id = $1", user.id)
+        if prem:
+            title += " <:earlysupporter:1278698352736997428>"
 
         embed = discord.Embed(
             title=title,

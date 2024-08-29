@@ -26,6 +26,36 @@ from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 from tools.configuration import api
 from io import BytesIO
 from rembg import remove
+import google.generativeai as genai
+
+api_keys = ["AIzaSyARqu0-ecLbA5gTpcCi8R8n8DQnM_y5SCc", "AIzaSyD6kJ3BEfJ9MoyiqkGQqmKwCH41rSAI7OY", "AIzaSyB5M5n1Y6FbzJn8ArixxWBCfwBRMkJReNw"]
+key = random.choice(api_keys)
+genai.configure(api_key=key)
+
+model = genai.GenerativeModel('gemini-pro',
+safety_settings = [
+        {
+            "category": "HARM_CATEGORY_DANGEROUS",
+            "threshold": "BLOCK_NONE",
+        },
+        {
+            "category": "HARM_CATEGORY_HARASSMENT",
+            "threshold": "BLOCK_NONE",
+        },
+        {
+            "category": "HARM_CATEGORY_HATE_SPEECH",
+            "threshold": "BLOCK_NONE",
+        },
+        {
+            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            "threshold": "BLOCK_NONE",
+        },
+        {
+            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+            "threshold": "BLOCK_NONE",
+        },
+    ]
+    )
 
 class Utility(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -43,20 +73,16 @@ class Utility(commands.Cog):
 
     @hybrid_command(
         name = "chatgpt",
-        aliases = ["openai", "ai", "ask"],
+        aliases = ["openai", "ai", "ask", "askheal"],
         description = "Ask chatgpt a question."
     )
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def chatgpt(self, ctx: Context, *, prompt: str):
-        await ctx.typing()
-
-        async with aiohttp.ClientSession() as session:
-            async with session.get(f"https://api.kastg.xyz/api/ai/llamaV3-large?prompt={prompt}&key=Kastg_OEq0gEfVZzWhVBqV3ghm_free") as r:
-                response = await r.json()
-                em = discord.Embed(title = f"{prompt}", description = response["result"][0]["response"], color = Colors.BASE_COLOR)
-                await ctx.send(embed=em)
+        async with ctx.typing():
+            response = model.generate_content(prompt)
+            await ctx.reply(response.text)
 
 
     @commands.Cog.listener()

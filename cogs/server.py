@@ -343,6 +343,99 @@ class Server(Cog):
             ctx.guild.id, trigger
         )
         return await ctx.approve(f"I will no longer respond to **{trigger}**")
+
+    @group(
+        name = "boostmessage",
+        aliases = ["boostmsg"],
+        description = "Configure boost messages for your guild.",
+        invoke_without_command = True
+    )
+    @commands.has_permissions(manage_messages = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def boostmessage(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+
+    @boostmessage.command(
+        name = "channel",
+        aliases = ["chan", "chnl"],
+        description = "Set the boost message channel."
+    )
+    @commands.has_permissions(manage_messages = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def boostmessage_channel(self, ctx: Context, *, channel: discord.TextChannel):
+        await self.bot.pool.execute("INSERT INTO boostmessage (guild_id, channel_id) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET channel_id = $2", ctx.guild.id, channel.id)
+        return await ctx.approve(f"Set the **boost message** channel to {channel.mention}")
+
+    @boostmessage.command(
+        name = "message",
+        aliases = ["mes", "msg"],
+        description = "Set the boost message message."
+    )
+    @commands.has_permissions(manage_messages = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def boostmessage_message(self, ctx: Context, *, message: str):
+        await self.bot.pool.execute("INSERT INTO boostmessage (guild_id, message) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET message = $2", ctx.guild.id, message)
+        processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+        content, embed, view = await EmbedBuilder.to_object(processed_message)
+            
+        await ctx.approve(f"Set the **boost message** message to:")
+        if content or embed:
+            await ctx.send(content=content, embed=embed, view=view)
+        else:
+            await ctx.send(content=processed_message)
+
+    @boostmessage.command(
+        name = "remove",
+        description = "Remove the boost message."
+    )
+    @commands.has_permissions(manage_messages = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def boostmessage_remove(self, ctx: Context):
+        data = await self.bot.pool.fetchrow("SELECT * FROM boostmessage WHERE guild_id = $1", ctx.guild.id)
+        if data is None:
+            return await ctx.warn("There is no boost message setup for this guild.")
+        await self.bot.pool.execute("DELETE FROM boostmessage WHERE guild_id = $1", ctx.guild.id)
+        return await ctx.approve("Boost message has been disabled.")
+
+    @commands.Cog.listener()
+    async def on_member_update(self, before: discord.Member, after: discord.Member):
+        if before.guild.premium_subscriber_role not in before.roles and after.guild.premium_subscriber_role in after.roles:
+            channel = before.guild.system_channel
+            
+            if channel is None:
+                res = await self.bot.pool.fetchrow("SELECT * FROM boostmessage WHERE guild_id = $1", before.guild.id)
+                if res:
+                    channel = before.guild.get_channel(res['channel_id'])
+            
+            if channel:
+                message = res["message"] if res else "Thanks for boosting the server!"
+                processed_message = EmbedBuilder.embed_replacement(after, message)
+                content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+                if content or embed:
+                    await channel.send(content=content, embed=embed, view=view)
+                else:
+                    await channel.send(content=processed_message)
+    
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message): 
+        if "MessageType.premium_guild" in str(message.type):
+            res = await self.bot.pool.fetchrow("SELECT * FROM boostmessage WHERE guild_id = $1", message.guild.id)
+            if res:
+                channel = message.guild.get_channel(res['channel_id'])
+            
+                if channel:
+
+                    boost_message = res["message"]
+                    processed_message = EmbedBuilder.embed_replacement(message.author, boost_message)
+                    content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+                    if content or embed:
+                        await channel.send(content=content, embed=embed, view=view)
+                    else:
+                        await channel.send(content=processed_message)
+
+
     
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Server(bot))

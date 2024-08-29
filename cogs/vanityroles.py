@@ -12,41 +12,29 @@ class Vanityroles(commands.Cog):
         self.bot, self.prev_act, self.whitelist = bot, {}, {1183029663149334579}
 
     @commands.Cog.listener()
-    async def on_presence_update(self, _, a):
-        try:
-            pa, ca = self.prev_act.get(a.id), a.activity.name if a.activity else ''
-            if pa != ca:
-                self.prev_act[a.id] = ca
-                await self.check(a, ca)
-        except Exception as e:
-            logging.error(f"Error in on_presence_update: {e}")
+    async def on_presence_update(self, _, member):
+        data = await self.bot.pool.fetchrow("SELECT * FROM vanityroles WHERE guild_id = $1", member.guild.id)
+        
+        if not data:
+            return  
 
-    async def check(self, m, ca):
-        try:
-            async with self.bot.pool.acquire() as c:
-                r = await c.fetchrow("SELECT channel_id, text, role_id FROM vanityroles WHERE guild_id = $1", m.guild.id)
-                if r:
-                    cid, t, rid = r['channel_id'], r['text'], r['role_id']
-                    role = m.guild.get_role(rid)
-                    if t in ca:
-                        if role and role not in m.roles:
-                            try:
-                                await m.add_roles(role)
-                            except:
-                                pass
-                            await self.send(m, t, cid)
-                    elif role in m.roles:
-                        await m.remove_roles(role)
-        except Exception as e:
-            logging.error(f"Error in check: {e}")
+        role_id = data["role_id"]
+        role = member.guild.get_role(role_id)
+        channel_id = data["channel_id"]
+        channel = member.guild.get_channel(channel_id)
+        string = data["text"]
 
-    async def send(self, m, t, cid):
-        try:
-            ch = m.guild.get_channel(cid)
-            if ch:
-                await ch.send(embed=discord.Embed(color=Colors.BASE_COLOR, description=f'{Emojis.APPROVE} Thanks for repping {t}, {m.mention}! <:1bearKissMilk:1271966989640011940>'))
-        except Exception as e:
-            logging.error(f"Error in send: {e}")
+
+        if string and role and channel:
+            current_activity = member.activity.name if member.activity else ''
+            if string in current_activity:
+                if role not in member.roles:
+                    await member.add_roles(role)
+                    embed = discord.Embed(description=f"Thank you for repping **{string}**, {member.mention}!", color=Colors.BASE_COLOR)
+                    await channel.send(embed=embed)
+            else:
+                if role in member.roles:
+                    await member.remove_roles(role)
 
 
     @hybrid_group(

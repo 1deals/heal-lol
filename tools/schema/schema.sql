@@ -158,3 +158,9 @@ CREATE TABLE IF NOT EXISTS guild_settings (
     guild_id BIGINT PRIMARY KEY,
     leveling_enabled BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+CREATE TABLE IF NOT EXISTS boostmessage (
+    guild_id BIGINT PRIMARY KEY,
+    message TEXT,
+    channel_id BIGINT
+);
