@@ -23,18 +23,6 @@ from tools.managers.lastfm import FMHandler
 from tools.managers.context import Context, Emojis, Colors
 from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 
-def has_perks():
-  async def predicate(ctx: Context):
-    check = await ctx.bot.pool.fetchrow(
-      "SELECT * FROM premium WHERE user_id = $1",
-      ctx.author.id
-    )
-    if not check:
-      await ctx.warn("You need to be a premium user to use this command.")
-      return False
-    return True
-  return commands.check(predicate)
-
 class LastFM(Cog):
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
@@ -204,7 +192,6 @@ class LastFM(Cog):
         aliases = ["cc"],
         description = "Configure your custom NowPlaying alias."
     )
-    @has_perks()
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def lastfm_customcommand(self, ctx: Context):
         return await ctx.send_help(ctx.command)
@@ -215,7 +202,6 @@ class LastFM(Cog):
         description = "Set your customcommand"
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    @has_perks()
     async def lastfm_customcommand_set(self, ctx: Context, *, customcommand: str = None):
         if customcommand is None:
             return await ctx.send_help(ctx.command)
@@ -228,7 +214,6 @@ class LastFM(Cog):
         description = "Remove your LastFM custom command."
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    @has_perks()
     async def lastfm_customcommand_remove(self, ctx: Context):
         data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", ctx.author.id)
         customcommand = data["command"]

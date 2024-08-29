@@ -506,8 +506,11 @@ class Moderation(commands.Cog):
         name = "unban",
         description = "Unbans a user."
     )
-    @has_permissions(moderate_members = True)
+    @has_permissions(ban_members = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
+    async def unban(self, ctx: Context, *, user: discord.User):
+        await ctx.guild.unban(user)
+        return await ctx.approve(f"Unbanned {user.name}.")
 
 
 async def setup(bot: Heal):
