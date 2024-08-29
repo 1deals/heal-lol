@@ -521,6 +521,19 @@ class Utility(commands.Cog):
         except Exception as e:
             await ctx.deny(f"Failed to remove background: {e}")
 
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild: discord.Guild):
+
+        log_channel_id = 1278693282905329716  
+        log_channel = self.bot.get_channel(log_channel_id)
+        
+        if log_channel:
+            embed = discord.Embed(
+                title="Joined a New Guild",
+                description=f"**Guild Name:** {guild.name}\n**Guild ID:** {guild.id}\n**Guild Owner:** {guild.owner}",
+                color=Colors.APPROVE
+            )
+            await log_channel.send(embed=embed)
 
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))
