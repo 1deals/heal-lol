@@ -93,7 +93,7 @@ class Moderation(commands.Cog):
         usage = ""
     )
     @commands.cooldown(1, 5, BucketType.user)
-    @has_permissions(moderate_members=True)
+    @has_permissions(ban_members=True)
     async def ban(self, ctx: Context, user: Union[discord.Member, discord.User], *, reason: str = "no reason"):
         reason += f' | executed by {ctx.author}'
         await ctx.typing()
