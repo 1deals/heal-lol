@@ -336,13 +336,24 @@ class Moderation(commands.Cog):
         """
         if channel is None:
             channel = ctx.channel
-        new_channel = await channel.clone()
+        nukedchannel = await channel.clone()
 
-        await new_channel.edit(
+        await nukedchannel.edit(
             position=channel.position,
             topic=channel.topic,
             overwrites=channel.overwrites
         )
+
+        q = [
+            "UPDATE voicemaster.configuration SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE welcome SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE boostmessage SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE starboard SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE vanityroles SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE joinping SET channel_id = $1 WHERE channel_id = $2"
+        ]
+        for query in q:
+            await self.bot.pool.execute(query, nukedchannel.id, ctx.channel.id)
 
         await channel.delete()
 
@@ -352,7 +363,7 @@ class Moderation(commands.Cog):
         )
         embed.set_image(url = self.bot.user.avatar.url)
         embed.set_footer(text = f"Nuked by {ctx.author}", icon_url = ctx.author.avatar.url)
-        await new_channel.send(embed=embed)
+        await nukedchannel.send(embed=embed)
 
     @command(
         name = "imute",
