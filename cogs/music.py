@@ -121,7 +121,13 @@ class Music(commands.Cog):
     )
     async def stop(self, ctx: Context):
         """Leaves the voice channel."""
-        await ctx.voice_client.kill()
+        if ctx.author.voice is None:
+            return  
+
+        if ctx.voice_client is None:
+            return  
+        else:
+            await ctx.voice_client.disconnect()
 
     @commands.hybrid_command(
         name = "shuffle"

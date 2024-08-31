@@ -561,5 +561,6 @@ class Utility(commands.Cog):
             )
             await log_channel.send(embed=embed)
 
+
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))

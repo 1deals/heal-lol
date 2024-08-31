@@ -263,8 +263,10 @@ class Information(commands.Cog):
     async def support(self, ctx: Context):
         return await ctx.neutral("Join our [**support server**](https://discord.gg/jCPYXFQekB)")
 
-    @commands.command(name = "avatar", aliases = ["av"])
+    @hybrid_command(name = "avatar", aliases = ["av"])
     @commands.cooldown(1, 5, commands.BucketType.user)
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def avatar(self, ctx: Context, user: Union[discord.Member, discord.User] = None):
         if user is None:
             user = ctx.author
@@ -274,11 +276,13 @@ class Information(commands.Cog):
         view.add_item(Button(label="avatar", url=user.avatar.url))
         await ctx.send(embed=embed, view=view)
     
-    @command(
+    @hybrid_command(
         name = "banner",
         aliases = ["bnr"],
         description = "Get the banner of a user."
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def banner(self, ctx: Context, user: Union[discord.Member, discord.User] = None):
         if user is None:
@@ -519,6 +523,133 @@ class Information(commands.Cog):
         embed.add_field(name="Humans:", value = f"{sum(1 for member in ctx.guild.members if not member.bot)}", inline = True)
         embed.add_field(name="Bots:", value = f"{ctx.guild.member_count - sum(1 for member in ctx.guild.members if not member.bot)}")
         return await ctx.reply(embed=embed)
+
+    @hybrid_command(
+        name = "roblox",
+        description = "Get information about a roblox user.",
+        aliases = ["rblx"]
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @cooldown(1, 5, BucketType.user)
+    async def roblox(self, ctx: Context, *, username: str):
+        url = "https://api.fulcrum.lol/roblox"
+        params = {"username": username}
+        headers = {"Authorization": api.luma} 
+
+        def humanize_number(value: int) -> str:
+            if value >= 1_000_000:
+                return f"{value / 1_000_000:.1f}M"
+            elif value >= 1_000:
+                return f"{value / 1_000:.1f}K"
+            return str(value)
+            
+        await ctx.typing()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+
+                    username = data.get("username")
+                    display_name = data.get("display_name", "N/A")
+                    bio = data.get("bio", "N/A")
+                    avatar = data.get("avatar")
+                    friends = data.get("friends", "0")
+                    followers = data.get("followers", "0")
+                    followings = data.get("followings", "0")
+                    url = data.get("url")
+                    id = data.get("id")
+                    banned = data.get("banned")
+
+                    if isinstance(followers, int):
+                        followers = humanize_number(followers)
+                    if isinstance(followings, int):
+                        followings = humanize_number(followings)
+                    if isinstance(friends, int):
+                        friends = humanize_number(friends)
+                    
+                    title = f"{username}"
+                    
+
+                    embed = discord.Embed(title = f"{title}", url = url ,color = Colors.BASE_COLOR, description = bio)
+                    embed.set_thumbnail(url=avatar)
+                    embed.add_field(name = "Following:", value = followings, inline = True)
+                    embed.add_field(name = "Followers:", value = followers)
+                    embed.add_field(name = "Friends:", value = friends)
+                    embed.set_footer(text = f"id: {id}")
+                    return await ctx.reply(embed=embed)
+                
+                else:
+                    await ctx.warn(f"API request failed with status code: {response.status}")
+
+    @hybrid_command(
+        name = "twitter",
+        description = "Get info about a user on twitter."
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @cooldown(1, 5, BucketType.user)
+    async def twitter(self, ctx: Context, *, username: str):
+        url = "https://api.fulcrum.lol/twitter"
+        params = {"username": username}
+        headers = {"Authorization": api.luma} 
+
+        def humanize_number(value: int) -> str:
+            if value >= 1_000_000:
+                return f"{value / 1_000_000:.1f}M"
+            elif value >= 1_000:
+                return f"{value / 1_000:.1f}K"
+            return str(value)
+            
+        await ctx.typing()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+
+                    username = data.get("username")
+                    avatar = data.get("avatar")
+                    bio = data.get("bio", "N/A")
+                    createat = data.get("created_at")
+                    followers = data.get("followers", "0")
+                    following = data.get("following", "0")
+                    posts = data.get("posts", "0")
+                    tweets = data.get("tweets", "0")
+                    url = data.get("url")
+                    verified = data.get("verified", False)
+
+                    if isinstance(followers, int):
+                        followers = humanize_number(followers)
+                    if isinstance(following, int):
+                        following = humanize_number(following)
+                    if isinstance(tweets, int):
+                        tweets = humanize_number(tweets)
+                    if isinstance(posts, int):
+                        posts = humanize_number(posts)
+                    
+                    created_at_datetime = datetime.datetime.strptime(createat, "%a %b %d %H:%M:%S %z %Y")
+                    created_at_timestamp = int(created_at_datetime.timestamp())
+                    created_at_formatted = f"<t:{created_at_timestamp}:R>"
+                    footer = ""
+                    if verified == True:
+                        footer+= "Verified account."
+
+                    embed = discord.Embed(title = f"{username}", url = url, color = Colors.BASE_COLOR, description = bio)
+                    embed.add_field(name = "Followers:", value = followers, inline = True)
+                    embed.add_field(name = "Following:", value = following, inline = True)
+                    embed.add_field(name = "Tweets:", value = tweets, inline = True)
+                    embed.add_field(name = "Posts:", value = posts, inline = True)
+                    embed.add_field(name = "Created at:", value = created_at_formatted, inline = True)
+                    embed.set_footer(text= footer)
+                    embed.set_thumbnail(url=avatar)
+                    return await ctx.reply(embed=embed)
+                
+                else:
+                    await ctx.warn(f"API request failed with status code: {response.status}")
+
+
+
+
         
 
 async def setup(bot: Heal):
