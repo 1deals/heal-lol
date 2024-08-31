@@ -702,7 +702,7 @@ class Information(commands.Cog):
                     data = await response.json() 
 
                     color = data.get("color")
-                    embed = discord.Embed(description = f"Dominant color - {color}", color = color)
+                    embed = discord.Embed(description = f"Dominant color - {hex(color)}", color = color)
                     return await ctx.reply(embed=embed)
   
                 if response.status == 422:
