@@ -144,8 +144,10 @@ class Information(commands.Cog):
             all_members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
             position = all_members.index(user) + 1
 
-            roles = [role.mention for role in user.roles if role.id != ctx.guild.id]
-            roles_list = ", ".join(roles) if roles else "None"
+            if len(user.roles) > 5:
+                roles_list = ', '.join([role.mention for role in list(reversed(user.roles[1:]))[:5]]) + f' + {len(user.roles) - 5} more'
+            else:
+                roles_list = ', '.join([role.mention for role in list(reversed(user.roles[1:]))[:5]] + ['@everyone'])
 
             join_position_ordinal = get_ordinal(position)
             embed.add_field(name=f"Joined {join_position_ordinal}", value=f"{format_dt(user.joined_at, style='f')}", inline=True)
@@ -474,6 +476,7 @@ class Information(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.hybrid_command(name="serverinfo",aliases=["si"])
+    @cooldown(1, 5, BucketType.user)
     async def serverinfo(self, ctx: commands.Context):
         """
         Get info about the guild
@@ -504,6 +507,15 @@ class Information(commands.Cog):
 
         return await ctx.send(embed=embed)
 
+    @command(
+        name = "membercount",
+        aliases =["mc"],
+        description = "Get the server's membercount."
+    )
+    @cooldown(1, 5, BucketType.user)
+    async def membercount(self, ctx: Context):
+        embed = discord.Embed(title = f"{ctx.guild.name}'s member count", color = Colors.BASE_COLOR)
+        embed.add_field()
         
 
 async def setup(bot: Heal):

@@ -12,6 +12,7 @@ from tools.managers.context import Context, Colors
 from tools.heal import Heal
 from typing import Union
 from random import choice
+from tools.configuration import api
 
 class Fun(commands.Cog):
     """
@@ -273,7 +274,7 @@ class Fun(commands.Cog):
                 async with cs.get(
                     "https://api.fulcrum.lol/uwu",
                     params={"message": message},
-                    headers={"Authorization": "SfHY8HukqUATXUwm"}
+                    headers={"Authorization": api.luma}
                 ) as r:
                     if r.status == 200:
                         data = await r.json()

@@ -177,10 +177,10 @@ class Utility(commands.Cog):
         if check:
             startTime = datetime.datetime.fromtimestamp(check["time"])  
             now = datetime.datetime.now()
-            time_away = humanize.precisedelta(now - startTime)
+            time_away = humanize.naturaldelta(now - startTime)
             
             embed = discord.Embed(
-                description=f"> <:steamhappy:1265787000573792397> **welcome back!** you went away **{time_away} ago**",
+                description=f"> 👋 **welcome back!** you went away **{time_away} ago**",
                 color=Colors.BASE_COLOR
             )
             await message.channel.send(embed=embed)
@@ -192,10 +192,10 @@ class Utility(commands.Cog):
                 if check:
                     startTime = datetime.datetime.fromtimestamp(check["time"])  
                     now = datetime.datetime.now()
-                    time_away = humanize.precisedelta(now - startTime)
+                    time_away = humanize.naturaldelta(now - startTime)
                     embed = discord.Embed(
                         color=Colors.BASE_COLOR,
-                        description=f'> <:steambored:1265785956930420836> {user.mention} is currently **AFK:** `{check["status"]}` - **{time_away} ago**'
+                        description=f'> 💤 {user.mention} is currently **AFK:** `{check["status"]}` - **{time_away} ago**'
                     )
                     await message.channel.send(embed=embed)
 
