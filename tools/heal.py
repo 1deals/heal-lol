@@ -15,6 +15,7 @@ import re
 import datetime
 import time
 import discord_ios
+import pathlib
 
 from asyncpg import Pool
 from typing import Dict, Set
@@ -169,6 +170,17 @@ class Heal(commands.AutoShardedBot):
     @property
     def uptime(self) -> str:
         return self.humanize_time(self._uptime)
+
+    @property
+    def linecount(self) -> int:
+        return sum(
+            [
+                len(f.open('r').readlines()) for f in [
+                    f for f in pathlib.Path('/root/healbot.lol/').glob('**/*.py') 
+                    if f.is_file()
+                ]
+            ]
+        )
     
     async def on_command_error(self, ctx: Context, exception: commands.CommandError) -> None:
         if type(exception) in [commands.CommandNotFound, commands.NotOwner, commands.CheckFailure]: return

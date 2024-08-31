@@ -48,7 +48,7 @@ class Information(commands.Cog):
             total_channels += len(guild.channels)
         availableMem = round(psutil.virtual_memory().available * 100 / psutil.virtual_memory().total)
         embed = discord.Embed(description =f"An all-in-one, aesthetically pleasing multipurpose bot, aimed to keep communities safe and thriving. Created by the [**Heal Team**](https://discord.gg/jCPYXFQekB)", color= Colors.BASE_COLOR)
-        embed.add_field(name= "__Statistics:__", value = f"**Guilds:** {len(self.bot.guilds)} \n**Users:** {len(self.bot.users): ,} \n**Channels:** {total_channels}", inline = False)
+        embed.add_field(name= "__Statistics:__", value = f"**Guilds:** {len(self.bot.guilds)} \n**Users:** {len(self.bot.users): ,} \n**Lines:** {self.bot.linecount: ,}", inline = False)
         embed.add_field(name = "__Bot:__", value= f"**Uptime:** {self.bot.uptime} \n**Latency:** {round(self.bot.latency * 1000)}ms \n**Commands:** {len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}", inline = False)
         embed.add_field(name = "__Usage:__", value = f"**Memory:** {psutil.virtual_memory().percent}% \n**Available:** {availableMem}% \n**CPU:** {psutil.cpu_percent()}%", inline = False)
         embed.set_thumbnail(url= self.bot.user.avatar.url)
@@ -270,7 +270,21 @@ class Information(commands.Cog):
     async def avatar(self, ctx: Context, user: Union[discord.Member, discord.User] = None):
         if user is None:
             user = ctx.author
-        embed = discord.Embed(title = f"{user}'s avatar.", color = Colors.BASE_COLOR)
+
+        APIKEY = api.heal  
+        api_url = "http://localhost:1337/dominantcolor"
+
+        params = {"source": user.avatar.url} 
+        headers = {"api-key": APIKEY} 
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url, params=params, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json() 
+
+                    color = data.get("color")
+        
+        embed = discord.Embed(title = f"{user}'s avatar.", color = color)
         embed.set_image(url = user.avatar.url)
         view = View()
         view.add_item(Button(label="avatar", url=user.avatar.url))

@@ -561,6 +561,88 @@ class Utility(commands.Cog):
             )
             await log_channel.send(embed=embed)
 
+    @hybrid_command(
+    name="dominant",
+    description="Get the dominant color from an image."
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def dominant(self, ctx: Context, *, image: str = None):
+        if ctx.message.attachments:
+            image_url = ctx.message.attachments[0].url
+        elif image:
+            image_url = image
+        else:
+            return await ctx.warn("Please provide an image URL or upload an image.")
+        
+        await ctx.typing()
+
+        APIKEY = api.heal  
+        api_url = "http://localhost:1337/dominantcolor"
+
+        params = {"source": image_url} 
+        headers = {"api-key": APIKEY} 
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url, params=params, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json() 
+
+                    color = data.get("color")
+                    embed = discord.Embed(description = f"Dominant color - {color}", color = color)
+                    return await ctx.reply(embed=embed)
+  
+                if response.status == 422:
+                    return await ctx.warn(f"{data.get("detail")}")
+
+    @hybrid_command(
+        name = "weather",
+        description = "Get weather from a certain location."
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def weather(self, ctx: Context, *, location: str):
+        APIKEY = api.luma
+        apiurl = "https://api.fulcrum.lol/weather"
+
+        params = {"location": location}
+        headers = {"Authorization": APIKEY}
+
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(apiurl, params=params, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json() 
+
+                    city = data.get("city")
+                    country = data.get("country")
+                    time = data.get("time")
+                    celsius = data.get("celsius")
+                    fahrenheit = data.get("fahrenheit")
+                    conditiontxt = data.get("condition_text")
+                    conditionicon = data.get("condition_icon")
+                    humid = data.get("humidity")
+                    windmph = data.get("wind_mph")
+                    windkph = data.get("wind_kph")
+                    feelslikecels = data.get("feelslike_c")
+                    feelslikefahren = data.get("feelslike_f")
+
+                    time_obj = datetime.datetime.fromisoformat(time)
+
+                    humanizedTime = time_obj.strftime("%I:%M %p")
+
+                    embed = discord.Embed(title = f"{country}, {city}", description = f"Right now, it's **{conditiontxt}** in **{city}**, at **{humanizedTime}**. **Humidity is {humid}%**")
+                    embed.add_field(name = "Tempurature:", value = f"{celsius}°c / {fahrenheit}°f \n Feels like: {feelslikecels}°c / {feelslikefahren}°f")
+                    embed.add_field(name = "Wind:", value = f"{windmph}mph / {windkph}kph")
+                    embed.set_thumbnail(url = conditionicon)
+                    return await ctx.reply(embed=embed)
+
+
+
+        
+
 
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))
