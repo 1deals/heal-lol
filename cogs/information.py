@@ -515,7 +515,10 @@ class Information(commands.Cog):
     @cooldown(1, 5, BucketType.user)
     async def membercount(self, ctx: Context):
         embed = discord.Embed(title = f"{ctx.guild.name}'s member count", color = Colors.BASE_COLOR)
-        embed.add_field()
+        embed.add_field(name="Total:", value = f"{ctx.guild.member_count}", inline = True)
+        embed.add_field(name="Humans:", value = f"{sum(1 for member in ctx.guild.members if not member.bot)}", inline = True)
+        embed.add_field(name="Bots:", value = f"{ctx.guild.member_count - sum(1 for member in ctx.guild.members if not member.bot)}")
+        return await ctx.reply(embed=embed)
         
 
 async def setup(bot: Heal):
