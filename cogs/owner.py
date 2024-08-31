@@ -289,7 +289,7 @@ class Owner(Cog):
     @commands.is_owner()
     async def apikey_add(self, ctx: Context, user: discord.User, role: str):
         key = secrets.token_urlsafe(32)  
-        url = "https://127.0.0.1"
+        url = "http://66.23.207.37:1337/"
 
         check = await self.bot.pool.fetchrow("SELECT * FROM api_key WHERE user_id = $1", user.id)
         if check is not None:

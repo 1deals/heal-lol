@@ -50,7 +50,7 @@ class Heal(commands.AutoShardedBot):
                 replied_user=False
             ),
             case_insensitive=True,
-            owner_ids=[187747524646404105, 461914901624127489, 392300135323009024, 809975522867412994 # blahja
+            owner_ids=[187747524646404105, 461914901624127489, 392300135323009024
             ]
         )
 
