@@ -325,45 +325,22 @@ class Moderation(commands.Cog):
             )
 
     @commands.command(
-        name = "nuke",
-        description = "Nukes a channel."
+        name="nuke",
+        description="Nukes a channel."
     )
     @commands.has_permissions(administrator=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def nuke(self, ctx: Context, *, channel: discord.TextChannel = None):
         """
-        Clone a channel
+        Clone a channel and delete the original one.
         """
         if channel is None:
             channel = ctx.channel
-        nukedchannel = await channel.clone()
 
-        await nukedchannel.edit(
-            position=channel.position,
-            topic=channel.topic,
-            overwrites=channel.overwrites
-        )
+        embed = discord.Embed(description = f"{Emojis.WARN} {ctx.author.mention}: Are you sure you want to nuke this channel?", color = Colors.WARN)
 
-        q = [
-            "UPDATE voicemaster.configuration SET channel_id = $1 WHERE channel_id = $2",
-            "UPDATE welcome SET channel_id = $1 WHERE channel_id = $2",
-            "UPDATE boostmessage SET channel_id = $1 WHERE channel_id = $2",
-            "UPDATE starboard SET channel_id = $1 WHERE channel_id = $2",
-            "UPDATE vanityroles SET channel_id = $1 WHERE channel_id = $2",
-            "UPDATE joinping SET channel_id = $1 WHERE channel_id = $2"
-        ]
-        for query in q:
-            await self.bot.pool.execute(query, nukedchannel.id, ctx.channel.id)
-
-        await channel.delete()
-
-        embed = discord.Embed(
-            description="",
-            color=Colors.BASE_COLOR
-        )
-        embed.set_image(url = self.bot.user.avatar.url)
-        embed.set_footer(text = f"Nuked by {ctx.author}", icon_url = ctx.author.avatar.url)
-        await nukedchannel.send(embed=embed)
+        view = Confirm(ctx, channel)
+        await ctx.send(embed=embed, view=view)
 
     @command(
         name = "imute",
@@ -523,6 +500,68 @@ class Moderation(commands.Cog):
         await ctx.guild.unban(user)
         return await ctx.approve(f"Unbanned {user.name}.")
 
+class Confirm(discord.ui.View):
+    def __init__(self, ctx: Context, channel: discord.TextChannel):
+        super().__init__(timeout=60)  # 60 seconds timeout
+        self.ctx = ctx
+        self.channel = channel
+        self.value = None
+
+    @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)
+    async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message("You cannot confirm this action.", ephemeral=True)
+            return
+
+        # Clone the channel
+        nukedchannel = await self.channel.clone()
+
+        await nukedchannel.edit(
+            position=self.channel.position,
+            topic=self.channel.topic,
+            overwrites=self.channel.overwrites
+        )
+
+        # Update database references
+        q = [
+            "UPDATE voicemaster.configuration SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE welcome SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE boostmessage SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE starboard SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE vanityroles SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE joinping SET channel_id = $1 WHERE channel_id = $2"
+        ]
+        for query in q:
+            await self.ctx.bot.pool.execute(query, nukedchannel.id, self.channel.id)
+
+        # Delete the original channel
+        await self.channel.delete()
+
+        # Send nuked confirmation
+        embed = discord.Embed(description="", color=Colors.BASE_COLOR)
+        embed.set_image(url = self.ctx.bot.user.avatar.url)
+        embed.set_footer(text=f"Nuked by {self.ctx.author}", icon_url=self.ctx.author.avatar.url)
+        await nukedchannel.send(embed=embed)
+
+        # Respond to the interaction to confirm action
+        await interaction.response.send_message("Channel nuked!", ephemeral=True)
+
+        # Disable the buttons after the action
+        self.disable_all_items()
+        await interaction.message.edit(view=self)
+
+    @discord.ui.button(label="No", style=discord.ButtonStyle.red)
+    async def cancel(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if interaction.user != self.ctx.author:
+            await interaction.response.send_message("You cannot cancel this action.", ephemeral=True)
+            return
+
+        # Respond to the interaction and delete the confirmation message
+        await interaction.response.send_message("Nuke cancelled.", ephemeral=True)
+        await interaction.message.delete()
+
+        # Disable the buttons after the action
+        self.disable_all_items()
 
 async def setup(bot: Heal):
     await bot.add_cog(Moderation(bot))

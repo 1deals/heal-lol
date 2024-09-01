@@ -408,7 +408,7 @@ class Server(Cog):
                     channel = before.guild.get_channel(res['channel_id'])
             
             if channel:
-                message = res["message"] if res else "Thanks for boosting the server!"
+                message = res["message"]
                 processed_message = EmbedBuilder.embed_replacement(after, message)
                 content, embed, view = await EmbedBuilder.to_object(processed_message)
 
