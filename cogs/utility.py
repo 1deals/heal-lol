@@ -406,7 +406,7 @@ class Utility(commands.Cog):
         if not url.startswith(("http://", "https://")):
             url = "https://" + url
 
-        blacklisted = ["ip"]
+        blacklisted = ["ip", "IP", "Ip", "iP"]
         if any(phrase in url for phrase in blacklisted):
             await ctx.warn("This URL cannot be screenshot due to restricted content.")
 
@@ -437,7 +437,7 @@ class Utility(commands.Cog):
                             else:
                                 await ctx.deny("Failed to download screenshot image. Try again later.")
                     if response.status == 422:
-                        return await ctx.deny(f"Api error, try again later.")
+                        return await ctx.deny(data["detail"])
         
 
     @commands.command(
@@ -578,6 +578,45 @@ class Utility(commands.Cog):
             )
             await log_channel.send(embed=embed)
 
+    @hybrid_command(
+        name = "image",
+        aliases = ["img"],
+        description = "Search for an image."
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def image(self, ctx: Context, *, query: str):
+        APIKEY = api.heal
+        api_url = "http://localhost:1337/browse/images"
+
+        params = {"query": query, "safe_mode": "true"}
+        headers = {"api-key": APIKEY} 
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url, params=params, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+
+                    images = data.get("images", [])
+                    if not images:
+                        return await ctx.warn("No images found for your query.")
+
+                    embeds = []
+                    for image_data in images:
+                        embed = discord.Embed(
+                            title=f"Image result for: {query}",
+                            color=Colors.BASE_COLOR
+                        )
+                        embed.set_image(url=image_data["url"])
+                        embed.set_footer(text=f"Page {len(embeds) + 1} of {len(images)} | Safemode: True")
+                        embeds.append(embed)
+
+                    await ctx.paginate(embeds)
+                else:
+                    await ctx.warn("Failed to retrieve images. Try again later.")
+
+                        
 
 
 
