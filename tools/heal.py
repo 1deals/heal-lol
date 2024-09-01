@@ -52,8 +52,7 @@ class Heal(commands.AutoShardedBot):
             case_insensitive=True,
             owner_ids=[187747524646404105, #me
                        461914901624127489, #lucky
-                       392300135323009024, #xur 
-                       809975522867412994 #blahja
+                       1176490404611379284, #kai
             ]
         )
 

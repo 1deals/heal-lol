@@ -141,6 +141,8 @@ class Information(commands.Cog):
             title += " <:staff:1277914880808063007> <:mlp_fatflutter:1278453716818854021>"
         if user.id == 1035497951591673917:  #qilla
              title += " <:staff:1277914880808063007> <a:menacemonkey:1271184769836912680>"
+        if user.id == 1176490404611379284: #kai
+            title += " <:owner:1277914467270922320> <:staff:1277914880808063007>"
 
         prem = await self.bot.pool.fetchval("SELECT * FROM premium WHERE user_id = $1", user.id)
         if prem:
