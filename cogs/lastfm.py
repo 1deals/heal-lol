@@ -22,6 +22,7 @@ from tools.heal import Heal
 from tools.managers.lastfm import FMHandler
 from tools.managers.context import Context, Emojis, Colors
 from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
+from tools.configuration import api
 
 class LastFM(Cog):
     def __init__(self, bot: Heal) -> None:
@@ -100,37 +101,29 @@ class LastFM(Cog):
             return await ctx.lastfm(f"**{user.name}** hasn't got their LastFM account linked.")
 
         lastfm_username = data["lfuser"]
+
+        APIKEY = api.heal
+        api_url = "http://66.23.207.37:1337/lastfm/recenttracks"
+
+        params = {"username": lastfm_username, "tracks": "1"}
+        headers = {"api-key": APIKEY} 
+
         async with aiohttp.ClientSession() as session:
-            params = {
-                'method': 'user.getRecentTracks',
-                'user': lastfm_username,
-                'api_key': "bc8082588489f949216859abba6e52be",
-                'format': 'json',
-                'limit': 1
-            }
-            async with session.get('http://ws.audioscrobbler.com/2.0/', params=params) as response:
-                if response.status != 200:
-                    return await ctx.deny("Failed to connect to LastFM API.")
+                async with session.get(api_url, params=params, headers=headers) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        track = data["tracks"][0]["name"]
+                        url = data["tracks"][0]["url"]
+                        artist = data["tracks"][0]["artist"]
+                        album_art = data["tracks"][0]["image"]
+                        album_name = data["tracks"][0]["album"]
 
-                data = await response.json()
-                if 'recenttracks' not in data or 'track' not in data['recenttracks']:
-                    return await ctx.warn(f"Could not retrieve data for user: {lastfm_username}")
-
-                track_info = data['recenttracks']['track'][0]
-
-                now_playing = track_info.get('@attr', {}).get('nowplaying') == 'true'
-
-                track_name = track_info['name']
-                artist_name = track_info['artist']['#text']
-                album_name = track_info.get('album', {}).get('#text', 'Unknown Album')
-                track_url = track_info['url']
-                album_art = track_info['image'][-1]['#text']
 
                 embed = discord.Embed(
                     color=Colors.BASE_COLOR
                 )
-                embed.add_field(name = "**Track**", value = f"[{track_name}]({track_url})", inline  = True)
-                embed.add_field(name = "**Artist**", value = f"{artist_name}", inline = False)
+                embed.add_field(name = "**Track**", value = f"[{track}]({url})", inline  = True)
+                embed.add_field(name = "**Artist**", value = f"{artist}", inline = False)
                 embed.set_author(name=f"{lastfm_username}")
                 if album_art:
                     embed.set_thumbnail(url=album_art)
@@ -224,7 +217,33 @@ class LastFM(Cog):
         await self.bot.pool.execute("UPDATE lastfm SET command = $1 WHERE user_id = $2", None, ctx.author.id)
         return await ctx.lastfm("**Deleted** your LastFM **custom command.**")
 
+    @lastfm.command(
+        name = "chart",
+        description = "Get your lastfm chart."
+    )
+    async def lastfm_chart(self, ctx: Context, user: Union[discord.Member, discord.User] = None, size: str = "3x3"):
+        APIKEY = api.heal
+        api_url = "http://66.23.207.37:1337/lastfm/chart"
 
+        if user == None:
+            user = ctx.author
+
+        data = await self.bot.pool.fetchrow("SELECT * FROM lastfm WHERE user_id = $1", user.id)
+        if not data:
+            return await ctx.lastfm(f"**{user.name}** hasn't got their LastFM account linked.")
+        lastfmuser = data["lfuser"]
+
+        params = {"username": lastfmuser, "size": size}
+        headers = {"api-key": APIKEY} 
+        async with ctx.typing():
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(api_url, params=params, headers=headers) as response:
+                            if response.status == 200:
+                                data = await response.json()
+                                image = data.get("image_url")
+                                embed = discord.Embed(title = f"lastfm chart for {lastfmuser}")
+                                embed.set_image(url = image)
+                                await ctx.send(embed=embed)
 
 
 async def setup(bot: Heal):

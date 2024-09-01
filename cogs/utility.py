@@ -415,29 +415,29 @@ class Utility(commands.Cog):
             headers = {"api-key": APIKEY} 
 
 
-            await ctx.typing()
+            async with ctx.typing():
 
-            async with aiohttp.ClientSession() as session:
-                async with session.get(api_url, params=params, headers=headers) as response:
-                    if response.status == 200:
-                        data = await response.json()
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(api_url, params=params, headers=headers) as response:
+                        if response.status == 200:
+                            data = await response.json()
 
-                        screenshot_url = data.get("screenshot_url")
+                            screenshot_url = data.get("screenshot_url")
 
-                        async with session.get(screenshot_url) as image_response:
-                            if image_response.status == 200:
-                                image_data = await image_response.read() 
+                            async with session.get(screenshot_url) as image_response:
+                                if image_response.status == 200:
+                                    image_data = await image_response.read() 
 
-                                file = discord.File(
-                                    io.BytesIO(image_data), 
-                                    filename="screenshot.png"
-                                )
+                                    file = discord.File(
+                                        io.BytesIO(image_data), 
+                                        filename="screenshot.png"
+                                    )
 
-                                await ctx.send(file=file)
-                            else:
-                                await ctx.deny("Failed to download screenshot image. Try again later.")
-                    if response.status == 422:
-                        return await ctx.deny(data["detail"])
+                                    await ctx.send(file=file)
+                                else:
+                                    await ctx.deny("Failed to download screenshot image. Try again later.")
+                        if response.status == 422:
+                            return await ctx.deny(data["detail"])
         
 
     @commands.command(
@@ -592,31 +592,75 @@ class Utility(commands.Cog):
 
         params = {"query": query, "safe_mode": "true"}
         headers = {"api-key": APIKEY} 
+        async with ctx.typing():
+            async with aiohttp.ClientSession() as session:
+                async with session.get(api_url, params=params, headers=headers) as response:
+                    if response.status == 200:
+                        data = await response.json()
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(api_url, params=params, headers=headers) as response:
-                if response.status == 200:
-                    data = await response.json()
+                        images = data.get("images", [])
+                        if not images:
+                            return await ctx.warn("No images found for your query.")
 
-                    images = data.get("images", [])
-                    if not images:
-                        return await ctx.warn("No images found for your query.")
+                        embeds = []
+                        for image_data in images:
+                            embed = discord.Embed(
+                                title=f"Image result for: {query}",
+                                color=Colors.BASE_COLOR
+                            )
+                            embed.set_image(url=image_data["url"])
+                            embed.set_footer(text=f"Page {len(embeds) + 1} of {len(images)} | Safemode: True")
+                            embeds.append(embed)
 
-                    embeds = []
-                    for image_data in images:
-                        embed = discord.Embed(
-                            title=f"Image result for: {query}",
-                            color=Colors.BASE_COLOR
-                        )
-                        embed.set_image(url=image_data["url"])
-                        embed.set_footer(text=f"Page {len(embeds) + 1} of {len(images)} | Safemode: True")
-                        embeds.append(embed)
+                        await ctx.paginate(embeds)
+                    else:
+                        await ctx.warn("Failed to retrieve images. Try again later.")
 
-                    await ctx.paginate(embeds)
-                else:
-                    await ctx.warn("Failed to retrieve images. Try again later.")
+    @hybrid_command(
+        name = "google",
+        aliases = ["search"],
+        description = "Search online."
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def google(self, ctx: Context, *, query: str):
+        APIKEY = api.heal
+        api_url = "http://66.23.207.37:1337/browse/search"
 
-                        
+        params = {"query": query}
+        headers = {"api-key": APIKEY} 
+
+        async with ctx.typing():
+            async with aiohttp.ClientSession() as session:
+                async with session.get(api_url, params=params, headers=headers) as response:
+                    if response.status == 200:
+                        data = await response.json()
+
+                        results = data.get("results", [])
+                        if not results:
+                            return await ctx.warn("No results found for your query.")
+
+                        embeds = []
+                        for result_data in results:
+                            title = result_data.get("title", "No title")
+                            url = result_data.get("url", "No URL")
+                            snippet = result_data.get("description", "No description available")
+                            image = result_data.get("image")
+
+                            embed = discord.Embed(
+                                title=f"{title}",
+                                url = url,
+                                description=f"{snippet}",
+                                color=Colors.BASE_COLOR
+                            )
+                            embed.set_footer(text=f"Page {len(embeds) + 1} of {len(results)}")
+                            embed.set_thumbnail(url = image)
+                            embeds.append(embed)
+
+                        await ctx.paginate(embeds)
+                    else:
+                        await ctx.warn("Failed to retrieve results. Try again later.")
 
 
 
