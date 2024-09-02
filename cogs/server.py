@@ -166,7 +166,7 @@ class Server(Cog):
     )
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_test(self, ctx: Context, channel: discord.TextChannel):
+    async def welcome_test(self, ctx: Context):
         res = await self.bot.pool.fetchrow("SELECT * from welcome WHERE guild_id = $1", ctx.guild.id)
 
         if res:
@@ -364,6 +364,7 @@ class Server(Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def boostmessage_channel(self, ctx: Context, *, channel: discord.TextChannel):
         await self.bot.pool.execute("INSERT INTO boostmessage (guild_id, channel_id) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET channel_id = $2", ctx.guild.id, channel.id)
+        await self.bot.cache.set(f"boostchannel-{ctx.guild.id}", channel.id)
         return await ctx.approve(f"Set the **boost message** channel to {channel.mention}")
 
     @boostmessage.command(
@@ -375,6 +376,7 @@ class Server(Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def boostmessage_message(self, ctx: Context, *, message: str):
         await self.bot.pool.execute("INSERT INTO boostmessage (guild_id, message) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET message = $2", ctx.guild.id, message)
+        await self.bot.cache.set(f"boostmessage-{ctx.guild.id}", message)
         processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
         content, embed, view = await EmbedBuilder.to_object(processed_message)
             
@@ -383,6 +385,27 @@ class Server(Cog):
             await ctx.send(content=content, embed=embed, view=view)
         else:
             await ctx.send(content=processed_message)
+
+    @boostmessage.command(
+        name = "test",
+        description = "Test the booster message config."
+    )
+    @commands.has_permissions(manage_messages = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def boostmessage_test(self, ctx: Context):
+        data = await self.bot.pool.fetchrow("SELECT * FROM boostmessage WHERE guild_id = $1", ctx.guild.id)
+        message = data["message"]
+        channelid = data["channel_id"]
+        message = await self.bot.cache.get(f"boostmessage-{ctx.guild.id}")
+        channelid = await self.bot.cache.get(f"boostchannel-{ctx.guild.id}")
+        channel = ctx.guild.get_channel(channelid)
+
+        processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+        content, embed, view = await EmbedBuilder.to_object(processed_message)
+        if content or embed:
+            await channel.send(content=content, embed=embed, view=view)
+        else:
+            await channel.send(content=processed_message)
 
     @boostmessage.command(
         name = "remove",
@@ -406,9 +429,11 @@ class Server(Cog):
                 res = await self.bot.pool.fetchrow("SELECT * FROM boostmessage WHERE guild_id = $1", before.guild.id)
                 if res:
                     channel = before.guild.get_channel(res['channel_id'])
+                    channel = await self.bot.cache.get(f"boostchannel-{before.guild.id}")
             
             if channel:
                 message = res["message"]
+                message = await self.bot.cache.get(f"boostmessage-{before.guild.id}")
                 processed_message = EmbedBuilder.embed_replacement(after, message)
                 content, embed, view = await EmbedBuilder.to_object(processed_message)
 
@@ -427,6 +452,7 @@ class Server(Cog):
                 if channel:
 
                     boost_message = res["message"]
+                    boost_message = await self.bot.cache.get(f"boostmessage-{message.guild.id}", message.id)
                     processed_message = EmbedBuilder.embed_replacement(message.author, boost_message)
                     content, embed, view = await EmbedBuilder.to_object(processed_message)
 

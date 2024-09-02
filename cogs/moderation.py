@@ -226,7 +226,7 @@ class Moderation(commands.Cog):
         name = "role",
         description = "Add / remove a role from a user.",
         aliases = ["r"],
-        invoke_without_command=False
+        invoke_without_command=True
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.has_permissions(manage_roles=True)
@@ -244,6 +244,40 @@ class Moderation(commands.Cog):
         else:
             await member.add_roles(role)
             await ctx.approve(f"Added {role.mention} to {member.name}")
+
+    @role.command(name="create", description="Create a new role in the server.")
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_roles=True)
+    async def role_create(self, ctx: Context, *, name: str):
+        role = await ctx.guild.create_role(name=name)
+        await ctx.approve(f"Created new role: {role.mention}")
+
+    @role.command(name="delete", description="Delete an existing role from the server.")
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_roles=True)
+    async def role_delete(self, ctx: Context, *, role: Union[discord.Role, str]):
+        if isinstance(role, str):
+            role = discord.utils.get(ctx.guild.roles, name=role)
+
+        if role is None:
+            return await ctx.warn('Please provide a **valid** role to delete.')
+
+        await role.delete()
+        await ctx.approve(f"Deleted role: **{role.name}**")
+
+    @role.command(name="rename", description="Rename an existing role in the server.")
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_roles=True)
+    async def role_rename(self, ctx: Context, role: Union[discord.Role, str], *, name: str):
+        if isinstance(role, str):
+            role = discord.utils.get(ctx.guild.roles, name=role)
+
+        if role is None:
+            return await ctx.warn('Please provide a **valid** role to rename.')
+
+        old_name = role.name
+        await role.edit(name=name)
+        await ctx.approve(f"Renamed role **{old_name}** to **{name}**")
 
 
 

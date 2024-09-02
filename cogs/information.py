@@ -64,14 +64,7 @@ class Information(commands.Cog):
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @cooldown(1, 5, BucketType.user)
     async def ping(self, ctx: Context):
-        start_time = discord.utils.utcnow()
-        message = await ctx.send("...🏓pong!")
-        end_time = discord.utils.utcnow()
-        ws_latency = (end_time - start_time).total_seconds() * 1000
-
-        latency = round(self.bot.latency * 1000)
-
-        await message.edit(content=f"🏓 Pong!`{latency}ms`")
+        return await ctx.reply(f"🏓... pong! **{round(self.bot.latency * 1000)}ms**")
 
             
 

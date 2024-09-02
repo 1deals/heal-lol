@@ -44,7 +44,7 @@ class Heal(commands.AutoShardedBot):
             command_prefix=";",
             help_command=HealHelp(),
             intents=intents,
-            activity = discord.Streaming(name="🔗 healbot.lol/support", url="https://twitch.tv/discord"),
+            activity = discord.Streaming(name="🔗 /healbot", url="https://twitch.tv/discord"),
             allowed_mentions=discord.AllowedMentions(
                 everyone=False,
                 users=True,
@@ -54,7 +54,6 @@ class Heal(commands.AutoShardedBot):
             case_insensitive=True,
             owner_ids=[187747524646404105, #me
                        461914901624127489, #lucky
-                       1176490404611379284, #kai
             ]
         )
 

@@ -86,32 +86,45 @@ class Utility(commands.Cog):
 
 
     @commands.Cog.listener()
-    async def on_message_delete(self, message):
+    async def on_message_delete(self, message: discord.Message):
         if message.guild:
             channel_id = message.channel.id
-            if channel_id not in self.deleted_messages:
-                self.deleted_messages[channel_id] = []
-            self.deleted_messages[channel_id].append(message)
+
+            cached_messages = await self.bot.cache.get(f"deleted_messages_{channel_id}")
+
+            if cached_messages is None:
+                cached_messages = []
+
+            cached_messages.append({
+                'content': message.content,
+                'author': str(message.author),
+                'timestamp': message.created_at.isoformat()
+            })
+
+            await self.bot.cache.set(f"deleted_messages_{channel_id}", cached_messages)
 
     @commands.command(aliases=['s'])
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def snipe(self, ctx, index: int = 1):
         channel_id = ctx.channel.id
-        sniped_messages = self.deleted_messages.get(channel_id, [])
+
+        sniped_messages = await self.bot.cache.get(f"deleted_messages_{channel_id}") or []
 
         if sniped_messages:
             if 1 <= index <= len(sniped_messages):
                 deleted_message = sniped_messages[-index]
 
-                deleting_user = ctx.guild.get_member(int(deleted_message.author.id))
+                message_user = ctx.guild.get_member_named(deleted_message['author']) or ctx.guild.get_member(int(deleted_message['author'].split('#')[0]))
 
-                message_user = ctx.guild.get_member(int(deleted_message.author.id))
+                if not message_user:
+                    embed = discord.Embed(description=f'> {Emojis.WARN} {ctx.author.mention}: User not found for the deleted message', color=Colors.BASE_COLOR)
+                    return await ctx.send(embed=embed)
 
                 user_pfp = message_user.avatar.url if message_user.avatar else message_user.default_avatar.url
 
                 embed = discord.Embed(
-                    title=f'',
-                    description=deleted_message.content,
+                    title='',
+                    description=deleted_message['content'],
                     color=Colors.BASE_COLOR
                 )
                 embed.set_author(name=message_user.display_name, icon_url=user_pfp)
@@ -130,8 +143,9 @@ class Utility(commands.Cog):
     @commands.has_permissions(manage_messages=True)
     async def clearsnipe(self, ctx: Context):
         channel_id = ctx.channel.id
-        if channel_id in self.deleted_messages:
-            del self.deleted_messages[channel_id]
+
+        if await self.bot.cache.get(f"deleted_messages_{channel_id}"):
+            await self.bot.cache.set(f"deleted_messages_{channel_id}", None)
             await ctx.message.add_reaction(f"{Emojis.APPROVE}")
         else:
             await ctx.message.add_reaction(f"{Emojis.WARN}")
