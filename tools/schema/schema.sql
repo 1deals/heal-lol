@@ -164,3 +164,17 @@ CREATE TABLE IF NOT EXISTS boostmessage (
     message TEXT,
     channel_id BIGINT
 );
+
+CREATE TABLE IF NOT EXISTS authed (
+    guild_id BIGINT PRIMARY KEY
+);
+
+CREATE TABLE IF NOT EXISTS usertracker (
+    guild_id BIGINT PRIMARY KEY,
+    channel_id BIGINT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS vanitytracker (
+    guild_id BIGINT PRIMARY KEY,
+    channel_id BIGINT NOT NULL
+);

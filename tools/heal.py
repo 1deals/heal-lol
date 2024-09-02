@@ -256,7 +256,23 @@ class Heal(commands.AutoShardedBot):
         check = await self.pool.fetchrow("SELECT * FROM blacklist WHERE user_id = $1", message.author.id)
         if check:
             return
+
+        prefix = await self.get_prefix(message)
+        if not message.content.startswith(tuple(prefix)):
+            return
+        
+        now = time.time()
+        author_id = message.author.id
+
+        self.message_cache[author_id] = [timestamp for timestamp in self.message_cache[author_id] if now - timestamp < self.cache_expiry_seconds]
+
+        if len(self.message_cache[author_id]) >= 10:
+            await self.pool.execute("INSERT INTO blacklist VALUES ($1)", author_id)
+            await message.channel.send(
+                embed = discord.Embed(color=Colors.BASE_COLOR   ,description=f"> {message.author.mention}: You are now **blacklisted**, join the support [server](https://discord.gg/healbot) for support.")
+            )
         else:
+            self.message_cache[author_id].append(now)
             await self.process_commands(message)
 
     async def disabled_command(self, ctx: Context) -> bool:

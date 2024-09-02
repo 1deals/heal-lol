@@ -461,6 +461,99 @@ class Server(Cog):
                     else:
                         await channel.send(content=processed_message)
 
+    @commands.Cog.listener()
+    async def on_user_update(self, before: discord.User, after: discord.User):
+        if before.name != after.name:
+            for guild in self.bot.guilds:
+                channel_id = await self.bot.cache.get(f"usernames-{guild.id}")
+                try:
+                    if channel_id:
+                        channel = guild.get_channel(channel_id)
+                        try:
+                            if channel is not None:
+                                await channel.send(f"The user **{before.name}** is now available.")
+                                await asyncio.sleep(1)
+                        except:
+                            continue
+                except Exception as E:
+                    logging.warning(f"Failed to send username tracking in {guild.id}: {E}")
+
+
+    @group(
+        name = "tracker",
+        aliases = ["track", "trackers"],
+        description = "Configure tracker settings.",
+        invoke_without_command = True
+    )
+    @commands.has_permissions(manage_guild = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def tracker(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+
+    @tracker.command(
+        name = "usernames",
+        aliases = ["users", "names"],
+        description = "Configure the username trackings"
+    )
+    @commands.has_permissions(manage_guild = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def tracker_usernames(self, ctx: Context, *, channel: discord.TextChannel):
+        existing_channel_id = await self.bot.pool.fetchval("SELECT channel_id FROM usertracker WHERE guild_id = $1", ctx.guild.id)
+
+        if existing_channel_id:
+            await self.bot.pool.execute("DELETE FROM usertracker WHERE guild_id = $1", ctx.guild.id)
+            await self.bot.cache.remove(f"usernames-{ctx.guild.id}")
+            return await ctx.approve("Username tracking will not be sent from now on.")
+
+        if channel:
+            await self.bot.pool.execute(
+                "INSERT INTO usertracker (guild_id, channel_id) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET channel_id = EXCLUDED.channel_id",
+                ctx.guild.id, channel.id
+            )
+            await self.bot.cache.set(f"usernames-{ctx.guild.id}", channel.id)
+            return await ctx.approve(f"Username tracking will now be sent into {channel.mention}.")
+
+    @tracker.command(
+        name = "vanity",
+        aliases = ["van", "vanities"],
+        description = "Configure vanity tracker."
+    )
+    @commands.has_permissions(manage_guild = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def trackers_vanity(self, ctx: Context, *, channel: discord.TextChannel):
+        existing_channel_id = await self.bot.pool.fetchval("SELECT channel_id FROM vanitytracker WHERE guild_id = $1", ctx.guild.id)
+
+        if existing_channel_id:
+            await self.bot.pool.execute("DELETE FROM vanitytracker WHERE guild_id = $1", ctx.guild.id)
+            await self.bot.cache.remove(f"vanities-{ctx.guild.id}")
+            return await ctx.approve("Vanity tracking will not be sent from now on.")
+
+        if channel:
+            await self.bot.pool.execute(
+                "INSERT INTO vanitytracker (guild_id, channel_id) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET channel_id = EXCLUDED.channel_id",
+                ctx.guild.id, channel.id
+            )
+            await self.bot.cache.set(f"vanities-{ctx.guild.id}", channel.id)
+            return await ctx.approve(f"Vanity tracking will now be sent into {channel.mention}.")
+
+    @commands.Cog.listener()
+    async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
+        if before.vanity_url_code != after.vanity_url_code:
+            for guild in self.bot.guilds:
+                channel_id = await self.bot.cache.get(f"vanities-{guild.id}")
+                try:
+                    if channel_id:
+                        channel = guild.get_channel(channel_id)
+                        try:
+                            if channel is not None:
+                                if after.vanity_url_code:
+                                    message = f"The vanity **{after.vanity_url_code}** is available!"
+                                    await channel.send(message)
+                                await asyncio.sleep(1)
+                        except Exception as e:
+                            logging.warning(f"Failed to send vanity URL update in {guild.id}: {e}")
+                except Exception as e:
+                    logging.warning(f"Failed to fetch vanity channel for {guild.id}: {e}")
 
     
 async def setup(bot: Heal) -> None:

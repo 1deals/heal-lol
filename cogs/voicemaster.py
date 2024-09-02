@@ -90,7 +90,7 @@ class VoiceMaster(Cog):
             category.id
         )
         
-        return await ctx.approve('Finished setting up the **VoiceMaster** channels. A category and two channels have been created, you can move the channels or rename them if you want.')
+        return await ctx.approve('Finished setting up the **VoiceMaster** channels. A category and two channels have been created, you are able to rename them if you like.')
 
     @voicemaster.command(
         name='remove',
