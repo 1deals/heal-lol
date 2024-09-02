@@ -22,6 +22,7 @@ from typing import Dict, Set
 from collections import defaultdict
 
 from tools.managers.help import HealHelp
+from tools.managers.cache import Cache
 from tools.managers.context import Context
 from tools.managers.lastfm import FMHandler
 from tools.configuration import Colors, Emojis
@@ -35,6 +36,7 @@ intents = discord.Intents.all()
 
 class Heal(commands.AutoShardedBot):
     def __init__(self):
+        self.cache = Cache()
         self.errors = Dict[str, commands.CommandError]
         self._uptime = time.time()
 
@@ -111,14 +113,39 @@ class Heal(commands.AutoShardedBot):
 
     async def get_prefix(self, message: discord.Message) -> tuple:
         if message.guild is None:
-            return (';',)
-        guild_prefix = await self.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id)
+            return ';'  
+
+        selfprefix_key = f"selfprefix-{message.author.id}"
+        selfprefix = await self.cache.get(selfprefix_key)
+
+        if selfprefix is None:
+            selfprefix = await self.pool.fetchval(
+                "SELECT prefix FROM selfprefix WHERE user_id = $1", 
+                self.user.id
+            )
+
+            if selfprefix:
+                await self.cache.set(selfprefix_key, selfprefix)
+            else:
+                
+                await self.cache.set(selfprefix_key, None)
+
+        if selfprefix:
+            return selfprefix
+
+        guild_prefix_key = f"prefix-{message.guild.id}"
+        guild_prefix = await self.cache.get(guild_prefix_key)
+
         if guild_prefix is None:
-            guild_prefix = ';'  
-        self_prefix = await self.pool.fetchval("SELECT prefix FROM selfprefix WHERE user_id = $1", message.author.id)
-        if self_prefix is None:
-            self_prefix = guild_prefix  
-        return (self_prefix, guild_prefix)
+            guild_prefix = await self.pool.fetchval(
+                "SELECT prefix FROM guilds WHERE guild_id = $1", 
+                message.guild.id
+            ) or ';'  
+
+
+            await self.cache.set(guild_prefix_key, guild_prefix)
+
+        return guild_prefix
 
     async def on_ready(self) -> None:
         log.info(f'Logged in as {self.user.name}#{self.user.discriminator} ({self.user.id})')

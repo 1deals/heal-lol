@@ -214,7 +214,7 @@ class Utility(commands.Cog):
             if self_prefix:
                 embed = discord.Embed(
                     title="",
-                    description=f"> Your **prefixes** are: `{guild_prefix}` **&** `{self_prefix}`",
+                    description=f"> Your **prefix** is: `{self_prefix}`",
                     color=Colors.BASE_COLOR)
                 await message.channel.send(embed=embed)
 
@@ -280,6 +280,7 @@ class Utility(commands.Cog):
             """,
             ctx.author.id, prefix
         )
+        await self.bot.cache.set(f"selfprefix-{ctx.author.id}", prefix)
         return await ctx.approve(f"**Self Prefix** updated to `{prefix}`")
 
     @selfprefix.command(
@@ -294,6 +295,7 @@ class Utility(commands.Cog):
             return await ctx.deny(f"You dont have a **selfprefix** setup.")
         else:
             await self.bot.pool.execute("DELETE FROM selfprefix WHERE user_id = $1", ctx.author.id)
+            await self.bot.cache.remove(f"selfprefix-{ctx.author.id}")
             return await ctx.approve("Removed your **selfprefix**.")
         
     @hybrid_group(
