@@ -110,41 +110,19 @@ class Heal(commands.AutoShardedBot):
             raise e
 
 
-    async def get_prefix(self, message: discord.Message) -> tuple:
+    async def get_prefix(self, message: Message) -> str:
         if message.guild is None:
-            return ';'  
-
-        selfprefix_key = f"selfprefix-{message.author.id}"
-        selfprefix = await self.cache.get(selfprefix_key)
-
-        if selfprefix is None:
-            selfprefix = await self.pool.fetchval(
-                "SELECT prefix FROM selfprefix WHERE user_id = $1", 
-                self.user.id
-            )
-
-            if selfprefix:
-                await self.cache.set(selfprefix_key, selfprefix)
-            else:
-                
-                await self.cache.set(selfprefix_key, None)
-
-        if selfprefix:
-            return selfprefix
-
-        guild_prefix_key = f"prefix-{message.guild.id}"
-        guild_prefix = await self.cache.get(guild_prefix_key)
-
+            return ';'
+        guild_prefix = await self.cache.get(f"prefix-{message.guild.id}")
         if guild_prefix is None:
-            guild_prefix = await self.pool.fetchval(
-                "SELECT prefix FROM guilds WHERE guild_id = $1", 
-                message.guild.id
-            ) or ';'  
-
-
-            await self.cache.set(guild_prefix_key, guild_prefix)
-
-        return guild_prefix
+            guild_prefix = await self.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id) or ';'
+            await self.cache.set(f"prefix-{message.guild.id}", guild_prefix)
+        self_prefix = await self.cache.get(f"selfprefix-{message.author.id}")
+        if self_prefix is None:
+            self_prefix = await self.pool.fetchval("SELECT prefix FROM selfprefix WHERE user_id = $1", message.author.id)
+            if self_prefix:
+                await self.cache.set(f"selfprefix-{message.author.id}", self_prefix)
+        return self_prefix or guild_prefix
 
     async def on_ready(self) -> None:
         log.info(f'Logged in as {self.user.name}#{self.user.discriminator} ({self.user.id})')

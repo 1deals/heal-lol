@@ -8,7 +8,7 @@ class Emojis:
     # embeds
     APPROVE = "<:approve:1276192812127359081>"
     DENY = "<:deny:1249312052640743446>"
-    WARN = "<:warning:1276192874337407098>"
+    WARN = "<:warning:1280197831273087053>"
     LASTFM = '<:LastFM:1272980316079788063>'
 
     # voice master
