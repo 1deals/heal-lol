@@ -583,7 +583,7 @@ class Utility(commands.Cog):
         if log_channel:
             embed = discord.Embed(
                 title="Joined a New Guild",
-                description=f"**Guild Name:** {guild.name}\n**Guild ID:** {guild.id}\n**Guild Owner:** {guild.owner} \n**User count:** {guild.members}",
+                description=f"**Guild Name:** {guild.name}\n**Guild ID:** {guild.id}\n**Guild Owner:** {guild.owner} \n**User count:** {len(guild.members)}",
                 color=Colors.APPROVE
             )
             await log_channel.send(embed=embed)
