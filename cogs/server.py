@@ -16,6 +16,7 @@ from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 import logging
 import random
 import string
+from tools.managers.cache import Cache
 
 class Server(Cog):
     def __init__(self, bot: Heal):
@@ -51,6 +52,7 @@ class Server(Cog):
             """,
             ctx.guild.id, prefix
         )
+        await self.bot.cache.set(f"prefix-{ctx.guild.id}", prefix)
         return await ctx.approve(f"**Server Prefix** updated to `{prefix}`")
     
     @prefix.command(
@@ -72,6 +74,7 @@ class Server(Cog):
             """,
             ctx.guild.id
         )
+        await self.bot.cache.remove(f"prefix-{ctx.guild.id}")
         return await ctx.approve(f"Your server's prefix has been **removed**. You can set a **new prefix** using `;prefix set <prefix>`")
 
     @group(
@@ -393,12 +396,28 @@ class Server(Cog):
     @commands.has_permissions(manage_messages = True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def boostmessage_test(self, ctx: Context):
-        data = await self.bot.pool.fetchrow("SELECT * FROM boostmessage WHERE guild_id = $1", ctx.guild.id)
-        message = data["message"]
-        channelid = data["channel_id"]
         message = await self.bot.cache.get(f"boostmessage-{ctx.guild.id}")
-        channelid = await self.bot.cache.get(f"boostchannel-{ctx.guild.id}")
-        channel = ctx.guild.get_channel(channelid)
+        channel_id = await self.bot.cache.get(f"boostchannel-{ctx.guild.id}")
+
+        if message is None or channel_id is None:
+            data = await self.bot.pool.fetchrow(
+                "SELECT * FROM boostmessage WHERE guild_id = $1", ctx.guild.id
+            )
+            if data:
+                message = message or data["message"]
+                channel_id = channel_id or data["channel_id"]
+
+            if message is None or channel_id is None:
+                await ctx.warn("Boost message configuration not found.")
+                return
+
+            await self.bot.cache.set(f"boostmessage-{ctx.guild.id}", message)
+            await self.bot.cache.set(f"boostchannel-{ctx.guild.id}", channel_id)
+
+        channel = ctx.guild.get_channel(channel_id)
+        if channel is None:
+            await ctx.deny("Channel not found.")
+            return
 
         processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
         content, embed, view = await EmbedBuilder.to_object(processed_message)
@@ -406,6 +425,7 @@ class Server(Cog):
             await channel.send(content=content, embed=embed, view=view)
         else:
             await channel.send(content=processed_message)
+
 
     @boostmessage.command(
         name = "remove",
@@ -424,16 +444,32 @@ class Server(Cog):
     async def on_member_update(self, before: discord.Member, after: discord.Member):
         if before.guild.premium_subscriber_role not in before.roles and after.guild.premium_subscriber_role in after.roles:
             channel = before.guild.system_channel
-            
             if channel is None:
-                res = await self.bot.pool.fetchrow("SELECT * FROM boostmessage WHERE guild_id = $1", before.guild.id)
-                if res:
-                    channel = before.guild.get_channel(res['channel_id'])
-                    channel = await self.bot.cache.get(f"boostchannel-{before.guild.id}")
-            
+                channel_id = await self.bot.cache.get(f"boostchannel-{before.guild.id}")
+
+                if channel_id is None:
+                    res = await self.bot.pool.fetchrow("SELECT * FROM boostmessage WHERE guild_id = $1", before.guild.id)
+                    if res:
+                        channel_id = res['channel_id']
+                        message = res['message']
+                        await self.bot.cache.set(f"boostchannel-{before.guild.id}", channel_id)
+                        await self.bot.cache.set(f"boostmessage-{before.guild.id}", message)
+                    else:
+                        return
+
+                channel = before.guild.get_channel(channel_id)
+
             if channel:
-                message = res["message"]
                 message = await self.bot.cache.get(f"boostmessage-{before.guild.id}")
+
+                if message is None:
+                    res = await self.bot.pool.fetchrow("SELECT * FROM boostmessage WHERE guild_id = $1", before.guild.id)
+                    if res:
+                        message = res["message"]
+                        await self.bot.cache.set(f"boostmessage-{before.guild.id}", message)
+                    else:
+                        return
+
                 processed_message = EmbedBuilder.embed_replacement(after, message)
                 content, embed, view = await EmbedBuilder.to_object(processed_message)
 

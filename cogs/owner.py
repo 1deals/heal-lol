@@ -68,7 +68,7 @@ class Owner(Cog):
     @is_owner()
     async def system_restart(self, ctx: Context):
         await ctx.approve(f"Restarting bot...")
-        os.system("pm2 restart 0")
+        os.system("pm2 restart 3")
 
 
     @system.command(
@@ -245,6 +245,31 @@ class Owner(Cog):
         else:
             embed = discord.Embed(description=f"Failed to ban **{member}** globally.", color=Colors.BASE_COLOR)
             await initial_message.edit(embed=embed)
+
+    @command(
+        name = "whitelist",
+        aliases = ["wl", "auth"],
+        description = "Authorize a guild."
+    )
+    @is_owner()
+    async def whitelist(self, ctx: Context, *, guild: Union[discord.Guild, int]):
+        if isinstance(guild, discord.Guild):
+            guild_id = guild.id
+        elif isinstance(guild, int):
+            guild_id = guild
+        else:
+            await ctx.warn("Please provide a valid guild ID or mention a guild.")
+            return
+
+        try:
+            await self.bot.pool.execute(
+                "INSERT INTO authed (guild_id) VALUES ($1) ON CONFLICT (guild_id) DO NOTHING;",
+                guild_id
+            )
+            await ctx.approve(f"Guild **{guild_id}** has been authorized successfully.")
+        except Exception as e:
+            await ctx.deny(f"An error occurred while authorizing the guild: {e}")
+            raise e
 
     @commands.group(
         name = "premium",

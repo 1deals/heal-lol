@@ -161,15 +161,8 @@ class Utility(commands.Cog):
         if status is None:
             status = "AFK"
 
-        await self.bot.pool.execute(
-            """
-            INSERT INTO afk (user_id, status, time)
-            VALUES ($1, $2, $3)
-            ON CONFLICT (user_id)
-            DO NOTHING
-            """,
-            ctx.author.id, status, int(datetime.datetime.now().timestamp())
-        )
+        current_time = int(datetime.datetime.now().timestamp())
+        await self.bot.cache.set(f"afk-{ctx.author.id}", (status, current_time))
 
         embed = discord.Embed(description= f":zzz: You are now **AFK** - `{status}`", color = Colors.BASE_COLOR)
         await ctx.reply(embed=embed)
@@ -181,37 +174,40 @@ class Utility(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        c = await self.bot.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id) or (';')
-        prefix = c
+        prefix = await self.bot.cache.get(f"prefix-{message.guild.id}") or ';'
 
         if message.content.strip().startswith(prefix + "afk"):
             return
 
-        check = await self.bot.pool.fetchrow("SELECT * from afk WHERE user_id = $1", message.author.id)
-        if check:
-            startTime = datetime.datetime.fromtimestamp(check["time"])  
+        afk_data = await self.bot.cache.get(f"afk-{message.author.id}")
+        if afk_data:
+            status, start_time = afk_data
+            start_time = datetime.datetime.fromtimestamp(start_time)
             now = datetime.datetime.now()
-            time_away = humanize.naturaldelta(now - startTime)
-            
+            time_away = humanize.naturaldelta(now - start_time)
+
             embed = discord.Embed(
-                description=f"> 👋 **welcome back!** you went away **{time_away} ago**",
-                color=Colors.BASE_COLOR
+                description=f"> 👋 **Welcome back!** You were away **{time_away} ago**",
+                color=Colors.BASE_COLOR  
             )
             await message.channel.send(embed=embed)
-            await self.bot.pool.execute("DELETE FROM afk WHERE user_id = $1", message.author.id)  
+            await self.bot.cache.remove(f"afk-{message.author.id}")
 
         if message.mentions:
             for user in message.mentions:
-                check = await self.bot.pool.fetchrow("SELECT * FROM afk WHERE user_id = $1", user.id)
-                if check:
-                    startTime = datetime.datetime.fromtimestamp(check["time"])  
+                afk_data = await self.bot.cache.get(f"afk-{user.id}")
+                if afk_data:
+                    status, start_time = afk_data
+                    start_time = datetime.datetime.fromtimestamp(start_time)
                     now = datetime.datetime.now()
-                    time_away = humanize.naturaldelta(now - startTime)
+                    time_away = humanize.naturaldelta(now - start_time)
+
                     embed = discord.Embed(
                         color=Colors.BASE_COLOR,
-                        description=f'> 💤 {user.mention} is currently **AFK:** `{check["status"]}` - **{time_away} ago**'
+                        description=f'> 💤 {user.mention} is currently **AFK:** `{status}` - **{time_away} ago**'
                     )
                     await message.channel.send(embed=embed)
+
 
         if message.author == self.bot.user:
             return
@@ -678,7 +674,17 @@ class Utility(commands.Cog):
                     else:
                         await ctx.warn("Failed to retrieve results. Try again later.")
 
-
+    @commands.command(
+        name="selfpurge",
+        aliases=["spurge", "me"],
+        description="Clears your own messages."
+    )
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    async def selfpurge(self, ctx: Context, amount: int = 100):
+        deleted = await ctx.channel.purge(
+            limit=amount,
+            check=lambda m: m.author == ctx.author
+        )
 
         
 

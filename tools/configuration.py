@@ -26,9 +26,9 @@ class Emojis:
 class Colors:
     BASE_COLOR   = 0x000000
     LAST_FM      = 0xd3222a
-    APPROVE = 0x4CAF50
-    WARN = 0xFFA500  
-    DENY = 0xF44336  
+    APPROVE = 0xa4e577
+    WARN = 0xf9d162  
+    DENY = 0xff3735
 
 class api:
     lastfm: str = "bc8082588489f949216859abba6e52be"
