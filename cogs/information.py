@@ -20,6 +20,8 @@ from tools.configuration import api
 from tools.models.statistics import BotStatistics
 import os
 from discord.ui import View, Button
+import googletrans
+from googletrans import Translator, LANGUAGES
 
 def get_ordinal(number):
         if 10 <= number % 100 <= 20:
@@ -757,7 +759,17 @@ class Information(commands.Cog):
                     embed.set_thumbnail(url = conditionicon)
                     return await ctx.reply(embed=embed)
 
+    @command(
+        aliases = ["trans"], 
+        description = "Translate a message from any language."
+    )
+    @commands.cooldown(1, 3, commands.BucketType.user)
+    async def translate(self, ctx, *, message):
+        translator = Translator()
+        trans_message = translator.translate(message, dest = "en")
 
+        embed = discord.Embed(description = f"**Translation from {trans_message.src}:** {trans_message.text}", color =Colors.BASE_COLOR)
+        await ctx.reply(embed=embed)
         
 
 async def setup(bot: Heal):

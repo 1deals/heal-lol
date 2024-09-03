@@ -421,25 +421,20 @@ class Utility(commands.Cog):
         if timeout is None:
             timeout = 1
 
-        blacklisted = ["ip", "IP", "Ip", "iP"]
-        if any(phrase in url for phrase in blacklisted):
-            await ctx.warn("This URL cannot be screenshot due to restricted content.")
-
-        else:
-            params = {"url": url, "timeout": timeout}
-            headers = {"api-key": APIKEY} 
+        params = {"url": url, "timeout": timeout}
+        headers = {"api-key": APIKEY} 
 
 
-            async with ctx.typing():
+        async with ctx.typing():
 
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(api_url, params=params, headers=headers) as response:
-                        if response.status == 200:
-                            data = await response.json()
+            async with aiohttp.ClientSession() as session:
+                async with session.get(api_url, params=params, headers=headers) as response:
+                    if response.status == 200:
+                        data = await response.json()
 
-                            screenshot_url = data.get("screenshot_url")
+                        screenshot_url = data.get("screenshot_url")
 
-                            async with session.get(screenshot_url) as image_response:
+                        async with session.get(screenshot_url) as image_response:
                                 if image_response.status == 200:
                                     image_data = await image_response.read() 
 
@@ -451,8 +446,8 @@ class Utility(commands.Cog):
                                     await ctx.send(file=file)
                                 else:
                                     await ctx.deny("Failed to download screenshot image. Try again later.")
-                        if response.status == 422:
-                            return await ctx.deny(data["detail"])
+                                if image_response.status == 403:
+                                    return await ctx.warn(f"{data["detail"]}")
         
 
     @commands.command(

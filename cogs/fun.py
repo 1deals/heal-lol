@@ -69,7 +69,8 @@ class Fun(commands.Cog):
         while len(players) > 1: 
             for player in players: 
                 strin = await self.get_string()
-                await ctx.neutral(f"⏰ <@{player}>, type a word containing **{strin.upper()}** in **10 seconds**", allowed_mentions=discord.AllowedMentions(users=True))
+                embed = discord.Embed(description = f"⏰ <@{player}>, type a word containing **{strin.upper()}** in **10 seconds**", color = Colors.BASE_COLOR)
+                await ctx.send(embed=embed, content = f"<@{player}>")
             
                 def is_correct(msg): 
                     return msg.author.id == player

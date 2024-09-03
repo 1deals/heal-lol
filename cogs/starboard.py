@@ -130,6 +130,8 @@ class Starboard(Cog):
                 inline=False
             )
             embed.set_author(name = f"{reaction.message.author}", icon_url= reaction.message.author.avatar.url)
+            if reaction.message.attachments:
+                    embed.set_image(url=reaction.message.attachments[0].url)
 
             try:
                 if message_id in self.skull_messages:
