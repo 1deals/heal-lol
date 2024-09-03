@@ -411,19 +411,22 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def screenshot(self, ctx: Context, *,url: str):
+    async def screenshot(self, ctx: Context, url: str, *, timeout: int = None):
         APIKEY = api.heal  
         api_url = "http://localhost:1337/screenshot"
 
         if not url.startswith(("http://", "https://")):
             url = "https://" + url
+        
+        if timeout is None:
+            timeout = 1
 
         blacklisted = ["ip", "IP", "Ip", "iP"]
         if any(phrase in url for phrase in blacklisted):
             await ctx.warn("This URL cannot be screenshot due to restricted content.")
 
         else:
-            params = {"url": url}
+            params = {"url": url, "timeout": timeout}
             headers = {"api-key": APIKEY} 
 
 
