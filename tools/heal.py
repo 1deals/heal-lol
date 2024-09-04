@@ -110,19 +110,27 @@ class Heal(commands.AutoShardedBot):
             raise e
 
 
-    async def get_prefix(self, message: Message) -> str:
+    async def get_prefix(self, message: Message) -> tuple:
+        """
+        Get the command prefixes for a message, considering both self-prefix and guild prefix.
+        """
         if message.guild is None:
-            return ';'
+            return
+        
         guild_prefix = await self.cache.get(f"prefix-{message.guild.id}")
         if guild_prefix is None:
             guild_prefix = await self.pool.fetchval("SELECT prefix FROM guilds WHERE guild_id = $1", message.guild.id) or ';'
             await self.cache.set(f"prefix-{message.guild.id}", guild_prefix)
+        
         self_prefix = await self.cache.get(f"selfprefix-{message.author.id}")
         if self_prefix is None:
             self_prefix = await self.pool.fetchval("SELECT prefix FROM selfprefix WHERE user_id = $1", message.author.id)
             if self_prefix:
                 await self.cache.set(f"selfprefix-{message.author.id}", self_prefix)
-        return self_prefix or guild_prefix
+        
+        return (self_prefix or guild_prefix, guild_prefix)
+
+    
 
     async def on_ready(self) -> None:
         log.info(f'Logged in as {self.user.name}#{self.user.discriminator} ({self.user.id})')

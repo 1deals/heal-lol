@@ -3,7 +3,7 @@ import sys
 import humanfriendly
 import re 
 import datetime
-
+from discord import AutoModTrigger, AutoModRuleTriggerType, AutoModRuleAction, AutoModRuleEventType
 from tools.managers.context     import Context
 from discord.ext.commands       import command, group, BucketType, has_permissions
 from tools.configuration        import Emojis, Colors
@@ -534,6 +534,57 @@ class Moderation(commands.Cog):
         await ctx.guild.unban(user)
         return await ctx.approve(f"Unbanned {user.name}.")
 
+    @group(
+        name = "filter",
+        description = "Configure filtering settings for your server.",
+        invoke_without_command = True
+    )
+    @has_permissions(manage_guild = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def filter(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+
+    @filter.command(
+        name = "invites",
+        description = "Filter discord server invites."
+    )
+    @has_permissions(manage_guild = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def filter_invites(self, ctx: Context):
+        """
+        Enable the invite filter
+        """
+
+        check = await self.bot.pool.fetchrow("SELECT rule_id FROM filter WHERE guild_id = $1 AND mode = $2", ctx.guild.id, "invites")
+        if not check:
+            trigger = AutoModTrigger(
+                type=AutoModRuleTriggerType.keyword,
+                regex_patterns=[r"(https?://)?(www.)?(discord.(gg|io|me|li)|discordapp.com/invite|discord.com/invite)/.+[a-z]"],)
+            mod = await ctx.guild.create_automod_rule(
+                name=f"{self.bot.user.name}-antilink",
+                event_type=AutoModRuleEventType.message_send,
+                trigger=trigger,
+                enabled=True,
+                actions=[
+                    AutoModRuleAction(
+                        custom_message=f"Message blocked by {self.bot.user.name} for containing an invite link"
+                    )
+                ],
+                reason="Filter invites rule created",
+            )
+            await self.bot.pool.execute("INSERT INTO filter VALUES ($1,$2,$3)", ctx.guild.id, "invites", mod.id)
+            return await ctx.approve(f"Enabled the filter for invites")
+        else:
+            mod = await ctx.guild.fetch_automod_rule(check[0])
+            if mod:
+                if mod.enabled:
+                    await mod.edit(enabled=False, reason=f"invites filter disabled by {ctx.author}")
+                    return await ctx.approve(f"Disabled the filter for discord invites")
+                if not mod.enabled:
+                    await mod.edit(enabled=True, reason=f"invites filter enabled by {ctx.author}")
+                    return await ctx.approve(f"Enabled the filter for invites.")
+            return await ctx.warn("The automod rule was not found")
+
 class Confirm(discord.ui.View):
     def __init__(self, ctx: Context, channel: discord.TextChannel):
         super().__init__(timeout=60)  # 60 seconds timeout
@@ -596,6 +647,8 @@ class Confirm(discord.ui.View):
 
         # Disable the buttons after the action
         self.disable_all_items()
+
+
 
 async def setup(bot: Heal):
     await bot.add_cog(Moderation(bot))

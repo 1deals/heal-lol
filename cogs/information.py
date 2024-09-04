@@ -55,7 +55,7 @@ class Information(commands.Cog):
         availableMem = round(100- memory_usage_percentage)
         cpu_usage = psutil.Process().cpu_percent()
         embed = discord.Embed(description =f"An all-in-one, aesthetically pleasing multipurpose bot, aimed to keep communities safe and thriving. Created by the [**Heal Team**](https://discord.gg/jCPYXFQekB)", color= Colors.BASE_COLOR)
-        embed.add_field(name= "__Statistics:__", value = f"**Guilds:** {len(self.bot.guilds)} \n**Users:** {len(self.bot.users): ,} \n**Lines:** {self.bot.linecount: ,}", inline = False)
+        embed.add_field(name= "__Statistics:__", value = f"**Guilds:** {len(self.bot.guilds)} \n**Users:** {sum(g.member_count for g in self.bot.guilds): ,} \n**Lines:** {self.bot.linecount: ,}", inline = False)
         embed.add_field(name = "__Bot:__", value= f"**Uptime:** {self.bot.uptime} \n**Latency:** {round(self.bot.latency * 1000)}ms \n**Commands:** {len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}", inline = False)
         embed.add_field(name = "__Usage:__", value = f"**Memory:** {round(memory_usage_percentage)}% \n**Available:** {availableMem}% \n**CPU:** {cpu_usage}%", inline = False)
         embed.set_thumbnail(url= self.bot.user.avatar.url)

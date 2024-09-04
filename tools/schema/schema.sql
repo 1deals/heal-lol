@@ -178,3 +178,10 @@ CREATE TABLE IF NOT EXISTS vanitytracker (
     guild_id BIGINT PRIMARY KEY,
     channel_id BIGINT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS filter (
+    guild_id BIGINT NOT NULL,
+    mode TEXT NOT NULL,
+    rule_id BIGINT NOT NULL,
+    PRIMARY KEY (guild_id, mode)
+);

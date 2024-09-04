@@ -32,30 +32,7 @@ api_keys = ["AIzaSyARqu0-ecLbA5gTpcCi8R8n8DQnM_y5SCc", "AIzaSyD6kJ3BEfJ9MoyiqkGQ
 key = random.choice(api_keys)
 genai.configure(api_key=key)
 
-model = genai.GenerativeModel('gemini-pro',
-safety_settings = [
-        {
-            "category": "HARM_CATEGORY_DANGEROUS",
-            "threshold": "BLOCK_NONE",
-        },
-        {
-            "category": "HARM_CATEGORY_HARASSMENT",
-            "threshold": "BLOCK_NONE",
-        },
-        {
-            "category": "HARM_CATEGORY_HATE_SPEECH",
-            "threshold": "BLOCK_NONE",
-        },
-        {
-            "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-            "threshold": "BLOCK_NONE",
-        },
-        {
-            "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-            "threshold": "BLOCK_NONE",
-        },
-    ]
-    )
+model = genai.GenerativeModel('gemini-pro')
 
 class Utility(commands.Cog):
     def __init__(self, bot: Heal) -> None:
@@ -224,7 +201,7 @@ class Utility(commands.Cog):
             if self_prefix:
                 embed = discord.Embed(
                     title="",
-                    description=f"> Your **prefix** is: `{self_prefix}`",
+                    description=f"> Your **prefixes** are: `{self_prefix}` & `{guild_prefix}",
                     color=Colors.BASE_COLOR)
                 await message.channel.send(embed=embed)
 

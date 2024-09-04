@@ -361,5 +361,26 @@ class Owner(Cog):
         except subprocess.CalledProcessError as e:
             await ctx.warn(f"An error occurred:\n```{e.stderr}```")
 
+    @hybrid_command()
+    async def shards(self, ctx: Context):
+        """
+        Check status of each bot shard
+        """
+
+        embed = Embed(
+            color=Colors.BASE_COLOR, title=f"Total shards ({self.bot.shard_count})"
+        )
+
+        for shard in self.bot.shards:
+            guilds = [g for g in self.bot.guilds if g.shard_id == shard]
+            users = sum([g.member_count for g in guilds])
+            embed.add_field(
+                name=f"Shard {shard}",
+                value=f"**ping**: {round(self.bot.shards.get(shard).latency * 1000)}ms\n**guilds**: {len(guilds)}\n**users**: {users:,}",
+                inline=False,
+            )
+
+        await ctx.send(embed=embed)
+
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Owner(bot))
