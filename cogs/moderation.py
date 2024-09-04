@@ -557,9 +557,7 @@ class Moderation(commands.Cog):
 
         check = await self.bot.pool.fetchrow("SELECT rule_id FROM filter WHERE guild_id = $1 AND mode = $2", ctx.guild.id, "invites")
         if not check:
-            trigger = AutoModTrigger(
-                type=AutoModRuleTriggerType.keyword,
-                regex_patterns=[r"(https?://)?(www.)?(discord.(gg|io|me|li)|discordapp.com/invite|discord.com/invite)/.+[a-z]"],)
+            trigger = AutoModTrigger( type=AutoModRuleTriggerType.keyword, regex_patterns=[r"(https?://)?(www.)?(discord.(gg|io|me|li)|discordapp.com/invite|discord.com/invite)/.+[a-z]"],)
             mod = await ctx.guild.create_automod_rule(
                 name=f"{self.bot.user.name}-antilink",
                 event_type=AutoModRuleEventType.message_send,
