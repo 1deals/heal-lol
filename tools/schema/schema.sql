@@ -185,3 +185,14 @@ CREATE TABLE IF NOT EXISTS filter (
     rule_id BIGINT NOT NULL,
     PRIMARY KEY (guild_id, mode)
 );
+
+CREATE TABLE IF NOT EXISTS booster_module (
+    guild_id BIGINT NOT NULL,
+    base BIGINT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS booster_roles (
+    guild_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    role_id BIGINT NOT NULL
+);

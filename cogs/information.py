@@ -403,40 +403,6 @@ class Information(commands.Cog):
 
         await ctx.paginate(embeds)
 
-    @command(
-        name = "roles",
-        aliases = ["rlist", "rolelist"],
-        usage = "roles"
-    )
-    @cooldown(1, 5, BucketType.user)
-    async def roles(self, ctx: Context):
-        roles    = ctx.guild.roles
-        count    = 0
-        embeds   = []
-
-        if len(ctx.guild.roles) == 0:
-            return await ctx.warn('there are no **roles** in this server.')
-        
-        entries = [
-            f"` {i} `  {r.mention}  -  {discord.utils.format_dt(r.created_at, style="R")}  |  ({len(r.members)} members)"
-            for i, r in enumerate(roles, start=1)
-        ]
-
-        embed = discord.Embed(color=Colors.BASE_COLOR, title=f"role list ({len(entries)})", description="")
-
-        for entry in entries:
-            embed.description += f'{entry}\n'
-            count += 1
-
-            if count == 10:
-                embeds.append(embed)
-                embed = discord.Embed(color=Colors.BASE_COLOR, description="", title=f"role list ({len(entries)})")
-                count = 0
-
-        if count > 0:
-            embeds.append(embed)
-
-        await ctx.paginate(embeds)
 
     @commands.group(
         name='server',
