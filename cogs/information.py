@@ -680,7 +680,7 @@ class Information(commands.Cog):
                     return await ctx.reply(embed=embed)
   
                 if response.status == 422:
-                    return await ctx.warn(f"{data.get("detail")}")
+                    return await ctx.warn(f"{data.get('detail')}")
 
     @hybrid_command(
         name = "weather",

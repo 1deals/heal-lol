@@ -424,7 +424,7 @@ class Utility(commands.Cog):
                                 else:
                                     await ctx.deny("Failed to download screenshot image. Try again later.")
                                 if image_response.status == 403:
-                                    return await ctx.warn(f"{data["detail"]}")
+                                    return await ctx.warn(f"{data['detail']}")
         
 
     @commands.command(
