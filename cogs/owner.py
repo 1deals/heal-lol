@@ -19,6 +19,7 @@ import traceback
 import secrets
 import config
 import subprocess
+import asyncio
 
 from tools.heal import Heal
 from tools.managers.context import Context, Emojis, Colors
@@ -206,45 +207,30 @@ class Owner(Cog):
         description = "Global bans a user."
     )
     @commands.is_owner()
-    async def globalban(self, ctx: Context, *, member: discord.User):
-        if member.id in self.bot.owner_ids:
+    async def globalban(self, ctx: Context, *, user: discord.User):
+        if user.id in self.bot.owner_ids:
             return await ctx.deny("You can't global ban a bot owner.")
-        if member.id == self.bot.user.id:
+        if user.id == self.bot.user.id:
             return await ctx.deny(f"Bro tried global banning me from {len(self.bot.guilds)} 💀")
 
-       
-        check = await self.bot.pool.fetchrow("SELECT * FROM globalban WHERE user_id = $1", member.id)
-        if check is not None:
-            return await ctx.warn(f"{member.mention} is already globalbanned.")
+        check = await self.bot.pool.fetchrow(
+            "SELECT * FROM globalban WHERE user_id = $1", user.id
+        )
+        if check:
+            await self.bot.pool.execute("DELETE FROM globalban WHERE user_id = $1", user.id)
+            return await ctx.approve("{user.mention} was succesfully globally unbanned")
 
-       
-        guild_ids = [guild.id for guild in self.bot.guilds]
-
-       
-        initial_message = await ctx.neutral(f"Globally banning {member.mention}...")
-
-   
-        ban_count = 0
-
-      
-        for guild in self.bot.guilds:
-            if guild.id not in guild_ids:
-                continue
-
-            try:
-                await guild.ban(member, reason='Globally banned by a bot owner.')
-                ban_count += 1
-            except Exception as e:
-                await ctx.warn(f"Failed to ban in {guild.name}: {e}")
-
-
-        if ban_count > 0:
-            await self.bot.pool.execute("INSERT INTO globalban (user_id) VALUES ($1)", member.id)
-            embed = discord.Embed(description = f"Globally banned *{member}** in **{ban_count} guild(s)**!", color = Colors.BASE_COLOR)
-            await initial_message.edit(embed=embed)
-        else:
-            embed = discord.Embed(description=f"Failed to ban **{member}** globally.", color=Colors.BASE_COLOR)
-            await initial_message.edit(embed=embed)
+        mutual_guilds = len(user.mutual_guilds)
+        tasks = [
+            g.ban(user, reason=f"Globally banned by bot owner: {ctx.author.name}")
+            for g in user.mutual_guilds
+            if g.me.guild_permissions.ban_members
+            and g.me.top_role > g.get_member(user.id).top_role
+            and g.owner_id != user.id
+        ]
+        await asyncio.gather(*tasks)
+        await self.bot.pool.execute("INSERT INTO globalban VALUES ($1)", user.id)
+        return await ctx.approve(f"{user.mention} was succesfully global banned in {len(tasks)}/{mutual_guilds} servers")
 
     @command(
         name = "whitelist",

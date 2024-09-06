@@ -134,6 +134,12 @@ class Information(commands.Cog):
         title = f"{user.name}"
         description = ""
 
+        if isinstance(user, discord.Member):
+            if user.voice:
+                deaf = ( "<:deafend:1281696524098736159>" if user.voice.self_deaf or user.voice.deaf else "<:undeafend:1281696645356196023>")
+                mute = ("<:mute:1281696050142384270>" if user.voice.self_mute or user.voice.mute else "<:unmute:1281696136134131823>")
+                channel = user.voice.channel
+                description += f"> {deaf} {mute} **In a voicechannel:** {channel.mention} \n"
 
         if user.id == 187747524646404105:  # me
             title += " <:owner:1277914467270922320> <:staff:1277914880808063007> <:dev:1277915125482786816> "
@@ -154,11 +160,20 @@ class Information(commands.Cog):
         if prem:
             title += " <:earlysupporter:1278698352736997428>"
 
+        perm = user.guild_permissions
+        perms = [perm_name.replace('_', ' ').title() for perm_name, value in perm if value]
+
+        if len(perms) > 10:
+            display_perms = ', '.join(perms[:10]) + f" +{len(perms) - 10} more"
+        else:
+            display_perms = ', '.join(perms)
+
         embed = discord.Embed(
             title=title,
             color=color
         )
         embed.add_field(name="Created", value=format_dt(user.created_at, style='f'), inline=True)
+        embed.add_field(name="Permissions", value=f"`{display_perms}`", inline=False)
 
         if isinstance(user, discord.Member) and user.joined_at:
             all_members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
