@@ -438,8 +438,7 @@ class Utility(commands.Cog):
     async def createembed(self, ctx: Context,  *, code: EmbedScript = None) -> Message:
         if code is None:
             return await ctx.neutral(f"Create embed code [**here**](https://healbot.lol/embed)")
-        flag: ScriptFlags = ctx.flag
-        return await ctx.send(**code, allowed_mentions=AllowedMentions(users=not flag.disallow_users_mention, roles=flag.allow_role_mentions, everyone=flag.allow_everyone_mention), delete_after=flag.delete_after)  # type: ignore
+        return await ctx.send(**code)
 
     @command(
         name = "firstmsg",
