@@ -1,6 +1,6 @@
 import discord
 
-from discord import Message
+from discord import Message, PermissionOverwrite
 from discord.ext import commands
 from discord.ext.commands import (
     Cog,
@@ -21,6 +21,12 @@ from tools.managers.cache import Cache
 class Server(Cog):
     def __init__(self, bot: Heal):
         self.bot = bot
+        self.validcounter_types = [
+            "humans", "bots", "boosters", "members"
+        ]
+        self.validchannel_types = [
+            "voice", "stage", "text"
+        ]
 
         
     @hybrid_group(
@@ -597,7 +603,7 @@ class Server(Cog):
                 except Exception as e:
                     logging.warning(f"Failed to fetch vanity channel for {guild.id}: {e}")
 
-    
+
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Server(bot))
     

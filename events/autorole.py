@@ -33,5 +33,22 @@ class autorole(Cog):
         else:
             pass
 
+    @commands.Cog.listener()
+    async def on_command_completion(self, ctx):
+        command_name = ctx.command.name
+
+        if command_name == "topcmds":
+            return
+        
+        if command_name.startswith('jsk'):
+            return
+
+        row = await self.bot.pool.fetchrow('SELECT usage_count FROM topcmds WHERE command_name = $1', command_name)
+        
+        if row is None:
+            await self.bot.pool.execute('INSERT INTO topcmds (command_name, usage_count) VALUES ($1, $2)', command_name, 1)
+        else:
+            await self.bot.pool.execute('UPDATE topcmds SET usage_count = usage_count + 1 WHERE command_name = $1', command_name)
+
 async def setup(bot: Heal) -> None:
     await bot.add_cog(autorole(bot))

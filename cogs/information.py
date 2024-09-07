@@ -759,13 +759,32 @@ class Information(commands.Cog):
         aliases = ["trans"], 
         description = "Translate a message from any language."
     )
-    @commands.cooldown(1, 3, commands.BucketType.user)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def translate(self, ctx, *, message):
         translator = Translator()
         trans_message = translator.translate(message, dest = "en")
 
         embed = discord.Embed(description = f"**Translation from {trans_message.src}:** {trans_message.text}", color =Colors.BASE_COLOR)
         await ctx.reply(embed=embed)
+
+    @commands.command()
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def topcmds(self, ctx: Context):
+        rows = await self.bot.pool.fetch('''
+            SELECT command_name, usage_count
+            FROM topcmds
+            ORDER BY usage_count DESC
+            LIMIT 10
+        ''')
+
+        embed = discord.Embed(title="Top 10 Commands", color=Colors.BASE_COLOR)
+        for row in rows:
+            command_name = row['command_name']
+            usage_count = row['usage_count']
+            embed.add_field(name=command_name, value=f"Used {usage_count} times", inline=False)
+
+        await ctx.send(embed=embed)
+
 
 async def setup(bot: Heal):
     await bot.add_cog(Information(bot))

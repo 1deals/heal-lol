@@ -196,3 +196,16 @@ CREATE TABLE IF NOT EXISTS booster_roles (
     user_id BIGINT NOT NULL,
     role_id BIGINT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS counters (
+    guild_id BIGINT PRIMARY KEY, 
+    channel_type TEXT, 
+    channel_id BIGINT, 
+    channel_name TEXT, 
+    module TEXT
+);
+
+CREATE TABLE IF NOT EXISTS topcmds (
+    command_name TEXT PRIMARY KEY,
+    usage_count INTEGER NOT NULL DEFAULT 0
+);
