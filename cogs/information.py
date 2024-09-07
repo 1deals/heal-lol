@@ -781,7 +781,7 @@ class Information(commands.Cog):
         for row in rows:
             command_name = row['command_name']
             usage_count = row['usage_count']
-            embed.add_field(name=command_name, value=f"Used {usage_count} times", inline=False)
+            embed.add_field(name=f"{command_name} - {usage_count}", value=f"", inline=False)
 
         await ctx.send(embed=embed)
 

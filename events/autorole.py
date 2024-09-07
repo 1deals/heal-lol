@@ -39,9 +39,6 @@ class autorole(Cog):
 
         if command_name == "topcmds":
             return
-        
-        if command_name.startswith('jsk'):
-            return
 
         row = await self.bot.pool.fetchrow('SELECT usage_count FROM topcmds WHERE command_name = $1', command_name)
         

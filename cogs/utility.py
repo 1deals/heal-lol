@@ -27,6 +27,8 @@ from tools.configuration import api
 from io import BytesIO
 from rembg import remove
 import google.generativeai as genai
+from tools.managers.flags import ScriptFlags
+from discord import AllowedMentions
 
 api_keys = ["AIzaSyARqu0-ecLbA5gTpcCi8R8n8DQnM_y5SCc", "AIzaSyD6kJ3BEfJ9MoyiqkGQqmKwCH41rSAI7OY", "AIzaSyB5M5n1Y6FbzJn8ArixxWBCfwBRMkJReNw"]
 key = random.choice(api_keys)
@@ -433,10 +435,11 @@ class Utility(commands.Cog):
         description = "Create an embed."
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def createembed(self, ctx: Context,  *, code: EmbedScript = None):
+    async def createembed(self, ctx: Context,  *, code: EmbedScript = None) -> Message:
         if code is None:
             return await ctx.neutral(f"Create embed code [**here**](https://healbot.lol/embed)")
-        await ctx.send(**code)
+        flag: ScriptFlags = ctx.flag
+        return await ctx.send(**code, allowed_mentions=AllowedMentions(users=not flag.disallow_users_mention, roles=flag.allow_role_mentions, everyone=flag.allow_everyone_mention), delete_after=flag.delete_after)  # type: ignore
 
     @command(
         name = "firstmsg",
