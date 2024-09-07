@@ -31,7 +31,7 @@ class Server(Cog):
         
     @hybrid_group(
         description='View guild prefix',
-        invoke_without_command=False,
+        invoke_without_command=True,
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def prefix(self, ctx: Context) -> Message:

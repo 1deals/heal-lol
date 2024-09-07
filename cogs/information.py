@@ -72,7 +72,17 @@ class Information(commands.Cog):
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @cooldown(1, 5, BucketType.user)
     async def ping(self, ctx: Context):
-        return await ctx.reply(f"🏓... pong! **{round(self.bot.latency * 1000)}ms**")
+
+        l = []
+        for _ in range(1):
+            n = datetime.datetime.utcnow()  
+            message = await ctx.reply(f"🏓... pong! **{round(self.bot.latency * 1000)}ms**")    
+            a = datetime.datetime.utcnow()  
+            l.append((a - n).total_seconds() * 1000)  
+
+        edit_latency = sum(l) / len(l)
+
+        await message.edit(content=f"🏓... pong! **{round(self.bot.latency * 1000)}ms** (edit: **{round(edit_latency)}ms**)")
 
             
 
