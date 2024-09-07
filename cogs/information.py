@@ -34,6 +34,7 @@ def get_ordinal(number):
 class Information(commands.Cog):
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
+        self.vc_start_times = {}
 
     @hybrid_command(
         name = "botinfo",
@@ -190,6 +191,20 @@ class Information(commands.Cog):
 
         embed.set_thumbnail(url=user.avatar.url)
 
+        button = Button(label="Permissions", style=discord.ButtonStyle.primary)
+
+        async def button_callback(interaction: discord.Interaction):
+            if interaction.user != ctx.author:
+                return await interaction.response.send_message("You can't use this button.", ephemeral=True)
+
+            full_perms = ', '.join(perms)
+            await interaction.response.send_message(f"All Permissions: `{full_perms}`", ephemeral=True)
+
+        button.callback = button_callback
+
+        view = View()
+        view.add_item(button)
+
         if data:
             lastfm_username = data["lfuser"]
             async with aiohttp.ClientSession() as session:
@@ -213,7 +228,7 @@ class Information(commands.Cog):
                                 description += f"> {Emojis.LASTFM} **Listening to [{track_name}]({track_url}) by {artist_name}**"
                                 embed.description = description
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, view=view)
 
     @hybrid_command(
         name = "instagram",
@@ -751,7 +766,6 @@ class Information(commands.Cog):
 
         embed = discord.Embed(description = f"**Translation from {trans_message.src}:** {trans_message.text}", color =Colors.BASE_COLOR)
         await ctx.reply(embed=embed)
-        
 
 async def setup(bot: Heal):
     await bot.add_cog(Information(bot))
