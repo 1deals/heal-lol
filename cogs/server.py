@@ -619,7 +619,7 @@ class Server(Cog):
          await self.bot.pool.execute("INSERT INTO uwulock VALUES ($1,$2)", ctx.guild.id, member.id)
      else: 
          await self.bot.pool.execute("DELETE FROM uwulock WHERE user_id = $1 AND guild_id = $2", member.id, ctx.guild.id)    
-     return await ctx.message.add_reaction({Emojis.APPROVE}) 
+     return await ctx.message.add_reaction(f'{Emojis.APPROVE}') 
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message): 
