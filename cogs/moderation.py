@@ -74,7 +74,7 @@ class Moderation(commands.Cog):
         try:
             if ctx.author is ctx.guild.owner:
                 await user.kick(reason=reason)
-                return await ctx.approve(f'Successfully kicked {user.mention} for {reason.split(' |')[0]}')
+                return await ctx.approve(f'Successfully kicked {user.mention} for {reason.split(" |")[0]}')
             if user is ctx.guild.owner:
                 return await ctx.warn(f"You're unable to kick the **server owner**.")
             if user is ctx.author:
@@ -83,7 +83,7 @@ class Moderation(commands.Cog):
                 return await ctx.warn(f"You're unable to kick a user with a **higher role** than **yourself**.")
             
             await user.kick(reason=reason)
-            return await ctx.approve(f'Successfully kicked {user.mention} for {reason.split(' |')[0]}')
+            return await ctx.approve(f'Successfully kicked {user.mention} for {reason.split(" |")[0]}')
         except:
             return await ctx.deny(f'Failed to kick {user.mention}.')
         
