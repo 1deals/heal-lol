@@ -170,22 +170,25 @@ class Information(commands.Cog):
         prem = await self.bot.pool.fetchval("SELECT * FROM premium WHERE user_id = $1", user.id)
         if prem:
             title += " <:earlysupporter:1278698352736997428>"
+        
         embed = discord.Embed(
                 title=title,
                 color=color
         )
-        if isinstance(user, discord.Member):
-                perm = user.guild_permissions
-                perms = [perm_name.replace('_', ' ').title() for perm_name, value in perm if value]
 
-                if len(perms) > 10:
-                        display_perms = ', '.join(perms[:10]) + f" +{len(perms) - 10} more"
-                else:
-                        display_perms = ', '.join(perms)
+        if isinstance(user, discord.Member) and user.joined_at:
+            perm = user.guild_permissions
+            perms = [perm_name.replace('_', ' ').title() for perm_name, value in perm if value]
+
+            if len(perms) > 10:
+                display_perms = ', '.join(perms[:10]) + f" +{len(perms) - 10} more"
+            else:
+                display_perms = ', '.join(perms)
+            embed.add_field(name="Permissions", value=f"`{display_perms}`", inline=False)
 
         
         embed.add_field(name="Created", value=format_dt(user.created_at, style='f'), inline=True)
-        embed.add_field(name="Permissions", value=f"`{display_perms}`", inline=False)
+
 
         if isinstance(user, discord.Member) and user.joined_at:
             all_members = sorted(ctx.guild.members, key=lambda m: m.joined_at)

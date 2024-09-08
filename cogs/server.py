@@ -17,6 +17,12 @@ import logging
 import random
 import string
 from tools.managers.cache import Cache
+from uwuipy import uwuipy
+
+async def uwuthing(bot, text: str) -> str: 
+   uwu = uwuipy.Uwuipy()
+   return uwu.uwuify(text)
+
 
 class Server(Cog):
     def __init__(self, bot: Heal):
@@ -602,6 +608,38 @@ class Server(Cog):
                             logging.warning(f"Failed to send vanity URL update in {guild.id}: {e}")
                 except Exception as e:
                     logging.warning(f"Failed to fetch vanity channel for {guild.id}: {e}")
+
+    @commands.command(description="uwuify a person's messages", help="donor", usage="[member]", brief="administrator")
+    @commands.has_permissions(administrator = True)
+    async def uwulock(self, ctx: Context, *, member: discord.Member): 
+     if member.bot:
+         return await ctx.warn("You can't **uwulock** a bot")
+     check = await self.bot.pool.fetchrow("SELECT user_id FROM uwulock WHERE user_id = $1 AND guild_id = $2", member.id, ctx.guild.id)    
+     if check is None: 
+         await self.bot.pool.execute("INSERT INTO uwulock VALUES ($1,$2)", ctx.guild.id, member.id)
+     else: 
+         await self.bot.pool.execute("DELETE FROM uwulock WHERE user_id = $1 AND guild_id = $2", member.id, ctx.guild.id)    
+     return await ctx.message.add_reaction("👍🏻") 
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message): 
+        if not message.guild:
+            return
+        if isinstance(message.author, discord.User): 
+            return
+        check = await self.bot.pool.fetchrow("SELECT * FROM uwulock WHERE guild_id = $1 AND user_id = $2", message.guild.id, message.author.id)
+        if check: 
+            try: 
+                await message.delete()
+                uwumsg = await uwuthing(self.bot, message.clean_content)
+                webhooks = await message.channel.webhooks()
+                if len(webhooks) == 0:
+                    webhook = await message.channel.create_webhook(name="heal", reason="for uwulock")
+                else: 
+                    webhook = webhooks[0]
+                await webhook.send(content=uwumsg, username=message.author.name, avatar_url=message.author.display_avatar.url)
+            except Exception as e:
+                logging.error(f"An error occurred: {e}")
 
 
 async def setup(bot: Heal) -> None:
