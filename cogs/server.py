@@ -513,10 +513,7 @@ class Server(Cog):
     async def on_user_update(self, before: discord.User, after: discord.User):
         if before.name != after.name:
             for guild in self.bot.guilds:
-                channel_id = await self.bot.cache.get(f"usernames-{guild.id}")
-                if channel_id is None:
-                    channel_id = await self.bot.pool.fetchrow("SELECT * FROM usertracker WHERE guild_id = $1", guild.id)
-                    await self.bot.cache.set(f"usernames-{guild.id}", channel_id)
+                channel_id = await self.bot.pool.fetchrow("SELECT * FROM usertracker WHERE guild_id = $1", guild.id)
                 try:
                     if channel_id:
                         channel = guild.get_channel(channel_id)
@@ -591,10 +588,7 @@ class Server(Cog):
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
         if before.vanity_url_code != after.vanity_url_code:
             for guild in self.bot.guilds:
-                channel_id = await self.bot.cache.get(f"vanities-{guild.id}")
-                if channel_id is None:
-                    channel_id = await self.bot.pool.fetchrow("SELECT * FROM vanitytracker WHERE guild_id = $1", guild.id)
-                    await self.bot.cache.set(f"vanities-{guild.id}", channel_id)
+                channel_id = await self.bot.pool.fetchrow("SELECT * FROM vanitytracker WHERE guild_id = $1", guild.id)
                 try:
                     if channel_id:
                         channel = guild.get_channel(channel_id)

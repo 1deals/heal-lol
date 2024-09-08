@@ -190,7 +190,7 @@ class Heal(commands.AutoShardedBot):
         return sum(
             [
                 len(f.open('r').readlines()) for f in [
-                    f for f in pathlib.Path('/root/healbot.lol/').glob('**/*.py') 
+                    f for f in pathlib.Path('/root/heal-lol/').glob('**/*.py') 
                     if f.is_file()
                 ]
             ]
