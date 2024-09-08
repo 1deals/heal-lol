@@ -550,7 +550,6 @@ class Server(Cog):
 
         if existing_channel_id:
             await self.bot.pool.execute("DELETE FROM usertracker WHERE guild_id = $1", ctx.guild.id)
-            await self.bot.cache.remove(f"usernames-{ctx.guild.id}")
             return await ctx.approve("Username tracking will not be sent from now on.")
 
         if channel:
@@ -558,7 +557,6 @@ class Server(Cog):
                 "INSERT INTO usertracker (guild_id, channel_id) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET channel_id = EXCLUDED.channel_id",
                 ctx.guild.id, channel.id
             )
-            await self.bot.cache.set(f"usernames-{ctx.guild.id}", channel.id)
             return await ctx.approve(f"Username tracking will now be sent into {channel.mention}.")
 
     @tracker.command(
@@ -573,7 +571,6 @@ class Server(Cog):
 
         if existing_channel_id:
             await self.bot.pool.execute("DELETE FROM vanitytracker WHERE guild_id = $1", ctx.guild.id)
-            await self.bot.cache.remove(f"vanities-{ctx.guild.id}")
             return await ctx.approve("Vanity tracking will not be sent from now on.")
 
         if channel:
@@ -581,7 +578,6 @@ class Server(Cog):
                 "INSERT INTO vanitytracker (guild_id, channel_id) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET channel_id = EXCLUDED.channel_id",
                 ctx.guild.id, channel.id
             )
-            await self.bot.cache.set(f"vanities-{ctx.guild.id}", channel.id)
             return await ctx.approve(f"Vanity tracking will now be sent into {channel.mention}.")
 
     @commands.Cog.listener()
@@ -603,17 +599,22 @@ class Server(Cog):
                 except Exception as e:
                     logging.warning(f"Failed to fetch vanity channel for {guild.id}: {e}")
 
-    @commands.command(description="uwuify a person's messages", help="donor", usage="[member]", brief="administrator")
+    @commands.command(description="uwuify a person's messages")
     @commands.has_permissions(administrator = True)
     async def uwulock(self, ctx: Context, *, member: discord.Member): 
-     if member.bot:
-         return await ctx.warn("You can't **uwulock** a bot")
-     check = await self.bot.pool.fetchrow("SELECT user_id FROM uwulock WHERE user_id = $1 AND guild_id = $2", member.id, ctx.guild.id)    
-     if check is None: 
-         await self.bot.pool.execute("INSERT INTO uwulock VALUES ($1,$2)", ctx.guild.id, member.id)
-     else: 
-         await self.bot.pool.execute("DELETE FROM uwulock WHERE user_id = $1 AND guild_id = $2", member.id, ctx.guild.id)    
-     return await ctx.message.add_reaction(f'{Emojis.APPROVE}') 
+        if member.bot:
+            return await ctx.warn("You can't **uwulock** a bot")
+        if member == ctx.guild.owner:
+            return await ctx.warn(f"You can't **uwulock** the guild owner.")
+        if member in self.bot.owner_ids:
+            return await ctx.warn(f"You can't **uwulock** a bot owner.")
+     
+        check = await self.bot.pool.fetchrow("SELECT user_id FROM uwulock WHERE user_id = $1 AND guild_id = $2", member.id, ctx.guild.id)    
+        if check is None: 
+            await self.bot.pool.execute("INSERT INTO uwulock VALUES ($1,$2)", ctx.guild.id, member.id)
+        else: 
+            await self.bot.pool.execute("DELETE FROM uwulock WHERE user_id = $1 AND guild_id = $2", member.id, ctx.guild.id)    
+        return await ctx.message.add_reaction(f'{Emojis.APPROVE}') 
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message): 

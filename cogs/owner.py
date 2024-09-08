@@ -172,6 +172,35 @@ class Owner(Cog):
 
         return await ctx.approve(f"**Blacklisted** {user.name}")
 
+    @command(
+        name = "blacklistguild",
+        description = "Blacklists a guild."
+    )
+    @commands.is_owner()
+    async def blacklistguild(self, ctx: Context, *, guildid: int):
+        if not guildid:
+            await ctx.warn("Guild not found.")
+            return
+
+        check = await self.bot.pool.fetchrow("SELECT 1 FROM blacklistguild WHERE guild_id = $1", guildid)
+        if check:
+            await self.bot.pool.execute("DELETE FROM blacklistguild WHERE guild_id = $1", guildid)
+            await ctx.approve(f"Guild {guildid} has been removed from the blacklist.")
+        else:
+            await self.bot.pool.execute("INSERT INTO blacklistguild (guild_id) VALUES ($1)", guildid)
+            await ctx.approve(f"Guild {guildid} has been added to the blacklist.")
+
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        check = await self.bot.pool.fetchrow("SELECT 1 FROM blacklistguild WHERE guild_id = $1", guild.id)
+
+        if check:
+            await guild.leave()
+            owner = await self.bot.fetch_user(187747524646404105)
+            await owner.send(f"Left a blacklisted guild: {guild}")
+        else:
+            print(f"Joined guild: {guild.id}")
+
     @commands.command()
     @commands.is_owner()
     async def gi(self, ctx, identifier: str):

@@ -203,7 +203,7 @@ class Utility(commands.Cog):
             if self_prefix:
                 embed = discord.Embed(
                     title="",
-                    description=f"> Your **prefixes** are: `{self_prefix}` & `{guild_prefix}",
+                    description=f"> Your **prefixes** are: `{self_prefix}` & `{guild_prefix}`",
                     color=Colors.BASE_COLOR)
                 await message.channel.send(embed=embed)
 
@@ -429,16 +429,17 @@ class Utility(commands.Cog):
                                     return await ctx.warn(f"{data['detail']}")
         
 
-    @commands.command(
-        name = "createembed",
-        aliases = ["ce"],
-        description = "Create an embed."
+    @command(
+        aliases=["createembed", "ce", "script"],
+        description = "Create an embed.",
+        flag=ScriptFlags,
     )
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def createembed(self, ctx: Context,  *, code: EmbedScript = None) -> Message:
-        if code is None:
+    @has_permissions(manage_messages=True)
+    async def embed(self, ctx: Context, *, script: EmbedScript = None) -> Message:
+        if script is None:
             return await ctx.neutral(f"Create embed code [**here**](https://healbot.lol/embed)")
-        return await ctx.send(**code)
+        flag: ScriptFlags = ctx.flag
+        return await ctx.send(**script, allowed_mentions=AllowedMentions(users=not flag.disallow_users_mention, roles=flag.allow_role_mentions, everyone=flag.allow_everyone_mention), delete_after=flag.delete_after)  # type: ignore
 
     @command(
         name = "firstmsg",

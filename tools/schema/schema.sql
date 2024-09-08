@@ -209,3 +209,7 @@ CREATE TABLE IF NOT EXISTS topcmds (
     command_name TEXT PRIMARY KEY,
     usage_count INTEGER NOT NULL DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS blacklistguild (
+    guild_id BIGINT PRIMARY KEY
+);
