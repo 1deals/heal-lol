@@ -180,12 +180,12 @@ class Information(commands.Cog):
                 else:
                         display_perms = ', '.join(perms)
 
-                embed = discord.Embed(
-                        title=title,
-                        color=color
-                )
-                embed.add_field(name="Created", value=format_dt(user.created_at, style='f'), inline=True)
-                embed.add_field(name="Permissions", value=f"`{display_perms}`", inline=False)
+        embed = discord.Embed(
+                title=title,
+                color=color
+        )
+        embed.add_field(name="Created", value=format_dt(user.created_at, style='f'), inline=True)
+        embed.add_field(name="Permissions", value=f"`{display_perms}`", inline=False)
 
         if isinstance(user, discord.Member) and user.joined_at:
             all_members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
