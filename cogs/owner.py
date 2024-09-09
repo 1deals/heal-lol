@@ -20,6 +20,7 @@ import secrets
 import config
 import subprocess
 import asyncio
+import requests
 
 from tools.heal import Heal
 from tools.managers.context import Context, Emojis, Colors
@@ -189,6 +190,32 @@ class Owner(Cog):
         else:
             await self.bot.pool.execute("INSERT INTO blacklistguild (guild_id) VALUES ($1)", guildid)
             await ctx.approve(f"Guild {guildid} has been added to the blacklist.")
+
+    @command(
+        name = "upload"
+    )
+    @commands.is_owner()
+    async def upload(self, ctx, attachment: discord.Attachment):
+        file_bytes = await attachment.read()
+        url = "https://catbox.moe/user/api.php"
+        payload = {
+            'reqtype': 'fileupload'
+        }
+        files = {
+            'fileToUpload': (attachment.filename, file_bytes)
+        }
+
+        async with aiohttp.ClientSession() as session:
+            form = aiohttp.FormData()
+            form.add_field('reqtype', 'fileupload')
+            form.add_field('fileToUpload', file_bytes, filename=attachment.filename)
+            
+            async with session.post(url, data=form) as response:
+                if response.status == 200:
+                    response_text = await response.text()
+                    await ctx.send(f"File uploaded successfully: {response_text}")
+                else:
+                    await ctx.send(f"Failed to upload the file. Status Code: {response.status}")
 
     @commands.Cog.listener()
     async def on_guild_join(self, guild):
