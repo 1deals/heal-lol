@@ -52,7 +52,7 @@ class Information(commands.Cog):
     @hybrid_command(
         name="ping",
     )
-    async def ping(self, ctx: Context) -> Message:
+    async def ping(self, ctx: Context):
         """
         View the bot's latency
         """
