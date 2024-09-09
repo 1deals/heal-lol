@@ -616,7 +616,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def google(self, ctx: Context, *, query: str):
         APIKEY = api.heal
-        api_url = "http://66.23.207.37:1337/browse/search"
+        api_url = "http://localhost:1337/browse/search"
 
         params = {"query": query}
         headers = {"api-key": APIKEY} 
