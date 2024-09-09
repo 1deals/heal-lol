@@ -38,29 +38,16 @@ class Information(commands.Cog):
 
     @hybrid_command(
         name = "botinfo",
-        aliases = ["bi", "bot"],
+        aliases = ["info", "bot", "bi"],
         description = "Get information about the bot."
     )
-    @discord.app_commands.allowed_installs(guilds=True, users=True)
-    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    @cooldown(1, 5, commands.BucketType.user)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def botinfo(self, ctx: Context):
-        total_channels = 0
-        for guild in self.bot.guilds:
-                    
-            total_channels += len(guild.channels)
-
-        memory_usage = psutil.Process().memory_info().rss
-        memory_usage_mb = memory_usage / (1024 * 1024)
-        memory_usage_percentage = (memory_usage / psutil.virtual_memory().total) * 100
-        availableMem = round(100- memory_usage_percentage)
-        cpu_usage = psutil.Process().cpu_percent()
-        embed = discord.Embed(description =f"An all-in-one, aesthetically pleasing multipurpose bot, aimed to keep communities safe and thriving. Created by the [**Heal Team**](https://discord.gg/jCPYXFQekB)", color= Colors.BASE_COLOR)
-        embed.add_field(name= "__Statistics:__", value = f"**Guilds:** {len(self.bot.guilds)} \n**Users:** {sum(g.member_count for g in self.bot.guilds): ,} \n**Lines:** {self.bot.linecount: ,}", inline = False)
-        embed.add_field(name = "__Bot:__", value= f"**Uptime:** {self.bot.uptime} \n**Latency:** {round(self.bot.latency * 1000)}ms \n**Commands:** {len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}", inline = False)
-        embed.add_field(name = "__Usage:__", value = f"**Memory:** {round(memory_usage_percentage)}% \n**Available:** {availableMem}% \n**CPU:** {cpu_usage}%", inline = False)
-        embed.set_thumbnail(url= self.bot.user.avatar.url)
-        return await ctx.send(embed=embed)
+        embed = discord.Embed(description = f"{self.bot.user.name} is serving **{len(self.bot.guilds): ,}** guilds with **{len(self.bot.users): ,}** users.")
+        embed.add_field(name = "Statistics", value = f"Commands: **{len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}** \nUptime: **{self.bot.uptime}** \nLatency: **{round(self.bot.latency * 1000)}ms** \nLines: **{self.bot.linecount: ,}**")
+        embed.set_author(name = f"{ctx.author.name}", icon_url= f"{ctx.author.avatar.url}")
+        embed.set_thumbnail(url = self.bot.user.avatar.url)
+        return await ctx.reply(embed=embed)
 
     @hybrid_command(
     name="ping",
@@ -76,13 +63,13 @@ class Information(commands.Cog):
         l = []
         for _ in range(1):
             n = datetime.datetime.utcnow()  
-            message = await ctx.reply(f"🏓... pong! **{round(self.bot.latency * 1000)}ms**")    
+            message = await ctx.reply(f"... `{round(self.bot.latency * 1000)}ms`")    
             a = datetime.datetime.utcnow()  
             l.append((a - n).total_seconds() * 1000)  
 
         edit_latency = sum(l) / len(l)
 
-        await message.edit(content=f"🏓... pong! **{round(self.bot.latency * 1000)}ms** (edit: **{round(edit_latency)}ms**)")
+        await message.edit(content=f"... `{round(self.bot.latency * 1000)}ms` (edit: `{round(edit_latency)}ms`)")
 
             
 
@@ -165,6 +152,8 @@ class Information(commands.Cog):
         if user.id == 1250382435632418816:  #lina
             title += " <:staff:1277914880808063007> <:mlp_fatflutter:1278453716818854021>"
         if user.id == 1035497951591673917:  #qilla
+             title += " <:staff:1277914880808063007> <a:menacemonkey:1271184769836912680>"
+        if user.id == 1140301345711206510:  #qilla
              title += " <:staff:1277914880808063007> <a:menacemonkey:1271184769836912680>"
 
         prem = await self.bot.pool.fetchval("SELECT * FROM premium WHERE user_id = $1", user.id)
