@@ -50,26 +50,20 @@ class Information(commands.Cog):
         return await ctx.reply(embed=embed)
 
     @hybrid_command(
-    name="ping",
-    aliases=["heartbeat", "latency", "websocket"],
-    usage="ping"
-
+        name="ping",
     )
-    @discord.app_commands.allowed_installs(guilds=True, users=True)
-    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    @cooldown(1, 5, BucketType.user)
-    async def ping(self, ctx: Context):
-
-        l = []
-        for _ in range(1):
-            n = datetime.datetime.utcnow()  
-            message = await ctx.reply(f"... `{round(self.bot.latency * 1000)}ms`")    
-            a = datetime.datetime.utcnow()  
-            l.append((a - n).total_seconds() * 1000)  
-
-        edit_latency = sum(l) / len(l)
-
-        await message.edit(content=f"... `{round(self.bot.latency * 1000)}ms` (edit: `{round(edit_latency)}ms`)")
+    async def ping(self, ctx: Context) -> Message:
+        """
+        View the bot's latency
+        """
+        start = time.time()
+        latency_ms = int(self.bot.latency * 1000)
+        message = await ctx.send(content="ping...")
+        finished = time.time() - start
+        edit_ms = round(finished * 1000, 1)
+        return await message.edit(
+            content=f"... `{latency_ms}ms` (edit: `{edit_ms}ms`)"
+        )
 
             
 
