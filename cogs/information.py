@@ -51,6 +51,8 @@ class Information(commands.Cog):
 
     @hybrid_command(
         name="ping",
+        aliases = ["websocket", "latency"],
+        description = "View the bot's latency."
     )
     async def ping(self, ctx: Context):
         """

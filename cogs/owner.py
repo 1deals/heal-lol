@@ -70,7 +70,7 @@ class Owner(Cog):
     @is_owner()
     async def system_restart(self, ctx: Context):
         await ctx.approve(f"Restarting bot...")
-        os.system("pm2 restart 3")
+        os.system("pm2 restart 0")
 
 
     @system.command(
