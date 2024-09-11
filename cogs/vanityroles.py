@@ -6,6 +6,7 @@ from tools.heal import Heal
 from discord import Embed
 from tools.managers.ratelimit import ratelimit
 from tools.managers.context import Context
+from tools.managers.cache import Cache
 
 class Vanityroles(commands.Cog):
     def __init__(self, bot: Heal):
@@ -27,14 +28,18 @@ class Vanityroles(commands.Cog):
 
         if string and role and channel:
             current_activity = member.activity.name if member.activity else ''
+            cached = await self.bot.cache.get(member.id)
             if string in current_activity:
-                if role not in member.roles:
-                    await member.add_roles(role)
-                    embed = discord.Embed(description=f"Thank you for repping **{string}**, {member.mention}!", color=Colors.BASE_COLOR)
-                    await channel.send(embed=embed)
+                if cached is None: 
+                    if role not in member.roles:
+                        await member.add_roles(role)
+                        embed = discord.Embed(description=f"Thank you for repping **{string}**, {member.mention}!", color=Colors.BASE_COLOR)
+                        await channel.send(embed=embed)
+                    await self.bot.cache.set(member.id, True, timeout=14400)
             else:
                 if role in member.roles:
                     await member.remove_roles(role)
+                await self.bot.cache.remove(member.id)
 
 
     @hybrid_group(
