@@ -65,6 +65,23 @@ class Utility(commands.Cog):
 
 
     @commands.Cog.listener()
+    async def on_message_edit(self, before: discord.Message, after: discord.Message):
+        if before.guild and not before.author.bot:
+            channel_id = before.channel.id
+            cached = await self.bot.cache.get(f"edited-{channel_id}")
+            if cached is None:
+                cached = []
+
+            cached.append({
+                'before_content': before.content,
+                'after_content': after.content,
+                'author': str(before.author),
+                'timestamp': before.edited_at.isoformat() if before.edited_at else before.created_at.isoformat()
+            })
+
+            await self.bot.cache.set(f"edited-{channel_id}", cached)
+
+    @commands.Cog.listener()
     async def on_message_delete(self, message: discord.Message):
         if message.guild:
             channel_id = message.channel.id
@@ -82,9 +99,10 @@ class Utility(commands.Cog):
 
             await self.bot.cache.set(f"deleted_messages_{channel_id}", cached_messages)
 
+
     @commands.command(aliases=['s'])
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def snipe(self, ctx, index: int = 1):
+    async def snipe(self, ctx: Context, index: int = 1):
         channel_id = ctx.channel.id
 
         sniped_messages = await self.bot.cache.get(f"deleted_messages_{channel_id}") or []
@@ -111,20 +129,60 @@ class Utility(commands.Cog):
 
                 await ctx.send(embed=embed)
             else:
-                embed = discord.Embed(description=f'> {Emojis.WARN} {ctx.author.mention}: Invalid snipe index', color=Colors.BASE_COLOR)
-                await ctx.send(embed=embed)
+                return await ctx.warn(f"Invalid snipe index")
         else:
-            embed = discord.Embed(description=f'> {Emojis.DENY} {ctx.author.mention}: No deleted messages to snipe', color=Colors.BASE_COLOR)
-            await ctx.send(embed=embed)
+            return await ctx.deny(f"No deleted messages to snipe")
+
+    @commands.command(aliases=['es'])
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def editsnipe(self, ctx: Context, index: int = 1):
+        channel_id = ctx.channel.id
+
+        sniped_messages = await self.bot.cache.get(f"edited-{channel_id}") or []
+
+        if sniped_messages:
+            if 1 <= index <= len(sniped_messages):
+                edited_message = sniped_messages[-index]
+
+                message_user = ctx.guild.get_member_named(edited_message['author']) or ctx.guild.get_member(int(edited_message['author'].split('#')[0]))
+
+                if not message_user:
+                    embed = discord.Embed(description=f'> {Emojis.WARN} {ctx.author.mention}: User not found for the edited message', color=Colors.BASE_COLOR)
+                    return await ctx.send(embed=embed)
+
+                user_pfp = message_user.avatar.url if message_user.avatar else message_user.default_avatar.url
+
+                embed = discord.Embed(
+                    title='Edited Message',
+                    description=f"**Before:** {edited_message['before_content']}\n**After:** {edited_message['after_content']}",
+                    color=Colors.BASE_COLOR
+                )
+                embed.set_author(name=message_user.display_name, icon_url=user_pfp)
+                embed.set_footer(text=f'Page {index} of {len(sniped_messages)}')
+
+                await ctx.send(embed=embed)
+            else:
+                return await ctx.warn(f"Invalid snipe index")
+        else:
+            return await ctx.deny(f"No edited messages to snipe")
+
+    
 
     @commands.command(aliases=["cs"])
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.has_permissions(manage_messages=True)
-    async def clearsnipe(self, ctx: Context):
+    async def clearsnipe(self, ctx: commands.Context):
         channel_id = ctx.channel.id
 
-        if await self.bot.cache.get(f"deleted_messages_{channel_id}"):
+        deleted_cache_exists = await self.bot.cache.get(f"deleted_messages_{channel_id}")
+        if deleted_cache_exists:
             await self.bot.cache.set(f"deleted_messages_{channel_id}", None)
+
+        edited_cache_exists = await self.bot.cache.get(f"edited-{channel_id}")
+        if edited_cache_exists:
+            await self.bot.cache.set(f"edited-{channel_id}", None)
+
+        if deleted_cache_exists or edited_cache_exists:
             await ctx.message.add_reaction(f"{Emojis.APPROVE}")
         else:
             await ctx.message.add_reaction(f"{Emojis.WARN}")
