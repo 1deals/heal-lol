@@ -223,7 +223,7 @@ class Boosterrole(commands.Cog):
     @has_br_role()
     @level2()
     async def boosterrole_icon(self, ctx: Context, *, icon: Union[discord.PartialEmoji, str]):
-        role = ctx.guild.get_role(await self.bot.pool.fetchval("SELECT role_id FROM booster_roles WHERE guild_id = $1 AND user_id = $2", ctx.guild,id, ctx.author.id))
+        role = ctx.guild.get_role(await self.bot.pool.fetchval("SELECT role_id FROM booster_roles WHERE guild_id = $1 AND user_id = $2", ctx.guild.id, ctx.author.id))
         if not role:
             return await ctx.warn(f"You don't have a booster role setup. Use `{ctx.clean_prefix}br create` to create one.")
         
