@@ -44,20 +44,6 @@ class healboost(Cog):
                 embed= discord.Embed(description=f"> Your premium access has been revoked for transferring your boosts.", color=Colors.BASE_COLOR)
                 await before.send(embed=embed)
 
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild: discord.Guild):
-        if guild.member_count < 15:
-            is_authed = await self.bot.pool.fetchval("SELECT 1 FROM authed WHERE guild_id = $1", guild.id)
-            
-            if not is_authed:
-                if guild.owner:
-                    try:
-                        embed = discord.Embed(description=f"{Emojis.WARN} This server is under the minimum member limit of **15 members**. Please join [**discord.gg/healbot**](https://discord.gg/healbot) and ask for an auth.", color = Colors.WARN)
-                        await guild.owner.send(embed=embed)
-                    except discord.Forbidden:
-                        print(f"Couldn't send a DM to the owner of {guild.name} ({guild.id})")
-
-                await guild.leave()
-
+    
 async def setup(bot: Heal) -> None:
     await bot.add_cog(healboost(bot))
