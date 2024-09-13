@@ -213,3 +213,23 @@ CREATE TABLE IF NOT EXISTS topcmds (
 CREATE TABLE IF NOT EXISTS blacklistguild (
     guild_id BIGINT PRIMARY KEY
 );
+
+CREATE TABLE IF NOT EXISTS booster_module (
+    guild_id BIGINT PRIMARY KEY,  
+    base BIGINT DEFAULT NULL      
+);
+
+
+CREATE TABLE IF NOT EXISTS booster_roles (
+    guild_id BIGINT,
+    user_id BIGINT,
+    role_id BIGINT,
+    PRIMARY KEY (guild_id, user_id)  
+);
+
+
+CREATE TABLE IF NOT EXISTS br_award (
+    guild_id BIGINT,
+    role_id BIGINT,
+    PRIMARY KEY (guild_id, role_id)  
+);
