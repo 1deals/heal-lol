@@ -41,6 +41,8 @@ class Information(commands.Cog):
         aliases = ["info", "bot", "bi"],
         description = "Get information about the bot."
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def botinfo(self, ctx: Context):
         embed = discord.Embed(description = f"{self.bot.user.name} is serving **{len(self.bot.guilds): ,}** guilds with **{len(self.bot.users): ,}** users.")
@@ -54,6 +56,8 @@ class Information(commands.Cog):
         aliases = ["websocket", "latency"],
         description = "View the bot's latency."
     )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def ping(self, ctx: Context):
         """
         View the bot's latency
