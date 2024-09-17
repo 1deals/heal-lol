@@ -513,18 +513,24 @@ class Server(Cog):
     async def on_user_update(self, before: discord.User, after: discord.User):
         if before.name != after.name:
             for guild in self.bot.guilds:
-                channel_id = await self.bot.pool.fetchrow("SELECT * FROM usertracker WHERE guild_id = $1", guild.id)
                 try:
-                    if channel_id:
-                        channel = guild.get_channel(channel_id)
-                        try:
+                    record = await self.bot.pool.fetchrow("SELECT channel_id FROM usertracker WHERE guild_id = $1", guild.id)
+
+                    if record:
+                        channel_id = record['channel_id'] 
+
+                        if channel_id:
+                            channel = guild.get_channel(channel_id)  
+
                             if channel is not None:
-                                await channel.send(f"The user **{before.name}** is now available.")
-                                await asyncio.sleep(1)
-                        except:
-                            continue
-                except Exception as E:
-                    logging.warning(f"Failed to send username tracking in {guild.id}: {E}")
+                                await channel.send(f"**{before.name}** is now available.")
+                            else:
+                                logging.warning(f"Channel with ID {channel_id} not found in guild {guild.id}.")
+                    else:
+                        logging.warning(f"No channel configured for tracking user updates in guild {guild.id}.")
+                        
+                except Exception as e:
+                    logging.warning(f"Failed to send username tracking in guild {guild.id}: {e}")
 
 
     @group(
@@ -584,23 +590,30 @@ class Server(Cog):
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
         if before.vanity_url_code != after.vanity_url_code:
             for guild in self.bot.guilds:
-                channel_id = await self.bot.pool.fetchrow("SELECT * FROM vanitytracker WHERE guild_id = $1", guild.id)
                 try:
-                    if channel_id:
-                        channel = guild.get_channel(channel_id)
-                        try:
-                            if channel is not None:
+
+                    record = await self.bot.pool.fetchrow("SELECT channel_id FROM vanitytracker WHERE guild_id = $1", guild.id)
+
+                    if record:
+                        channel_id = record['channel_id']  
+
+                        if channel_id:
+                            channel = guild.get_channel(channel_id)  
+
+                            if channel:
                                 if after.vanity_url_code:
-                                    message = f"The vanity **{after.vanity_url_code}** is available!"
+                                    message = f"The vanity **{after.vanity_url_code}** is now available!"
                                     await channel.send(message)
-                                await asyncio.sleep(1)
-                        except Exception as e:
-                            logging.warning(f"Failed to send vanity URL update in {guild.id}: {e}")
+                                else:
+                                    message = "The vanity URL is no longer available."
+                                    await channel.send(message)
+                    
                 except Exception as e:
-                    logging.warning(f"Failed to fetch vanity channel for {guild.id}: {e}")
+                    logging.warning(f"Failed to fetch vanity URL tracking channel or send message for guild {guild.id}: {e}")
 
     @commands.command(description="uwuify a person's messages")
     @commands.has_permissions(administrator = True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
     async def uwulock(self, ctx: Context, *, member: discord.Member): 
         if member.bot:
             return await ctx.warn("You can't **uwulock** a bot")
@@ -635,6 +648,117 @@ class Server(Cog):
                 await webhook.send(content=uwumsg, username=message.author.name, avatar_url=message.author.display_avatar.url)
             except Exception as e:
                 logging.error(f"An error occurred: {e}")
+
+    @group(
+        name = "invoke",
+        description = "Change punishment messages for command responses",
+        invoke_without_command = True
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_guild = True)
+    async def invoke(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+
+    @invoke.command(
+    name="ban",
+    description="Change the ban command response."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_guild=True)
+    async def invoke_ban(self, ctx: Context, *, message: str = None):
+        if message is None:
+            await self.bot.pool.execute("DELETE FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "ban")
+            return await ctx.approve(f"Reset the **invoke ban** message to default.")
+        else:
+            await self.bot.pool.execute(
+                "INSERT INTO invoke (guild_id, type, message) VALUES ($1, $2, $3) "
+                "ON CONFLICT (guild_id, type) DO UPDATE SET message = EXCLUDED.message",
+                ctx.guild.id, "ban", message
+            )
+            processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+            await ctx.approve("Set the **invoke ban** message to:")
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
+
+
+    @invoke.command(
+        name="unban",
+        description="Change the unban command response."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_guild=True)
+    async def invoke_unban(self, ctx: Context, *, message: str = None):
+        if message is None:
+            await self.bot.pool.execute("DELETE FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "unban")
+            return await ctx.approve(f"Reset the **invoke unban** message to default.")
+        else:
+            await self.bot.pool.execute(
+                "INSERT INTO invoke (guild_id, type, message) VALUES ($1, $2, $3) "
+                "ON CONFLICT (guild_id, type) DO UPDATE SET message = EXCLUDED.message",
+                ctx.guild.id, "unban", message
+            )
+            processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+            await ctx.approve("Set the **invoke unban** message to:")
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
+
+    @invoke.command(
+        name = "mute",
+        description = "Change the mute invoke message."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_guild=True)
+    async def invoke_mute(self, ctx: Context, *, message: str = None):
+        if message is None:
+            await self.bot.pool.execute("DELETE FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "mute")
+            return await ctx.approve(f"Reset the **invoke mute** message to default.")
+        else:
+            await self.bot.pool.execute(
+                "INSERT INTO invoke (guild_id, type, message) VALUES ($1, $2, $3) "
+                "ON CONFLICT (guild_id, type) DO UPDATE SET message = EXCLUDED.message",
+                ctx.guild.id, "mute", message
+            )
+            processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+            await ctx.approve("Set the **invoke mute** message to:")
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
+
+    @invoke.command(
+        name = "unmute",
+        description = "Change the unmute invoke message. "
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_guild=True)
+    async def invoke_unmute(self, ctx: Context, *, message: str = None):
+        if message is None:
+            await self.bot.pool.execute("DELETE FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "unmute")
+            return await ctx.approve(f"Reset the **invoke mute** message to default.")
+        else:
+            await self.bot.pool.execute(
+                "INSERT INTO invoke (guild_id, type, message) VALUES ($1, $2, $3) "
+                "ON CONFLICT (guild_id, type) DO UPDATE SET message = EXCLUDED.message",
+                ctx.guild.id, "unmute", message
+            )
+            processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+            await ctx.approve("Set the **invoke unmute** message to:")
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
 
 
 async def setup(bot: Heal) -> None:

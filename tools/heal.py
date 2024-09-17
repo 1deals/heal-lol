@@ -44,7 +44,7 @@ class Heal(commands.AutoShardedBot):
             command_prefix=";",
             help_command=HealHelp(),
             intents=intents,
-            activity = discord.Streaming(name="🔗 /healbot", url="https://twitch.tv/discord"),
+            activity = discord.CustomActivity(name=f"🔗discord.gg/healbot"),
             allowed_mentions=discord.AllowedMentions(
                 everyone=False,
                 users=True,

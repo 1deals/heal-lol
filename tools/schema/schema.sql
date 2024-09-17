@@ -233,3 +233,10 @@ CREATE TABLE IF NOT EXISTS br_award (
     role_id BIGINT,
     PRIMARY KEY (guild_id, role_id)  
 );
+
+CREATE TABLE IF NOT EXISTS invoke (
+    guild_id BIGINT, 
+    type TEXT,
+    message TEXT,
+    PRIMARY KEY (guild_id, type)
+);

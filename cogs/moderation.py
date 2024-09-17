@@ -11,6 +11,7 @@ from tools.paginator            import Paginator
 from discord.utils              import format_dt
 from discord.ext                import commands
 from tools.heal                 import Heal
+from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 import asyncio
 from typing import Union
 from collections import defaultdict
@@ -95,10 +96,10 @@ class Moderation(commands.Cog):
     @commands.cooldown(1, 5, BucketType.user)
     @has_permissions(ban_members=True)
     async def ban(self, ctx: Context, user: Union[discord.Member, discord.User], *, reason: str = "no reason"):
+        
         reason += f' | executed by {ctx.author}'
         await ctx.typing()
 
-        
         if isinstance(user, discord.Member):
             if user == ctx.guild.owner:
                 return await ctx.warn(f"You're unable to ban the **server owner**.")
@@ -108,7 +109,20 @@ class Moderation(commands.Cog):
                 return await ctx.warn(f"You're unable to ban a user with a **higher role** than **yourself**.")
                 
         await ctx.guild.ban(user, reason=reason)
-        return await ctx.approve(f'Successfully banned {user.mention} for {reason.split(" |")[0]}')
+
+        data = await self.bot.pool.fetchrow("SELECT * FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "ban")
+
+        if data and data["message"]:
+            message = data["message"]
+            processed_message = EmbedBuilder.embed_replacement(user, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
+        else:
+            return await ctx.approve(f'Successfully banned {user.mention} for {reason.split(" |")[0]}')
         
     @commands.command(name='mute', description='mute a user in your server', brief='-mute <user> <time> <reason>')
     @commands.has_permissions(manage_messages=True)
@@ -137,20 +151,31 @@ class Moderation(commands.Cog):
 
         await user.timeout(discord.utils.utcnow() + datetime.timedelta(seconds=time), reason=reason)
 
-        if reason:
+        data = await self.bot.pool.fetchrow("SELECT * FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "mute")
 
-            await ctx.approve(f"Muted **{user}** for `{humanfriendly.format_timespan(time)}` - **{reason}**")
+        if data and data["message"]:
+            message = data["message"]
+            processed_message = EmbedBuilder.embed_replacement(user, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
+        else:
+            return await ctx.approve(f'Muted **{user}** for `{humanfriendly.format_timespan(time)}` - **{reason}**')
+
     
     @commands.command(name='unmute', description='ummute a user in your server', brief='-ummute <user> <reason>')
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 10, commands.BucketType.user)
-    async def unmute(self, ctx: commands.Context, user: discord.Member, *, reason: str = "No reason provided"):
+    async def unmute(self, ctx: Context, user: discord.Member, *, reason: str = "No reason provided"):
         
         if user.id == self.bot.user.id:
-            return await ctx.deny("I cannot **mute** myself.")
+            return await ctx.deny("I cannot **unmute** myself.")
 
         if user.id == ctx.author.id:
-            return await ctx.deny("You cannot **mute** yourself.")
+            return await ctx.deny("You cannot **unmute** yourself.")
 
 
         member = ctx.guild.get_member(user.id)
@@ -158,18 +183,28 @@ class Moderation(commands.Cog):
 
             if ctx.author.id != ctx.guild.owner_id:
                 if member.top_role.position >= ctx.guild.me.top_role.position:
-                    return await ctx.warn("You cannot **mute** a member with a higher role than me.")
+                    return await ctx.warn("You cannot **unmute** a member with a higher role than me.")
                 if member.top_role.position >= ctx.author.top_role.position:
-                    return await ctx.warn("You cannot **mute** a member with a higher role than you.")
+                    return await ctx.warn("You cannot **unmute** a member with a higher role than you.")
         else:
             pass
         
 
         await user.timeout(None, reason=reason)
 
-        if reason:
+        data = await self.bot.pool.fetchrow("SELECT * FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "unmute")
 
-            await ctx.approve(f"Unmuted **{user}**")
+        if data and data["message"]:
+            message = data["message"]
+            processed_message = EmbedBuilder.embed_replacement(user, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
+        else:
+            return await ctx.approve(f"**Unmuted {user}**")
     
     @commands.command(
     name="forcenickname",
@@ -532,7 +567,19 @@ class Moderation(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def unban(self, ctx: Context, *, user: discord.User):
         await ctx.guild.unban(user)
-        return await ctx.approve(f"Unbanned {user.name}.")
+        data = await self.bot.pool.fetchrow("SELECT * FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "unban")
+
+        if data and data["message"]:
+            message = data["message"]
+            processed_message = EmbedBuilder.embed_replacement(user, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
+        else:
+            return await ctx.approve(f'Unbanned {user.mention}')
 
     @group(
         name = "filter",
