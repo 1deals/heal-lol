@@ -722,6 +722,20 @@ class Utility(commands.Cog):
             check=lambda m: m.author == ctx.author
         )
 
+    @commands.command(
+    name="botclear",
+    aliases=["bc"],
+    description="Clears messages sent by bots in the channel."
+    )
+    @commands.cooldown(1, 10, commands.BucketType.user)
+    @commands.has_permissions(manage_messages=True)
+    async def botclear(self, ctx: Context, amount: int = 100):
+        deleted = await ctx.channel.purge(
+            limit=amount,
+            check=lambda m: m.author.bot
+        )
+        await ctx.message.add_reaction(f"<:approve:1276192812127359081>")
+
         
 
 
