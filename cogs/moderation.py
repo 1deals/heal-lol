@@ -63,35 +63,41 @@ class Moderation(commands.Cog):
 
     @command(
         name = "kick",
-        aliases = ["getout", "bye"],
-        usage = "kick @fetchrow rule breaker"
+        aliases = ["getout", "bye"]
     )
     @commands.cooldown(1, 5, BucketType.user)
     @has_permissions(moderate_members=True)
     async def kick(self, ctx: Context, user: Union[discord.Member, discord.User], *, reason: str = "no reason"):
-        reason += ' | executed by {}'.format(ctx.author)
+        reason += f' | executed by {ctx.author}'
         await ctx.typing()
 
-        try:
-            if ctx.author is ctx.guild.owner:
-                await user.kick(reason=reason)
-                return await ctx.approve(f'Successfully kicked {user.mention} for {reason.split(" |")[0]}')
-            if user is ctx.guild.owner:
+        if isinstance(user, discord.Member):
+            if user == ctx.guild.owner:
                 return await ctx.warn(f"You're unable to kick the **server owner**.")
-            if user is ctx.author:
+            if user == ctx.author:
                 return await ctx.warn(f"You're unable to kick **yourself**.")
             if ctx.author.top_role.position <= user.top_role.position:
                 return await ctx.warn(f"You're unable to kick a user with a **higher role** than **yourself**.")
-            
-            await user.kick(reason=reason)
+
+        await user.kick(reason=reason)
+
+        data = await self.bot.pool.fetchrow("SELECT * FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "kick")
+
+        if data and data["message"]:
+            message = data["message"]
+            processed_message = EmbedBuilder.embed_replacement(user, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
+        else:
             return await ctx.approve(f'Successfully kicked {user.mention} for {reason.split(" |")[0]}')
-        except:
-            return await ctx.deny(f'Failed to kick {user.mention}.')
         
     @command(
         name = "ban",
-        aliases = ["fuckoff", "banish"],
-        usage = ""
+        aliases = ["fuckoff", "banish"]
     )
     @commands.cooldown(1, 5, BucketType.user)
     @has_permissions(ban_members=True)
