@@ -115,7 +115,7 @@ class Information(commands.Cog):
             user = user or ctx.author
 
         APIKEY = api.heal  
-        api_url = "http://localhost:1337/dominantcolor"
+        api_url = "http://localhost:1999/dominantcolor"
 
         params = {"source": user.avatar.url} 
         headers = {"api-key": APIKEY} 
@@ -325,7 +325,7 @@ class Information(commands.Cog):
             user = ctx.author
 
         APIKEY = api.heal  
-        api_url = "http://localhost:1337/dominantcolor"
+        api_url = "http://localhost:1999/dominantcolor"
 
         params = {"source": user.avatar.url} 
         headers = {"api-key": APIKEY} 
@@ -698,7 +698,7 @@ class Information(commands.Cog):
         await ctx.typing()
 
         APIKEY = api.heal  
-        api_url = "http://localhost:1337/dominantcolor"
+        api_url = "http://localhost:1999/dominantcolor"
 
         params = {"source": image_url} 
         headers = {"api-key": APIKEY} 

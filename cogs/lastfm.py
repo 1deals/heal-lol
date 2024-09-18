@@ -103,7 +103,7 @@ class LastFM(Cog):
         lastfm_username = data["lfuser"]
 
         APIKEY = api.heal
-        api_url = "http://localhost:1337/lastfm/recenttracks"
+        api_url = "http://localhost:1999/lastfm/recenttracks"
 
         params = {"username": lastfm_username, "tracks": "1"}
         headers = {"api-key": APIKEY} 
@@ -223,7 +223,7 @@ class LastFM(Cog):
     )
     async def lastfm_chart(self, ctx: Context, user: Union[discord.Member, discord.User] = None, size: str = "3x3"):
         APIKEY = api.heal
-        api_url = "http://localhost:1337/lastfm/chart"
+        api_url = "http://localhost:1999/lastfm/chart"
 
         if user == None:
             user = ctx.author

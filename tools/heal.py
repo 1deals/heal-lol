@@ -15,6 +15,7 @@ import re
 import datetime
 import time
 import discord_ios
+import socket
 import pathlib
 
 from asyncpg import Pool
@@ -53,7 +54,6 @@ class Heal(commands.AutoShardedBot):
             ),
             case_insensitive=True,
             owner_ids=[187747524646404105, #me
-                       461914901624127489, #lucky
             ]
         )
 
@@ -151,6 +151,12 @@ class Heal(commands.AutoShardedBot):
         self.add_view(Interface(self))
 
         return await super().setup_hook()
+
+    async def start(self, token: str, *, reconnect: bool = True) -> None:
+        self._connection.http.connector = aiohttp.TCPConnector(
+            limit=0, family=socket.AF_INET, local_addr=("216.105.170.102", 0)
+        )
+        return await super().start(token, reconnect=reconnect)
 
     async def get_context(self, message: Message, *, cls=Context):
         return await super().get_context(message, cls=cls)

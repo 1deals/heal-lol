@@ -513,7 +513,6 @@ class Server(Cog):
     async def on_user_update(self, before: discord.User, after: discord.User):
         if before.name != after.name:
             for guild in self.bot.guilds:
-                try:
                     record = await self.bot.pool.fetchrow("SELECT channel_id FROM usertracker WHERE guild_id = $1", guild.id)
 
                     if record:
@@ -526,11 +525,6 @@ class Server(Cog):
                                 await channel.send(f"**{before.name}** is now available.")
                             else:
                                 logging.warning(f"Channel with ID {channel_id} not found in guild {guild.id}.")
-                    else:
-                        logging.warning(f"No channel configured for tracking user updates in guild {guild.id}.")
-                        
-                except Exception as e:
-                    logging.warning(f"Failed to send username tracking in guild {guild.id}: {e}")
 
 
     @group(
@@ -590,7 +584,6 @@ class Server(Cog):
     async def on_guild_update(self, before: discord.Guild, after: discord.Guild):
         if before.vanity_url_code != after.vanity_url_code:
             for guild in self.bot.guilds:
-                try:
 
                     record = await self.bot.pool.fetchrow("SELECT channel_id FROM vanitytracker WHERE guild_id = $1", guild.id)
 
@@ -607,9 +600,6 @@ class Server(Cog):
                                 else:
                                     message = "The vanity URL is no longer available."
                                     await channel.send(message)
-                    
-                except Exception as e:
-                    logging.warning(f"Failed to fetch vanity URL tracking channel or send message for guild {guild.id}: {e}")
 
     @commands.command(description="uwuify a person's messages")
     @commands.has_permissions(administrator = True)

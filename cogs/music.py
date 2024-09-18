@@ -86,7 +86,7 @@ class Music(commands.Cog):
 
         await self.pomice.create_node(
             bot=self.bot,
-            host="206.53.61.17",
+            host="127.0.0.1",
             port=2333,
             password="youshallnotpas",
             spotify_client_id="3f6b4c43339342bd83ac665b447da650",

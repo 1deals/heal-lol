@@ -450,7 +450,7 @@ class Utility(commands.Cog):
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     async def screenshot(self, ctx: Context, url: str, *, timeout: int = None):
         APIKEY = api.heal  
-        api_url = "http://localhost:1337/screenshot"
+        api_url = "http://localhost:1999/screenshot"
 
         if not url.startswith(("http://", "https://")):
             url = "https://" + url
@@ -636,7 +636,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def image(self, ctx: Context, *, query: str):
         APIKEY = api.heal
-        api_url = "http://localhost:1337/browse/images"
+        api_url = "http://localhost:1999/browse/images"
 
         params = {"query": query, "safe_mode": "true"}
         headers = {"api-key": APIKEY} 
@@ -674,7 +674,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 10, commands.BucketType.user)
     async def google(self, ctx: Context, *, query: str):
         APIKEY = api.heal
-        api_url = "http://localhost:1337/browse/search"
+        api_url = "http://localhost:1999/browse/search"
 
         params = {"query": query}
         headers = {"api-key": APIKEY} 
