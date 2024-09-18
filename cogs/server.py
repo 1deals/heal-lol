@@ -597,9 +597,6 @@ class Server(Cog):
                                 if after.vanity_url_code:
                                     message = f"The vanity **{after.vanity_url_code}** is now available!"
                                     await channel.send(message)
-                                else:
-                                    message = "The vanity URL is no longer available."
-                                    await channel.send(message)
 
     @commands.command(description="uwuify a person's messages")
     @commands.has_permissions(administrator = True)
