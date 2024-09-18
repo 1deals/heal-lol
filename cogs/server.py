@@ -753,7 +753,7 @@ class Server(Cog):
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.has_permissions(manage_guild=True)
-    async def invoke_unmute(self, ctx: Context, *, message: str = None):
+    async def invoke_kick(self, ctx: Context, *, message: str = None):
         if message is None:
             await self.bot.pool.execute("DELETE FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "kick")
             return await ctx.approve(f"Reset the **invoke kick** message to default.")
