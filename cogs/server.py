@@ -797,6 +797,20 @@ class Server(Cog):
         await self.bot.pool.execute("INSERT INTO modlogs (guild_id, channel_id) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET channel_id = $2", ctx.guild.id, channel.id)
         return await ctx.approve(f"Set the **modlogs** channel to: {channel.mention}")
 
+    @modlogs.command(
+        name = "remove",
+        description = "Remove the modlogs channel"
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(administrator = True)
+    async def modlogs_remove(self, ctx: Context):
+        data = await self.bot.pool.fetchrow("SELECT channel_id FROM modlogs WHERE guild_id = $1", ctx.guild.id)
+        if data:
+            await self.bot.pool.execute("DELETE FROM modlogs WHERE guild_id = $1", ctx.guild.id)
+            return await ctx.approve("Modlogs have been **disabled**")
+        if data is None:
+            return await ctx.deny("Modlogs aren't setup in this guild.")
+
 
 
 async def setup(bot: Heal) -> None:
