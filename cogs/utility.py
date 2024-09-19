@@ -201,8 +201,7 @@ class Utility(commands.Cog):
         current_time = int(datetime.datetime.now().timestamp())
         await self.bot.cache.set(f"afk-{ctx.author.id}", (status, current_time))
 
-        embed = discord.Embed(description= f":zzz: You are now **AFK** - `{status}`", color = Colors.BASE_COLOR)
-        await ctx.reply(embed=embed)
+        return await ctx.approve(f"You're now **AFK**: **{status}**")
 
     TIKTOK_URL_PATTERN = re.compile(r'(https?://)?(www\.)?(vm\.tiktok\.com|t\.tiktok\.com|www\.tiktok\.com/@[A-Za-z0-9_.-]+/video|www\.tiktok\.com/t)/[A-Za-z0-9_/]+')
 
@@ -224,9 +223,11 @@ class Utility(commands.Cog):
             time_away = humanize.naturaldelta(now - start_time)
 
             embed = discord.Embed(
-                description=f"> 👋 **Welcome back!** You were away **{time_away} ago**",
-                color=Colors.BASE_COLOR  
+                title = f"Welcome back {message.author.display_name}!",
+                description = f"You were last seen **{time_away} ago.**",
+                timestamp = datetime.datetime.now()
             )
+            embed.set_author(name = message.author.display_name, icon_url = message.author.avatar.url)
             await message.channel.send(embed=embed)
             await self.bot.cache.remove(f"afk-{message.author.id}")
 

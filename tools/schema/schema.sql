@@ -240,3 +240,13 @@ CREATE TABLE IF NOT EXISTS invoke (
     message TEXT,
     PRIMARY KEY (guild_id, type)
 );
+
+CREATE TABLE IF NOT EXISTS modlogs (
+    guild_id BIGINT PRIMARY KEY,
+    channel_id BIGINT
+);
+
+CREATE TABLE IF NOT EXISTS cases (
+    guild_id BIGINT PRIMARY KEY,
+    count BIGINT
+);

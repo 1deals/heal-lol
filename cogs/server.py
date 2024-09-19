@@ -772,6 +772,32 @@ class Server(Cog):
             else:
                 await ctx.channel.send(content=processed_message)
 
+    @group(
+        name = "modlogs",
+        aliases = ["mlogs", "moderationlogs"],
+        invoke_without_command = True,
+        description = "Configure moderation logs."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(administrator = True)
+    async def modlogs(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+
+    @modlogs.command(
+        name = "set",
+        description = "Set the moderation logs channel.",
+        aliases = ["channel"]
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(administrator = True)
+    async def modlogs_set(self, ctx: Context, *, channel: discord.TextChannel = None):
+        if channel is None:
+            return await ctx.warn(f"Please enter a **channel**.")
+        
+        await self.bot.pool.execute("INSERT INTO modlogs (guild_id, channel_id) VALUES ($1, $2) ON CONFLICT (guild_id) DO UPDATE SET channel_id = $2", ctx.guild.id, channel.id)
+        return await ctx.approve(f"Set the **modlogs** channel to: {channel.mention}")
+
+
 
 async def setup(bot: Heal) -> None:
     await bot.add_cog(Server(bot))

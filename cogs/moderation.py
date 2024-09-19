@@ -20,6 +20,33 @@ import json
 from humanfriendly import format_timespan
 import os
 
+async def send_modlog(bot: Heal, action: str, moderator: discord.Member, vict: Union[discord.Member, discord.User], reason: str):
+    settings = await bot.pool.fetchrow("SELECT channel_id FROM modlogs WHERE guild_id = $1", moderator.guild.id)
+    
+    if settings and "channel_id" in settings:
+        res = await bot.pool.fetchrow("SELECT count FROM cases WHERE guild_id = $1", moderator.guild.id)
+        if res is None:
+            await bot.pool.execute("INSERT INTO cases (guild_id, count) VALUES ($1, $2)", moderator.guild.id, 0)
+            casenum = 1 
+        else:
+            casenum = int(res['count']) + 1
+            await bot.pool.execute("UPDATE cases SET count = $1 WHERE guild_id = $2", casenum, moderator.guild.id)
+        
+        await bot.pool.execute("UPDATE cases SET count = $1 WHERE guild_id = $2", casenum, moderator.guild.id)
+        
+        embed = discord.Embed(title=f"{action} -> case #{casenum}", color=Colors.BASE_COLOR, timestamp=datetime.datetime.now())
+        embed.add_field(name="Moderator:", value=f"{moderator.name} ({moderator.id})", inline = True)
+        embed.add_field(name="Victim:", value=f"{vict.name} ({vict.id})", inline = False)
+        embed.add_field(name="Reason:", value=f"{reason}", inline = False)
+        embed.set_thumbnail(url = moderator.avatar.url)
+
+        try:
+            logschan = moderator.guild.get_channel(settings['channel_id'])
+            if logschan:
+                await logschan.send(embed=embed)
+        except:
+            pass
+
 class Moderation(commands.Cog):
     """
     Moderation commands.
@@ -28,6 +55,7 @@ class Moderation(commands.Cog):
         self.bot = bot
         self.locks = defaultdict(asyncio.Lock)
         self.role_lock = defaultdict(asyncio.Lock)
+
 
     @command(
         name = "lock",
@@ -83,7 +111,7 @@ class Moderation(commands.Cog):
 
         data = await self.bot.pool.fetchrow("SELECT * FROM invoke WHERE guild_id = $1 AND type = $2", ctx.guild.id, "kick")
 
-        if data and data["message"]:
+        if data and "message" in data:
             message = data["message"]
             processed_message = EmbedBuilder.embed_replacement(user, message)
             content, embed, view = await EmbedBuilder.to_object(processed_message)
@@ -92,8 +120,11 @@ class Moderation(commands.Cog):
                 await ctx.channel.send(content=content, embed=embed, view=view)
             else:
                 await ctx.channel.send(content=processed_message)
-        else:
-            return await ctx.approve(f'Successfully kicked {user.mention} for {reason.split(" |")[0]}')
+        
+        if data is None:
+            await ctx.approve(f'Successfully kicked {user.mention} for {reason.split(" |")[0]}')
+
+        await send_modlog(self.bot, "kick", ctx.author, user, reason)
         
     @command(
         name = "ban",
@@ -127,8 +158,12 @@ class Moderation(commands.Cog):
                 await ctx.channel.send(content=content, embed=embed, view=view)
             else:
                 await ctx.channel.send(content=processed_message)
-        else:
-            return await ctx.approve(f'Successfully banned {user.mention} for {reason.split(" |")[0]}')
+        
+        if data is None:
+            await ctx.approve(f'Successfully banned {user.mention} for {reason.split(" |")[0]}')
+        
+        await send_modlog(self.bot, "ban", ctx.author, user, reason)
+    
         
     @commands.command(name='mute', description='mute a user in your server', brief='-mute <user> <time> <reason>')
     @commands.has_permissions(manage_messages=True)
@@ -168,8 +203,10 @@ class Moderation(commands.Cog):
                 await ctx.channel.send(content=content, embed=embed, view=view)
             else:
                 await ctx.channel.send(content=processed_message)
-        else:
-            return await ctx.approve(f'Muted **{user}** for `{humanfriendly.format_timespan(time)}` - **{reason}**')
+        if data is None:
+            await ctx.approve(f'Muted **{user}** for `{humanfriendly.format_timespan(time)}` - **{reason}**')
+
+        await send_modlog(self.bot, "mute", ctx.author, user, reason)
 
     
     @commands.command(name='unmute', description='ummute a user in your server', brief='-ummute <user> <reason>')
@@ -209,8 +246,9 @@ class Moderation(commands.Cog):
                 await ctx.channel.send(content=content, embed=embed, view=view)
             else:
                 await ctx.channel.send(content=processed_message)
-        else:
-            return await ctx.approve(f"**Unmuted {user}**")
+        if data is None:
+            await ctx.approve(f"**Unmuted {user}**")
+        await send_modlog(self.bot, "unmute", ctx.author, user, reason)
     
     @commands.command(
     name="forcenickname",
@@ -241,6 +279,7 @@ class Moderation(commands.Cog):
             else: 
                 await self.bot.pool.execute("UPDATE forcenick SET name = $1 WHERE user_id = $2 AND guild_id = $3", name, user.id, ctx.guild.id)  
             await user.edit(nick=name)
+            await send_modlog(self.bot, "force nickname", ctx.author, user, reason = "Forced nickname.")
             return await ctx.approve(f"Forced **{user.name}'s** nickname to be **`{name}`**!")
 
     @commands.Cog.listener()
@@ -259,6 +298,7 @@ class Moderation(commands.Cog):
     async def purge(self, ctx: Context, *, amount: int):
         await ctx.message.delete()
         await ctx.channel.purge(limit=amount)
+        await send_modlog(self.bot, "purge", ctx.author, vict= ctx.author ,reason = "purged")
         purgemsg = await ctx.approve(f"**Successfully** purged {amount} messages.")
         await asyncio.sleep(2)
         await purgemsg.delete()
@@ -282,9 +322,12 @@ class Moderation(commands.Cog):
         if role in member.roles:
             await member.remove_roles(role)
             await ctx.approve(f"Removed {role.mention} from {member.name}")
+            await send_modlog(self.bot, "role removed", ctx.author, member, reason = "role removed.")
         else:
             await member.add_roles(role)
+            await send_modlog(self.bot, "role added", ctx.author, member, reason = "role added.")
             await ctx.approve(f"Added {role.mention} to {member.name}")
+
 
     @role.command(name="create", description="Create a new role in the server.")
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -416,6 +459,7 @@ class Moderation(commands.Cog):
 
         view = Confirm(ctx, channel)
         await ctx.send(embed=embed, view=view)
+        await send_modlog(self.bot, "channel nuked", ctx.author, channel, reason = "Channel nuked.")
 
     @command(
         name = "imute",
@@ -430,6 +474,7 @@ class Moderation(commands.Cog):
         overwrite.attach_files = False
         overwrite.embed_links = False
         await channel.set_permissions(member, overwrite=overwrite)
+        await send_modlog(self.bot, "image mute", ctx.author, member, reason = "image muted user.")
         await ctx.approve(f"Removed media permissions from **{member.mention}** in {channel.mention}.")
     
     @command(
@@ -445,6 +490,7 @@ class Moderation(commands.Cog):
         overwrite.attach_files = True
         overwrite.embed_links = True
         await channel.set_permissions(member, overwrite=overwrite)
+        await send_modlog(self.bot, "image unmute", ctx.author, member, reason = "restored users image perms")
         await ctx.approve(f"Restored media permissions to **{member.mention}** in {channel.mention}.")
 
     @commands.group(
@@ -584,8 +630,9 @@ class Moderation(commands.Cog):
                 await ctx.channel.send(content=content, embed=embed, view=view)
             else:
                 await ctx.channel.send(content=processed_message)
-        else:
+        if data is None:
             return await ctx.approve(f'Unbanned {user.mention}')
+        await send_modlog(self.bot, "unban", ctx.author, user, reason = "unbanned user.")
 
     @group(
         name = "filter",
@@ -665,7 +712,8 @@ class Confirm(discord.ui.View):
             "UPDATE boostmessage SET channel_id = $1 WHERE channel_id = $2",
             "UPDATE starboard SET channel_id = $1 WHERE channel_id = $2",
             "UPDATE vanityroles SET channel_id = $1 WHERE channel_id = $2",
-            "UPDATE joinping SET channel_id = $1 WHERE channel_id = $2"
+            "UPDATE joinping SET channel_id = $1 WHERE channel_id = $2",
+            "UPDATE modlogs SET channel_id = $1 WHERE channel_id = $2"
         ]
         for query in q:
             await self.ctx.bot.pool.execute(query, nukedchannel.id, self.channel.id)

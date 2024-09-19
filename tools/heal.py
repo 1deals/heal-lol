@@ -53,8 +53,7 @@ class Heal(commands.AutoShardedBot):
                 replied_user=False
             ),
             case_insensitive=True,
-            owner_ids=[187747524646404105, #me
-            ]
+            owner_ids=[187747524646404105, 1208472692337020999]
         )
 
         self.message_cache = defaultdict(list)
