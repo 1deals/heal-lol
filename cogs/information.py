@@ -818,7 +818,73 @@ class Information(commands.Cog):
 
         await ctx.paginate(embeds)
 
-    
+    @command(
+        name = "inrole",
+        description = "Check users in a certain role."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def inrole(self, ctx: Context, *, role: discord.Role = None):
+        if role is None:
+            return await ctx.send_help(ctx.command)
+        inrole = [m for m in ctx.guild.members if role in m.roles]
+        embeds = []
+        count = 0
+
+        if not inrole:
+            return await ctx.warn(f"There is **no one** in the role {role.mention}.")
+        
+        entries = [
+            f"` {i} `  **{m.name}**  ({m.id})"
+            for i, m in enumerate(inrole, start=1)
+        ]
+
+        embed = discord.Embed(color=Colors.BASE_COLOR, title=f"Members in {role.name} ({len(entries)})", description="")
+        for entry in entries:
+            embed.description += f'{entry}\n'
+            count += 1
+
+            if count == 10:
+                embeds.append(embed)
+                embed = discord.Embed(color=Colors.BASE_COLOR, description="", title=f"Members in {role.name} ({len(entries)})")
+                count = 0
+
+        if count > 0:
+            embeds.append(embed)
+
+        await ctx.paginate(embeds)
+
+    @command(
+        name = "boosters",
+        description = "Check the guild's boosters."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def boosters(self, ctx: Context):
+        boosters = ctx.guild.premium_subscribers
+        embeds = []
+        count = 0
+
+        if not boosters:
+            return await ctx.warn(f"There are no **boosters** in this guild..")
+        
+        entries = [
+            f"` {i} `  **{m.name}**  ({m.id})"
+            for i, m in enumerate(boosters, start=1)
+        ]
+
+        embed = discord.Embed(color=Colors.BASE_COLOR, title=f"Boosters ({len(entries)})", description="")
+        for entry in entries:
+            embed.description += f'{entry}\n'
+            count += 1
+
+            if count == 10:
+                embeds.append(embed)
+                embed = discord.Embed(color=Colors.BASE_COLOR, description="", title=f"Boosters ({len(entries)})")
+                count = 0
+
+        if count > 0:
+            embeds.append(embed)
+
+        await ctx.paginate(embeds)
 
 
 async def setup(bot: Heal):
