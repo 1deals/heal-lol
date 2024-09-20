@@ -183,7 +183,8 @@ class LastFM(Cog):
     @lastfm.group(
         name = "customcommand",
         aliases = ["cc"],
-        description = "Configure your custom NowPlaying alias."
+        description = "Configure your custom NowPlaying alias.",
+        invoke_without_command = True
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def lastfm_customcommand(self, ctx: Context):
