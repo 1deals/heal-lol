@@ -459,7 +459,6 @@ class Moderation(commands.Cog):
 
         view = Confirm(ctx, channel)
         await ctx.send(embed=embed, view=view)
-        await send_modlog(self.bot, "channel nuked", ctx.author, channel, reason = "Channel nuked.")
 
     @command(
         name = "imute",
@@ -724,6 +723,7 @@ class Confirm(discord.ui.View):
         # Send nuked confirmation
         embed = discord.Embed(description="", color=Colors.BASE_COLOR)
         embed.set_image(url = self.ctx.bot.user.avatar.url)
+        await send_modlog(self.ctx.bot, "channel nuked", self.ctx.author, self.ctx.channel, reason = "Channel nuked.")
         embed.set_footer(text=f"Nuked by {self.ctx.author}", icon_url=self.ctx.author.avatar.url)
         await nukedchannel.send(embed=embed)
 

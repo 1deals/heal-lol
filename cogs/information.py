@@ -788,6 +788,38 @@ class Information(commands.Cog):
 
         await ctx.send(embed=embed)
 
+    @command(
+        name = "bots",
+        description = "Get a list of bots."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def bots(self, ctx: Context):
+        bots = [b for b in ctx.guild.members if b.bot]
+        count = 0
+        embeds = []
+
+        entries = [
+            f"` {i} `  **{m.name}**  ({m.id})"
+            for i, m in enumerate(bots, start=1)
+        ]
+        embed = discord.Embed(color=Colors.BASE_COLOR, title=f"bot list ({len(entries)})", description="")
+
+        for entry in entries:
+            embed.description += f'{entry}\n'
+            count += 1
+
+            if count == 10:
+                embeds.append(embed)
+                embed = discord.Embed(color=Colors.BASE_COLOR, description="", title=f"bot list ({len(entries)})")
+                count = 0
+
+        if count > 0:
+            embeds.append(embed)
+
+        await ctx.paginate(embeds)
+
+    
+
 
 async def setup(bot: Heal):
     await bot.add_cog(Information(bot))
