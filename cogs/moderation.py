@@ -721,8 +721,7 @@ class Confirm(discord.ui.View):
         await self.channel.delete()
 
         # Send nuked confirmation
-        embed = discord.Embed(description="", color=Colors.BASE_COLOR)
-        embed.set_image(url = self.ctx.bot.user.avatar.url)
+        await ctx.send(f"First!")
         await send_modlog(self.ctx.bot, "channel nuked", self.ctx.author, self.ctx.channel, reason = "Channel nuked.")
         embed.set_footer(text=f"Nuked by {self.ctx.author}", icon_url=self.ctx.author.avatar.url)
         await nukedchannel.send(embed=embed)
