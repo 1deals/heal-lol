@@ -721,10 +721,8 @@ class Confirm(discord.ui.View):
         await self.channel.delete()
 
         # Send nuked confirmation
-        await ctx.send(f"First!")
+        await nukedchannel.send(f"First!")
         await send_modlog(self.ctx.bot, "channel nuked", self.ctx.author, self.ctx.channel, reason = "Channel nuked.")
-        embed.set_footer(text=f"Nuked by {self.ctx.author}", icon_url=self.ctx.author.avatar.url)
-        await nukedchannel.send(embed=embed)
 
         # Respond to the interaction to confirm action
         await interaction.response.send_message("Channel nuked!", ephemeral=True)
