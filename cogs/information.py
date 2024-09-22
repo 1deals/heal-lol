@@ -32,6 +32,9 @@ def get_ordinal(number):
         return f"{number}{suffix}"
 
 class Information(commands.Cog):
+        """
+        Information commands
+        """
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
         self.vc_start_times = {}
