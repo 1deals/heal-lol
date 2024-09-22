@@ -22,52 +22,7 @@ from tools.configuration import api
 class LastFM(Cog):
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
-        self.handler = FMHandler("bc8082588489f949216859abba6e52be")
-
-    async def lastfm_replacement(self, user: str, params: str) -> str:
-        a = await self.handler.get_tracks_recent(user, 1)
-        userinfo = await self.handler.get_user_info(user)
-        userpfp = userinfo["user"]["image"][2]["#text"]
-        artist = a["recenttracks"]["track"][0]["artist"]["#text"]
-        albumplays = (
-            await self.handler.get_album_playcount(user, a["recenttracks"]["track"][0])
-            or "N/A"
-        )
-        artistplays = await self.handler.get_artist_playcount(user, artist)
-        trackplays = (
-            await self.handler.get_track_playcount(user, a["recenttracks"]["track"][0])
-            or "N/A"
-        )
-        album = (
-            a["recenttracks"]["track"][0]["album"]["#text"].replace(" ", "+") or "N/A"
-        )
-        params = (
-            params.replace("{track}", a["recenttracks"]["track"][0]["name"])
-            .replace("{trackurl}", a["recenttracks"]["track"][0]["url"])
-            .replace("{artist}", a["recenttracks"]["track"][0]["artist"]["#text"])
-            .replace("{artisturl}", f"https://last.fm/music/{artist.replace(' ', '+')}")
-            .replace(
-                "{trackimage}",
-                str((a["recenttracks"]["track"][0])["image"][3]["#text"]).replace(
-                    "{https", "https"
-                ),
-            )
-            .replace("{artistplays}", str(artistplays))
-            .replace("{albumplays}", str(albumplays))
-            .replace("{trackplays}", str(trackplays))
-            .replace(
-                "{album}", a["recenttracks"]["track"][0]["album"]["#text"] or "N/A"
-            )
-            .replace(
-                "{albumurl}",
-                f"https://www.last.fm/music/{artist.replace(' ', '+')}/{album.replace(' ', '+')}"
-                or "https://none.none",
-            )
-            .replace("{username}", user)
-            .replace("{scrobbles}", a["recenttracks"]["@attr"]["total"])
-            .replace("{useravatar}", userpfp)
-        )
-        return params
+        # fm key bc8082588489f949216859abba6e52be
 
     @hybrid_group(
         name="lastfm",
@@ -142,6 +97,12 @@ class LastFM(Cog):
         headers = {"api-key": APIKEY}
 
         async with aiohttp.ClientSession() as session:
+            async with session.get(f"http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user={lastfm_username}&api_key={api.lastfm}&format=json") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    playcount = data["user"]["playcount"]
+
+        async with aiohttp.ClientSession() as session:
             async with session.get(api_url, params=params, headers=headers) as response:
                 if response.status == 200:
                     data = await response.json()
@@ -151,14 +112,13 @@ class LastFM(Cog):
                     album_art = data["tracks"][0]["image"]
                     album_name = data["tracks"][0]["album"]
 
-            embed = discord.Embed(color=Colors.BASE_COLOR)
-            embed.add_field(name="**Track**", value=f"[{track}]({url})", inline=True)
-            embed.add_field(name="**Artist**", value=f"{artist}", inline=False)
-            embed.set_author(name=f"{lastfm_username}")
+            embed = discord.Embed(color=Colors.BASE_COLOR, description = f"**[{track}]({url})**")
+            embed.add_field(name="", value=f"**{artist}** | *{album_name}*", inline=False)
+            embed.set_author(name=f"Now playing - {lastfm_username}", icon_url= user.avatar.url)
             if album_art:
                 embed.set_thumbnail(url=album_art)
 
-            embed.set_footer(text=f"Album: {album_name}")
+            embed.set_footer(text=f"Total scrobbles: {playcount}")
             message = await ctx.send(embed=embed)
             await message.add_reaction("🔥")
             await message.add_reaction("👎")
@@ -260,42 +220,6 @@ class LastFM(Cog):
             "UPDATE lastfm SET command = $1 WHERE user_id = $2", None, ctx.author.id
         )
         return await ctx.lastfm("**Deleted** your LastFM **custom command.**")
-
-    @lastfm.command(name="chart", description="Get your lastfm chart.")
-    async def lastfm_chart(
-        self,
-        ctx: Context,
-        user: Union[discord.Member, discord.User] = None,
-        size: str = "3x3",
-    ):
-        APIKEY = api.heal
-        api_url = "http://localhost:1999/lastfm/chart"
-
-        if user == None:
-            user = ctx.author
-
-        data = await self.bot.pool.fetchrow(
-            "SELECT * FROM lastfm WHERE user_id = $1", user.id
-        )
-        if not data:
-            return await ctx.lastfm(
-                f"**{user.name}** hasn't got their LastFM account linked."
-            )
-        lastfmuser = data["lfuser"]
-
-        params = {"username": lastfmuser, "size": size}
-        headers = {"api-key": APIKEY}
-        async with ctx.typing():
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    api_url, params=params, headers=headers
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        image = data.get("image_url")
-                        embed = discord.Embed(title=f"lastfm chart for {lastfmuser}")
-                        embed.set_image(url=image)
-                        await ctx.send(embed=embed)
 
 
 async def setup(bot: Heal):
