@@ -1,5 +1,6 @@
 import asyncio
 
+
 class Cache:
     def __init__(self):
         self.dict = {}

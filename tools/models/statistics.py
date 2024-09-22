@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from tools.heal import Heal as bot
 
+
 @dataclass
 class BotStatistics:
     total_files: int = 0

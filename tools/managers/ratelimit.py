@@ -13,6 +13,7 @@ from cashews import cache
 
 cache.setup("mem://")
 
+
 def ratelimit(key: str, limit: int, duration: int = 60, retry: bool = True):
     def decorator(func: Callable):
         @wraps(func)
