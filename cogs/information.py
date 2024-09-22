@@ -165,15 +165,6 @@ class Information(commands.Cog):
                 color=color
         )
 
-        if isinstance(user, discord.Member) and user.joined_at:
-            perm = user.guild_permissions
-            perms = [perm_name.replace('_', ' ').title() for perm_name, value in perm if value]
-
-            if len(perms) > 10:
-                display_perms = ', '.join(perms[:10]) + f" +{len(perms) - 10} more"
-            else:
-                display_perms = ', '.join(perms)
-            embed.add_field(name="Permissions", value=f"`{display_perms}`", inline=False)
 
         
         embed.add_field(name="Created", value=format_dt(user.created_at, style='f'), inline=True)
@@ -193,20 +184,6 @@ class Information(commands.Cog):
             embed.add_field(name="Roles", value=roles_list, inline=False)
 
         embed.set_thumbnail(url=user.avatar.url)
-
-        button = Button(label="Permissions", style=discord.ButtonStyle.primary)
-
-        async def button_callback(interaction: discord.Interaction):
-            if interaction.user != ctx.author:
-                return await interaction.response.send_message("You can't use this button.", ephemeral=True)
-
-            full_perms = ', '.join(perms)
-            await interaction.response.send_message(f"All Permissions: `{full_perms}`", ephemeral=True)
-
-        button.callback = button_callback
-
-        view = View()
-        view.add_item(button)
 
         if data:
             lastfm_username = data["lfuser"]
@@ -231,7 +208,7 @@ class Information(commands.Cog):
                                 description += f"> {Emojis.LASTFM} **Listening to [{track_name}]({track_url}) by {artist_name}**"
                                 embed.description = description
 
-        await ctx.send(embed=embed, view=view)
+        await ctx.send(embed=embed)
 
     @hybrid_command(
         name = "instagram",
