@@ -46,6 +46,7 @@ class Heal(commands.AutoShardedBot):
             command_prefix=";",
             help_command=HealHelp(),
             intents=intents,
+            shard_count = 2,
             activity=discord.CustomActivity(name=f"🔗discord.gg/healbot"),
             allowed_mentions=discord.AllowedMentions(
                 everyone=False, users=True, roles=False, replied_user=False
