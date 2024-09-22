@@ -55,8 +55,11 @@ class Information(commands.Cog):
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def botinfo(self, ctx: Context):
+        description = f"{self.bot.user.name} is serving **{len(self.bot.guilds): ,}** guilds with **{len(self.bot.users): ,}** users."
+        if ctx.guild:
+            description += f"This server is on shard **{ctx.guild.shard_id} out of {self.bot.shard_count}**"
         embed = discord.Embed(
-            description=f"{self.bot.user.name} is serving **{len(self.bot.guilds): ,}** guilds with **{len(self.bot.users): ,}** users."
+            description=description
         )
         embed.add_field(
             name="Statistics",
