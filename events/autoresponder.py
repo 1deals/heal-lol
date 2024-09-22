@@ -45,7 +45,7 @@ class autoresponder(Cog):
                 else:
                     return await message.channel.send(content=processed_message)
 
-            if trigger.lower() in message.content.lower():
+            if not strict and trigger.lower() in message.content.lower():
                 if content or embed:
                     return await message.channel.send(content=content, embed=embed, view=view)
                 else:

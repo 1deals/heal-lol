@@ -568,7 +568,6 @@ class Utility(commands.Cog):
     @command(
         aliases=["createembed", "ce", "script"],
         description="Create an embed.",
-        flag=ScriptFlags,
     )
     @has_permissions(manage_messages=True)
     async def embed(self, ctx: Context, *, script: EmbedScript = None) -> Message:
@@ -576,8 +575,7 @@ class Utility(commands.Cog):
             return await ctx.neutral(
                 f"Create embed code [**here**](https://healbot.lol/embed)"
             )
-        flag: ScriptFlags = ctx.flag
-        return await ctx.send(**script, allowed_mentions=AllowedMentions(users=not flag.disallow_users_mention, roles=flag.allow_role_mentions, everyone=flag.allow_everyone_mention), delete_after=flag.delete_after)  # type: ignore
+        return await ctx.send(**script)
 
     @command(name="firstmsg", description="Get the first message in the channel.")
     @commands.cooldown(1, 5, commands.BucketType.user)
