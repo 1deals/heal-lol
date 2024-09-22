@@ -11,6 +11,8 @@ import asyncio
 from tools.managers.embedBuilder import EmbedBuilder, EmbedScript
 import logging
 from tools.managers.ratelimit import ratelimit
+from tools.managers.flags import BasicFlags, ScriptFlags
+from discord import AllowedMentions
 
 
 class autoresponder(Cog):
@@ -19,7 +21,7 @@ class autoresponder(Cog):
 
     @commands.Cog.listener()
     @ratelimit(key="{message.author}", limit=3, duration=10, retry=False)
-    async def on_message(self, message: discord.Message) -> Message:
+    async def on_message(self, message: discord.Message, flag: ScriptFlags = None) -> Message:
         if message.author.bot or not message.guild:
             return
 
@@ -30,17 +32,24 @@ class autoresponder(Cog):
         for entry in data:
             trigger = entry["trigger"]
             response = entry["response"]
-
-            if message.content.lower().startswith(trigger.lower()):
-                processed_message = EmbedBuilder.embed_replacement(
-                    message.author, response
-                )
-                content, embed, view = await EmbedBuilder.to_object(processed_message)
-
+            strict = entry["strict"]
+            
+            processed_message = EmbedBuilder.embed_replacement(
+                message.author, response
+            )
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+            
+            if strict and message.content.lower().startswith(trigger.lower()):
                 if content or embed:
-                    await message.channel.send(content=content, embed=embed, view=view)
+                    return await message.channel.send(content=content, embed=embed, view=view)
                 else:
-                    await message.channel.send(content=processed_message)
+                    return await message.channel.send(content=processed_message)
+
+            if trigger.lower() in message.content.lower():
+                if content or embed:
+                    return await message.channel.send(content=content, embed=embed, view=view)
+                else:
+                    return await message.channel.send(content=processed_message)
 
 
 async def setup(bot: Heal) -> None:

@@ -14,7 +14,7 @@ import random
 import string
 from tools.managers.cache import Cache
 from uwuipy import uwuipy
-
+from tools.managers.flags import ScriptFlags
 
 async def uwuthing(bot, text: str) -> str:
     uwu = uwuipy.Uwuipy()
@@ -351,14 +351,15 @@ class Server(Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def autoresponder(self, ctx: Context):
         return await ctx.send_help(ctx.command)
-
+    
     @autoresponder.command(
-        name="add", aliases=["set"], description="Setup an autoresponder"
+        name="add", aliases=["set"], description="Setup an autoresponder", flag=ScriptFlags,
     )
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def autoresponder_add(self, ctx: Context, *, input: str):
         trigger, response = map(str.strip, input.split(",", 1))
+        flag: ScriptFlags = ctx.flag
 
         existing_entry = await self.bot.pool.fetchrow(
             "SELECT * FROM autoresponder WHERE guild_id = $1 AND trigger = $2",
@@ -372,13 +373,14 @@ class Server(Cog):
             characters = string.ascii_letters
             randomid = "".join(random.choice(characters) for _ in range(10))
             await self.bot.pool.execute(
-                "INSERT INTO autoresponder (guild_id, trigger, response, id) VALUES ($1, $2, $3, $4)",
+                "INSERT INTO autoresponder (guild_id, trigger, response, id, strict) VALUES ($1, $2, $3, $4, $5)",
                 ctx.guild.id,
                 trigger,
                 response,
                 randomid,
+                not flag.not_strict
             )
-        return await ctx.approve(f"I will respond to **{trigger}** with **{response}**")
+        return await ctx.approve(f"I will respond to **{trigger}** with **{response}** (strict: {not ctx.flag.not_strict})")
 
     @autoresponder.command(
         name="remove", aliases=["delete"], description="Removes an autoresponder."

@@ -117,6 +117,7 @@ CREATE TABLE IF NOT EXISTS autoresponder (
     guild_id BIGINT,
     trigger TEXT,
     response TEXT,
+    strict BOOLEAN default TRUE,
     id TEXT,
     PRIMARY KEY (guild_id, trigger)
 );
