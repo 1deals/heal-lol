@@ -44,9 +44,6 @@ def br_enabled():
     return commands.check(predicate)
 
 class Boosterrole(commands.Cog):
-    """
-    Configure booster role commands.
-    """
     def __init__(self, bot: Heal):
         self.bot = bot
 
