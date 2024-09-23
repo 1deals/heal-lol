@@ -835,7 +835,7 @@ class Utility(commands.Cog):
         if not data: 
             return await ctx.warn(f"You do not have a **timezone** setup. Do `{ctx.clean_prefix}tz set <timezone>` to get started.")
         
-        timezone = data[0]["timezone"] 
+        timezone = data["timezone"]
 
         tz = pytz.timezone(timezone)
         current_time = datetime.datetime.now(tz)
