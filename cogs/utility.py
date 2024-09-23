@@ -1455,10 +1455,10 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def timezone_set(self, ctx: Context, *, timezone: str = None):
         timezone = timezone.capitalize()
-        if timezone in TIMEZONEMAPPING:
-            timezone = TIMEZONEMAPPING[timezone]
         if timezone not in TIMEZONEMAPPING:
             return await ctx.warn(f"The **timezone** `{timezone}` is not a valid timezone.")
+        if timezone in TIMEZONEMAPPING:
+            timezone = TIMEZONEMAPPING[timezone]
 
         await self.bot.pool.execute("INSERT INTO timezones (user_id, timezone) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET timezone = $2", ctx.author.id, timezone)
         return await ctx.approve(f"Set your timezone to `{timezone}`.")
