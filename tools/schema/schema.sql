@@ -254,5 +254,5 @@ CREATE TABLE IF NOT EXISTS cases (
 
 CREATE TABLE IF NOT EXISTS timezones (
     user_id BIGINT PRIMARY KEY,
-    timzone TEXT
+    timezone TEXT
 );
