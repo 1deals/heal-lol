@@ -829,15 +829,15 @@ class Utility(commands.Cog):
         invoke_without_command = True
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def timezone(self, ctx: Context, *, user: Union[discord.Member, discord.User] = None):
-        data = await self.bot.pool.fetchrow("SELECT * FROM timezones WHERE user_id = $1", user.id)
+    async def timezone(self, ctx: Context, *, user: discord.Member = None):
+        data = await self.bot.pool.fetchrow("SELECT timezone FROM timezones WHERE user_id = $1", user.id)
     
         if not data: 
             return await ctx.warn(f"You do not have a **timezone** setup. Do `{ctx.clean_prefix}tz set <timezone>` to get started.")
         
-        timezone = data["timezone"]
+    
 
-        tz = pytz.timezone(timezone)
+        tz = pytz.timezone(data)
         current_time = datetime.datetime.now(tz)
         formatted = current_time.strftime('%I:%M %p')
 
