@@ -554,7 +554,7 @@ class Information(commands.Cog):
 
         embed = discord.Embed(
             title=f"{guild.name}",
-            description=f"{f'> {guild.description}' if guild.description is not None else ''}\n> Created on <t:{int(guild.created_at.timestamp())}:F> <t:{int(guild.created_at.timestamp())}:R>",
+            description=f"{f'> {guild.description}' if guild.description is not None else ''}\n> Created on <t:{int(guild.created_at.timestamp())}:F> <t:{int(guild.created_at.timestamp())}:R> \n> **{guild.name} is on shard {ctx.guild.shard_id}/{self.bot.shard_count}**",
             color=Colors.BASE_COLOR,
         )
         users = [m for m in guild.members if not m.bot]
