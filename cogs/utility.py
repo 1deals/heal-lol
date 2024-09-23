@@ -830,6 +830,8 @@ class Utility(commands.Cog):
     )
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def timezone(self, ctx: Context, *, user: discord.Member = None):
+        if user is None:
+            user = ctx.author
         data = await self.bot.pool.fetchrow("SELECT timezone FROM timezones WHERE user_id = $1", user.id)
     
         if not data: 
