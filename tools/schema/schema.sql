@@ -251,3 +251,8 @@ CREATE TABLE IF NOT EXISTS cases (
     guild_id BIGINT PRIMARY KEY,
     count BIGINT
 );
+
+CREATE TABLE IF NOT EXISTS timezones (
+    user_id BIGINT PRIMARY KEY,
+    timzone TEXT
+);

@@ -37,6 +37,11 @@ from rembg import remove
 import google.generativeai as genai
 from tools.managers.flags import ScriptFlags
 from discord import AllowedMentions
+import pytz
+
+all_timezones = pytz.all_timezones
+
+TIMEZONE_MAPPING = {tz: tz for tz in all_timezones}
 
 api_keys = [
     "AIzaSyARqu0-ecLbA5gTpcCi8R8n8DQnM_y5SCc",
@@ -816,6 +821,39 @@ class Utility(commands.Cog):
     async def botclear(self, ctx: Context, amount: int = 100):
         deleted = await ctx.channel.purge(limit=amount, check=lambda m: m.author.bot)
         await ctx.message.add_reaction(f"<:approve:1276192812127359081>")
+
+    @group(
+        name = "timezone",
+        aliases = ["tz"],
+        description = "View your current time or somebody elses.",
+        invoke_without_command = True
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def timezone(self, ctx: Context, *, user: Union[discord.Member, discord.User] = None):
+        data = await self.bot.pool.fetchrow("SELECT * FROM timezones WHERE user_id = $1", user.id)
+    
+        if not data: 
+            return await ctx.warn(f"You do not have a **timezone** setup. Do `{ctx.clean_prefix}tz set <timezone>` to get started.")
+        
+        timezone = data[0]["timezone"] 
+
+        tz = pytz.timezone(timezone)
+        current_time = datetime.datetime.now(tz)
+        formatted = current_time.strftime('%I:%M %p')
+
+        return await ctx.neutral(f"⏰ It is **{formatted}** for **{user}**")
+        
+    @timezone.command(
+        name = "set",
+        description = "Set your timezone."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def timezone_set(self, ctx: Context, *, timezone: str = None):
+        if timezone in TIMEZONE_MAPPING:
+            timezone = TIMEZONE_MAPPING[timezone]
+
+        await self.bot.pool.execute("INSERT INTO timezones (user_id, timezone) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET timezone = $2", ctx.author.id, timezone)
+        return await ctx.approve(f"Set your timezone to `{timezone}`.")
 
 
 async def setup(bot: Heal):
