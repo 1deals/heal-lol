@@ -1,0 +1,2852 @@
+[
+    {
+        "name": "addemoji",
+        "description": "Adds an emoji to your server",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "emoji",
+                "optional": true
+            },
+            {
+                "name": "name",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "group_name": "tiktok",
+        "description": "Tiktok commands",
+        "category": "Utility",
+        "subcommands": [
+            {
+                "name": "reposter",
+                "description": "Repost a tiktok video",
+                "category": "Utility",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "url",
+                        "optional": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "levels",
+        "description": "Displays the global leaderboard for levels.",
+        "category": "Leveling",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "group_name": "lastfm",
+        "description": "Interact with LastFM through heal.",
+        "category": "LastFM",
+        "subcommands": [
+            {
+                "name": "login",
+                "description": "Set your LastFM account.",
+                "category": "LastFM",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "lfuser",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "customcommand",
+                "description": "Configure your custom NowPlaying alias.",
+                "category": "LastFM",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "variables",
+                "description": "Get a list of LastFM variables to use in you custom embeds.",
+                "category": "LastFM",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "nowplaying",
+                "description": "Get your LastFM now playing.",
+                "category": "LastFM",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "logout",
+                "description": "Unlink your LastFM account from heal.",
+                "category": "LastFM",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "removebg",
+        "description": "Removes a background from an image.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "image",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "stare",
+        "description": "Stare at a user.",
+        "category": "Roleplay",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "clearsnipe",
+        "description": "",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "roleall",
+        "description": "Gives a role to all users.",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "role",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "ping",
+        "description": "View the bot's latency.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "bots",
+        "description": "Get a list of bots.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "wave",
+        "description": "Wave at a user.",
+        "category": "Roleplay",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "group_name": "starboard",
+        "description": "Showcase messages in your guild.",
+        "category": "Starboard",
+        "subcommands": [
+            {
+                "name": "threshold",
+                "description": "Set the starboard threshold.",
+                "category": "Starboard",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "threshold",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "emoji",
+                "description": "Set the starboard emoji, if not \ud83c\udf1f will be used.",
+                "category": "Starboard",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "emoji",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "channel",
+                "description": "Set the starboard channel.",
+                "category": "Starboard",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "nuke",
+        "description": "Nukes a channel.",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "channel",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "editsnipe",
+        "description": "",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "index",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "shuffle",
+        "description": "",
+        "category": "Music",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "oldnames",
+        "description": "Get your name history.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "activity",
+        "description": "Change the bots activity status.",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "activity",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "group_name": "boostmessage",
+        "description": "Configure boost messages for your guild.",
+        "category": "Server",
+        "subcommands": [
+            {
+                "name": "message",
+                "description": "Set the boost message message.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "message",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "test",
+                "description": "Test the booster message config.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "channel",
+                "description": "Set the boost message channel.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "remove",
+                "description": "Remove the boost message.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "poke",
+        "description": "Poke a user.",
+        "category": "Roleplay",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "imute",
+        "description": "Remove image permissions from a user in a channel.",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "member",
+                "optional": false
+            },
+            {
+                "name": "channel",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "unlock",
+        "description": "",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "channel",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "iunmute",
+        "description": "Restore someones image permissions in a channel.",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "member",
+                "optional": false
+            },
+            {
+                "name": "channel",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "shazam",
+        "description": "Get a track name from sound",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "wink",
+        "description": "Wink at a user.",
+        "category": "Roleplay",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "kick",
+        "description": "",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": false
+            },
+            {
+                "name": "reason",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "globalban",
+        "description": "Global bans a user.",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "group_name": "thread",
+        "description": "Thread settings.",
+        "category": "Moderation",
+        "subcommands": [
+            {
+                "name": "lock",
+                "description": "Lock a thread.",
+                "category": "Moderation",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "rename",
+                "description": "Renames a thread.",
+                "category": "Moderation",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "optional": false
+                    },
+                    {
+                        "name": "name",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "unlock",
+                "description": "Unlocks a thread.",
+                "category": "Moderation",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "delete",
+                "description": "Deletes a thread.",
+                "category": "Moderation",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "thread",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "disablecommand",
+        "description": "Disables a command.",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "command",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "upload",
+        "description": "",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "attachment",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "resume",
+        "description": "",
+        "category": "Music",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "membercount",
+        "description": "Get the server's membercount.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "embed",
+        "description": "Create an embed.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "script",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "tickle",
+        "description": "Tickle a user.",
+        "category": "Roleplay",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "support",
+        "description": "Join our support server.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "ban",
+        "description": "",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": false
+            },
+            {
+                "name": "reason",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "avatar",
+        "description": "",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "help",
+        "description": "",
+        "category": "Uncategorized",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "command",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "botinfo",
+        "description": "Get information about the bot.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "stop",
+        "description": "",
+        "category": "Music",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "group_name": "levelling",
+        "description": "",
+        "category": "Leveling",
+        "subcommands": [
+            {
+                "name": "disable",
+                "description": "Disable leveling in your guild.",
+                "category": "Leveling",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "enable",
+                "description": "Enable leveling in your guild.",
+                "category": "Leveling",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "topcmds",
+        "description": "",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "twitter",
+        "description": "Get info about a user on twitter.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "username",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "inrole",
+        "description": "Check users in a certain role.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "role",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "mute",
+        "description": "mute a user in your server",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": false
+            },
+            {
+                "name": "time",
+                "optional": true
+            },
+            {
+                "name": "reason",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "group_name": "api",
+        "description": "",
+        "category": "Owner",
+        "subcommands": [
+            {
+                "name": "add",
+                "description": "add an api key",
+                "category": "Owner",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "optional": false
+                    },
+                    {
+                        "name": "role",
+                        "optional": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "feed",
+        "description": "Feed a user.",
+        "category": "Roleplay",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "group_name": "modlogs",
+        "description": "Configure moderation logs.",
+        "category": "Server",
+        "subcommands": [
+            {
+                "name": "set",
+                "description": "Set the moderation logs channel.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "remove",
+                "description": "Remove the modlogs channel",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "pause",
+        "description": "",
+        "category": "Music",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "lock",
+        "description": "",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "channel",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "unmute",
+        "description": "ummute a user in your server",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": false
+            },
+            {
+                "name": "reason",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "group_name": "joinping",
+        "description": "Add join pings to your server!",
+        "category": "Server",
+        "subcommands": [
+            {
+                "name": "channel",
+                "description": "Adds or removes a joinping from your guild.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "list",
+                "description": "Get a list of channels which have joinping enabled.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "group_name": "system",
+        "description": "System commands.",
+        "category": "Owner",
+        "subcommands": [
+            {
+                "name": "restart",
+                "description": "restarts the bot.",
+                "category": "Owner",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "banner",
+                "description": "",
+                "category": "Owner",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "image",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "pfp",
+                "description": "",
+                "category": "Owner",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "image",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "forcenickname",
+        "description": "force a nickname upon a user.",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": false
+            },
+            {
+                "name": "name",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "dominant",
+        "description": "Get the dominant color from an image.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "image",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "sync",
+        "description": "",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "shards",
+        "description": "",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "purge",
+        "description": "Purge messages.",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "amount",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "8ball",
+        "description": "Ask 8ball a question.",
+        "category": "Fun",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "question",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "skip",
+        "description": "",
+        "category": "Music",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "afk",
+        "description": "Let members know your AFK.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "status",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "serverinfo",
+        "description": "",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "translate",
+        "description": "Translate a message from any language.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "message",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "invite",
+        "description": "",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "blacklistguild",
+        "description": "Blacklists a guild.",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "guildid",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "uwuify",
+        "description": "Uwuify a message.",
+        "category": "Fun",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "message",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "group_name": "tracker",
+        "description": "Configure tracker settings.",
+        "category": "Server",
+        "subcommands": [
+            {
+                "name": "usernames",
+                "description": "Configure the username trackings",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "vanity",
+                "description": "Configure vanity tracker.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "screenshot",
+        "description": "Screenshot a website.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "url",
+                "optional": false
+            },
+            {
+                "name": "timeout",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "group_name": "voicemaster",
+        "description": "Make temporary voice channels in your server!",
+        "category": "VoiceMaster",
+        "subcommands": [
+            {
+                "name": "setup",
+                "description": "Begin VoiceMaster server configuration setup",
+                "category": "VoiceMaster",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "remove",
+                "description": "Remove all temporary voice channels managed by VoiceMaster",
+                "category": "VoiceMaster",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "group_name": "role",
+        "description": "Add / remove a role from a user.",
+        "category": "Moderation",
+        "subcommands": [
+            {
+                "name": "rename",
+                "description": "Rename an existing role in the server.",
+                "category": "Moderation",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "role",
+                        "optional": false
+                    },
+                    {
+                        "name": "name",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "create",
+                "description": "Create a new role in the server.",
+                "category": "Moderation",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "name",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "delete",
+                "description": "Delete an existing role from the server.",
+                "category": "Moderation",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "role",
+                        "optional": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "uwulock",
+        "description": "uwuify a person's messages",
+        "category": "Server",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "member",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "group_name": "selfprefix",
+        "description": "Selfprefix settings.",
+        "category": "Utility",
+        "subcommands": [
+            {
+                "name": "set",
+                "description": "Set your selfprefix",
+                "category": "Utility",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "prefix",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "remove",
+                "description": "Delete your selfprefix.",
+                "category": "Utility",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "whitelist",
+        "description": "Authorize a guild.",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "guild",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "blacktea",
+        "description": "Play a game of blacktea.",
+        "category": "Fun",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "howgay",
+        "description": "",
+        "category": "Fun",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "member",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "howlesbian",
+        "description": "",
+        "category": "Fun",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "member",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "google",
+        "description": "Search online.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "query",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "group_name": "premium",
+        "description": "Gives / revokes a users premium.",
+        "category": "Owner",
+        "subcommands": [
+            {
+                "name": "add",
+                "description": "Give a user premium.",
+                "category": "Owner",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "remove",
+                "description": "Revokes a user premium.",
+                "category": "Owner",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "volume",
+        "description": "",
+        "category": "Music",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "volume",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "userinfo",
+        "description": "Get info about a user.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "selfpurge",
+        "description": "Clears your own messages.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "amount",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "group_name": "server",
+        "description": "get information about the server.",
+        "category": "Information",
+        "subcommands": [
+            {
+                "name": "icon",
+                "description": "get the server's icon.",
+                "category": "Information",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "banner",
+                "description": "Get the server's banner.",
+                "category": "Information",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "bible",
+        "description": "",
+        "category": "Fun",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "push",
+        "description": "Push to the github repo.",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "group_name": "autorole",
+        "description": "Enable / disable autorole in your guild.",
+        "category": "Server",
+        "subcommands": [
+            {
+                "name": "enable",
+                "description": "Set an autorole in your guild.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "role",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "disable",
+                "description": "Disable autorole in your guild.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "role",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "weather",
+        "description": "Get weather from a certain location.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "location",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "group_name": "autoresponder",
+        "description": "Configure autoresponders for your guild.",
+        "category": "Server",
+        "subcommands": [
+            {
+                "name": "add",
+                "description": "Setup an autoresponder",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "input",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "remove",
+                "description": "Removes an autoresponder.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "trigger",
+                        "optional": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "name": "boosters",
+        "description": "Check the guild's boosters.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "gi",
+        "description": "",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "identifier",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "leaveguild",
+        "description": "Force the bot to leave a guild by its ID.",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "guild_id",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "gif",
+        "description": "Turns an image into a gif.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "roblox",
+        "description": "Get information about a roblox user.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "username",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "enablecommand",
+        "description": "Enable a command.",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "command",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "group_name": "voice",
+        "description": "Voicechannel settings.",
+        "category": "VoiceMaster",
+        "subcommands": [
+            {
+                "name": "unlock",
+                "description": "Unlocks your voicechannel.",
+                "category": "VoiceMaster",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "lock",
+                "description": "Locks your voicechannel.",
+                "category": "VoiceMaster",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "hug",
+        "description": "Hugs a user.",
+        "category": "Roleplay",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "chatgpt",
+        "description": "Ask chatgpt a question.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "prompt",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "loop",
+        "description": "",
+        "category": "Music",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "group_name": "jishaku",
+        "description": "",
+        "category": "Jishaku",
+        "subcommands": [
+            {
+                "name": "shell",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "argument",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "hide",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "cancel",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "index",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "node",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "argument",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "curl",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "url",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "sync",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "targets",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "debug",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "command_string",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "py_inspect",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "argument",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "shutdown",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "voice",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "git",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "argument",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "override",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "overrides",
+                        "optional": false
+                    },
+                    {
+                        "name": "command_string",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "source",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "command_name",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "permtrace",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": false
+                    },
+                    {
+                        "name": "targets",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "show",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "invite",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "perms",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "retain",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "toggle",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "dis",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "argument",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "load",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "extensions",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "tasks",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "pip",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "argument",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "cat",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "argument",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "ast",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "argument",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "repeat",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "times",
+                        "optional": false
+                    },
+                    {
+                        "name": "command_string",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "unload",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "extensions",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "rtt",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "py",
+                "description": "",
+                "category": "Jishaku",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "argument",
+                        "optional": false
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "group_name": "welcome",
+        "description": "Toggle the welcome module.",
+        "category": "Server",
+        "subcommands": [
+            {
+                "name": "channel",
+                "description": "Set a welcome channel for the guild.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "message",
+                "description": "Set a welcome message for the guild.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "message",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "remove",
+                "description": "Delete a welcome message from a channel.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "test",
+                "description": "Test your set welcome message.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "firstmsg",
+        "description": "Get the first message in the channel.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "play",
+        "description": "",
+        "category": "Music",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "query",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "botclear",
+        "description": "Clears messages sent by bots in the channel.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "amount",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "instagram",
+        "description": "Get information about an instagram user.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "username",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "group_name": "vape",
+        "description": "Vape commands.",
+        "category": "Fun",
+        "subcommands": [
+            {
+                "name": "flavors",
+                "description": "See a list of vape flavors.",
+                "category": "Fun",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "flavor",
+                "description": "Set your vape flavor",
+                "category": "Fun",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "flavor",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "hit",
+                "description": "Hit your vape.",
+                "category": "Fun",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "unban",
+        "description": "Unbans a user.",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "commandcount",
+        "description": "Gets the command count of the bot.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "say",
+        "description": "Make the bot repeat the text",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "msg",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "joinposition",
+        "description": "Get your joinposition.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "kiss",
+        "description": "Kisses a user.",
+        "category": "Roleplay",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "group_name": "invoke",
+        "description": "Change punishment messages for command responses",
+        "category": "Server",
+        "subcommands": [
+            {
+                "name": "unmute",
+                "description": "Change the unmute invoke message. ",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "message",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "mute",
+                "description": "Change the mute invoke message.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "message",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "kick",
+                "description": "Change the kick invoke message",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "message",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "unban",
+                "description": "Change the unban command response.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "message",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "ban",
+                "description": "Change the ban command response.",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "message",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "group_name": "boosterrole",
+        "description": "Configure boosterroles in your guild.",
+        "category": "Boosterrole",
+        "subcommands": [
+            {
+                "name": "disable",
+                "description": "Disable the booster role module in your guild.",
+                "category": "Boosterrole",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "create",
+                "description": "Create your booster role.",
+                "category": "Boosterrole",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "name",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "name",
+                "description": "Rename your boosterrole.",
+                "category": "Boosterrole",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "name",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "base",
+                "description": "Set the base for the booster role.",
+                "category": "Boosterrole",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "role",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "delete",
+                "description": "Delete your booster role.",
+                "category": "Boosterrole",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "icon",
+                "description": "Set your booster role icon.",
+                "category": "Boosterrole",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "icon",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "colour",
+                "description": "Set your booster role's color.",
+                "category": "Boosterrole",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "color",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "setup",
+                "description": "Enable the booster role module in your guild.",
+                "category": "Boosterrole",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "blacklist",
+        "description": "Blacklist a user.",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "name": "exportcommands",
+        "description": "",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "poll",
+        "description": "Create a poll.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "question",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "unblacklist",
+        "description": "Unblacklist a user.",
+        "category": "Owner",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "group_name": "filter",
+        "description": "Configure filtering settings for your server.",
+        "category": "Moderation",
+        "subcommands": [
+            {
+                "name": "invites",
+                "description": "Filter discord server invites.",
+                "category": "Moderation",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "group_name": "timezone",
+        "description": "View your current time or somebody elses.",
+        "category": "Utility",
+        "subcommands": [
+            {
+                "name": "view",
+                "description": "View yours or somebody elses timezone.",
+                "category": "Utility",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "user",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "set",
+                "description": "Set your timezone.",
+                "category": "Utility",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "timezone",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "group_name": "vanityroles",
+        "description": "Give roles based on a users status",
+        "category": "Vanityroles",
+        "subcommands": [
+            {
+                "name": "text",
+                "description": "Set the text you want the bot to look for.",
+                "category": "Vanityroles",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "text",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "disable",
+                "description": "Disable the vanity role awards.",
+                "category": "Vanityroles",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "channel",
+                "description": "Set the channel to send award logs.",
+                "category": "Vanityroles",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "role",
+                "description": "Set the role to award members.",
+                "category": "Vanityroles",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "role",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "test",
+                "description": "Test the vanityrole system.",
+                "category": "Vanityroles",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "group_name": "prefix",
+        "description": "View guild prefix",
+        "category": "Server",
+        "subcommands": [
+            {
+                "name": "set",
+                "description": "Set command prefix for server",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "prefix",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "remove",
+                "description": "Remove command prefix for server",
+                "category": "Server",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            }
+        ]
+    },
+    {
+        "name": "pin",
+        "description": "Pins the message you reply to.",
+        "category": "Moderation",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "link",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "banner",
+        "description": "Get the banner of a user.",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "slap",
+        "description": "Slaps a user.",
+        "category": "Roleplay",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "nowplaying",
+        "description": "",
+        "category": "LastFM",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "snipe",
+        "description": "",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "index",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "uptime",
+        "description": "",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "bans",
+        "description": "",
+        "category": "Information",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": []
+    },
+    {
+        "name": "shoot",
+        "description": "Shoots a user.",
+        "category": "Roleplay",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "user",
+                "optional": true
+            }
+        ]
+    },
+    {
+        "name": "image",
+        "description": "Search for an image.",
+        "category": "Utility",
+        "permissions": [
+            "N/A"
+        ],
+        "parameters": [
+            {
+                "name": "query",
+                "optional": false
+            }
+        ]
+    },
+    {
+        "group_name": "logs",
+        "description": "Configure logs for your server.",
+        "category": "Logs",
+        "subcommands": [
+            {
+                "name": "message",
+                "description": "Setup message logs",
+                "category": "Logs",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "leave",
+                "description": "Setup leave logs",
+                "category": "Logs",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": false
+                    }
+                ]
+            },
+            {
+                "name": "joins",
+                "description": "Setup join logs.",
+                "category": "Logs",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": true
+                    }
+                ]
+            },
+            {
+                "name": "list",
+                "description": "List all logging settings and their current status.",
+                "category": "Logs",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": []
+            },
+            {
+                "name": "voice",
+                "description": "Setup voice logs",
+                "category": "Logs",
+                "permissions": [
+                    "N/A"
+                ],
+                "parameters": [
+                    {
+                        "name": "channel",
+                        "optional": true
+                    }
+                ]
+            }
+        ]
+    }
+]

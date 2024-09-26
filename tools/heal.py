@@ -55,6 +55,7 @@ class Heal(commands.AutoShardedBot):
             owner_ids=[187747524646404105, 1208472692337020999],
         )
 
+        self.uptime2 = time.time()
         self.message_cache = defaultdict(list)
         self.cache_expiry_seconds = 30
         self.add_check(self.disabled_command)

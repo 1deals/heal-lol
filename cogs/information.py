@@ -80,12 +80,13 @@ class Information(commands.Cog):
         """
         View the bot's latency
         """
-        start = time.time()
-        latency_ms = int(self.bot.latency * 1000)
-        message = await ctx.send(content="ping...")
-        finished = time.time() - start
-        edit_ms = round(finished * 1000, 1)
-        return await message.edit(content=f"... `{latency_ms}ms` (edit: `{edit_ms}ms`)")
+        #start = time.time()
+        #latency_ms = int(self.bot.latency * 1000)
+        #message = await ctx.send(content="ping...")
+        #finished = time.time() - start
+        #edit_ms = round(finished * 1000, 1)
+        #return await message.edit(content=f"... `{latency_ms}ms` (edit: `{edit_ms}ms`)")
+        return await ctx.reply(f"*...* `{round(self.bot.latency * 1000)}ms`")
 
     @hybrid_command(name="invite", aliases=["inv"], usage="invite")
     @discord.app_commands.allowed_installs(guilds=True, users=True)
@@ -582,8 +583,6 @@ class Information(commands.Cog):
         )
         embed.add_field(name="owner", value=f"{guild.owner.name} ({guild.owner.id})")
         features = ", ".join(guild.features)
-        if guild.features:
-            embed.add_field(name="features", value=f"```\n{features}\n```")
         embed.set_thumbnail(url=guild.icon.url if guild.icon else "https://none.none")
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.display_avatar.url)
         embed.set_footer(text=f"ID: {guild.id}")

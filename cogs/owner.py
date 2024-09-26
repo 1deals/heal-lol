@@ -3,7 +3,7 @@ import os
 import sys
 import aiohttp
 
-from discord import Message, Embed
+from discord import Message, Embed, File
 from discord.ext import commands
 from discord.ext.commands import Cog, command, hybrid_command, is_owner
 from typing import Union
@@ -16,6 +16,7 @@ import config
 import subprocess
 import asyncio
 import requests
+import json
 
 from tools.heal import Heal
 from tools.managers.context import Context, Emojis, Colors
@@ -425,11 +426,61 @@ class Owner(Cog):
             users = sum([g.member_count for g in guilds])
             embed.add_field(
                 name=f"Shard {shard}",
-                value=f"**ping**: {round(self.bot.shards.get(shard).latency * 1000)}ms\n**guilds**: {len(guilds)}\n**users**: {users:,}",
+                value=f"**ping**: {round(self.bot.shards.get(shard).latency * 1000)}ms\n**guilds**: {len(guilds)}\n**users**: {users:,} \n**uptime:** {self.bot.uptime}",
                 inline=False,
             )
 
         await ctx.send(embed=embed)
+
+    @command(name="exportcommands", brief="Export command information to JSON")
+    async def exportcommands(self, ctx: Context):
+        """
+        Export command information, including group commands, to a JSON file.
+        """
+        commands_info = []
+
+        # Helper function to add command information
+        def get_command_info(command):
+            return {
+                "name": command.name,
+                "description": command.description or "",
+                "category": command.cog_name or "Uncategorized",
+                "permissions": ["N/A"],  # Placeholder for permissions
+                "parameters": [
+                    {
+                        "name": param.name,
+                        "optional": param.default != param.empty
+                    }
+                    for param in command.clean_params.values()
+                ]
+            }
+
+        # Iterate over all commands, including group commands
+        for command in self.bot.commands:
+            if isinstance(command, discord.ext.commands.Group):
+                # If it's a command group, export the group's commands too
+                group_info = {
+                    "group_name": command.name,
+                    "description": command.description or "",
+                    "category": command.cog_name or "Uncategorized",
+                    "subcommands": []
+                }
+                for subcommand in command.commands:  # Loop through subcommands
+                    subcommand_info = get_command_info(subcommand)
+                    group_info["subcommands"].append(subcommand_info)
+
+                commands_info.append(group_info)
+            else:
+                # Regular commands
+                command_info = get_command_info(command)
+                commands_info.append(command_info)
+
+        # Write to a JSON file
+        with open("commands.json", "w") as f:
+            json.dump(commands_info, f, indent=4)
+
+        # Send the file
+        await ctx.send(file=File("commands.json"))
 
 
 async def setup(bot: Heal) -> None:
