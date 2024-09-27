@@ -4,6 +4,7 @@ import sys
 import time
 import random
 from random import choice
+from psutil import Process
 
 from tools.managers.context import Context
 from discord.ext.commands import (
@@ -45,6 +46,18 @@ class Information(commands.Cog):
     def __init__(self, bot: Heal) -> None:
         self.bot = bot
         self.vc_start_times = {}
+        self.process = Process()
+
+    def format_size(self, bytes):
+        """Convert bytes to a human-readable format."""
+        if bytes >= 1024 ** 3:  # GB
+            return f"{bytes / (1024 ** 3):.2f} GB"
+        elif bytes >= 1024 ** 2:  # MB
+            return f"{bytes / (1024 ** 2):.2f} MB"
+        elif bytes >= 1024:  # KB
+            return f"{bytes / 1024:.2f} KB"
+        else:  # Bytes
+            return f"{bytes} Bytes"
 
     @hybrid_command(
         name="botinfo",
@@ -56,14 +69,16 @@ class Information(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def botinfo(self, ctx: Context):
         description = f"{self.bot.user.name} is serving **{len(self.bot.guilds): ,}** guilds with **{len(self.bot.users): ,}** users."
-        if ctx.guild:
-            description += f"This server is on shard **{ctx.guild.shard_id} out of {self.bot.shard_count}**"
         embed = discord.Embed(
             description=description
         )
         embed.add_field(
             name="Statistics",
-            value=f"Commands: **{len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}** \nUptime: **{self.bot.uptime}** \nLatency: **{round(self.bot.latency * 1000)}ms** \nLines: **{self.bot.linecount: ,}**",
+            value=f"> Commands: **{len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}** \n> Uptime: **{self.bot.uptime}** \n> Latency: **{round(self.bot.latency * 1000)}ms**",
+        )
+        embed.add_field(
+            name = "Usage",
+            value = f"> Memory: **{self.format_size(self.process.memory_info().rss)}** \n> Virtual Mem: **{self.format_size(self.process.memory_info().vms)}** \n> CPU: **{self.process.cpu_percent()}%** \n> Lines: **{self.bot.linecount: ,}**"
         )
         embed.set_author(name=f"{ctx.author.name}", icon_url=f"{ctx.author.avatar.url}")
         embed.set_thumbnail(url=self.bot.user.avatar.url)
