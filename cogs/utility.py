@@ -889,6 +889,40 @@ class Utility(commands.Cog):
         else:
             return await ctx.neutral(f"{ctx.author.mention}: {user.mention}'s local time is **{formatted_time}**.")
 
+    @hybrid_command(
+        name = "urban",
+        description = "Lookup a meaning of a word on urban dictionary."
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def urban(self, ctx: Context, *, word: str):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"http://api.urbandictionary.com/v0/define?term={word}") as response:
+                if response.status == 200:
+                    data = await response.json()
+                    definitions = data.get("list", [])
+                    embeds = []
+
+                    for definition in definitions:
+                        embed = discord.Embed(
+                            title=f"{word}",
+                            description=definition.get("definition", "No definition found."),
+                            color=Colors.BASE_COLOR
+                        )
+                        embed.add_field(
+                            name="Example",
+                            value=definition.get("example", "No example found."),
+                            inline=False
+                        )
+                        embed.set_footer(text=f"👍 {definition.get('thumbs_up', 0)} | 👎 {definition.get('thumbs_down', 0)}")
+                        embeds.append(embed)
+                    
+                    await ctx.paginate(embeds)
+                else:
+                    await ctx.warn("Failed to retrieve data from Urban Dictionary.")
+                        
+
 
 async def setup(bot: Heal):
     await bot.add_cog(Utility(bot))
