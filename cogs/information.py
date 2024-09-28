@@ -982,6 +982,25 @@ class Information(commands.Cog):
 
         await ctx.paginate(embeds)
 
+    @hybrid_command(
+        name = "inviteinfo",
+        aliases = ["ii"],
+        description = "View information about a server."
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def inviteinfo(self, ctx: Context, *, invite: discord.Invite = None):
+        if invite is None:
+            return await ctx.send_help(ctx.command)
+
+        embed = discord.Embed(title = f"Invite code: {invite.code}", description = f"{invite.guild.description}")
+        embed.add_field(name=f"Invite:", value = f"> **Channel:** {invite.channel.name} \n> **ID:** {invite.channel.id} \n> **Expires:** {f'yes ({self.bot.humanize_time(invite.expires_at.replace(tzinfo=None))})' if invite.expires_at else 'no'} \n> **Uses:** {invite.uses or 'None'}")
+        embed.add_field(name="Server:", value = f"> **Name:** {invite.guild.name} \n> **Members:** {invite.approximate_member_count: ,} \n> **Created:** {discord.utils.format_dt(invite.created_at, style='R') if invite.created_at else 'N/A'} \n> **Boosts:** {invite.guild.premium_subscription_count:,}")
+        embed.set_thumbnail(url= invite.guild.icon.url)
+        return await ctx.send(embed=embed)
+    
+
 
 async def setup(bot: Heal):
     await bot.add_cog(Information(bot))
