@@ -31,6 +31,7 @@ import os
 from discord.ui import View, Button
 import googletrans
 from googletrans import Translator, LANGUAGES
+import humanize
 
 
 def get_ordinal(number):
@@ -995,7 +996,7 @@ class Information(commands.Cog):
             return await ctx.send_help(ctx.command)
 
         embed = discord.Embed(title = f"Invite code: {invite.code}", description = f"{invite.guild.description}")
-        embed.add_field(name=f"Invite:", value = f"> **Channel:** {invite.channel.name} \n> **ID:** {invite.channel.id} \n> **Expires:** {f'yes ({self.bot.humanize_time(invite.expires_at.replace(tzinfo=None))})' if invite.expires_at else 'no'} \n> **Uses:** {invite.uses or 'None'}")
+        embed.add_field(name=f"Invite:", value = f"> **Channel:** {invite.channel.name} \n> **ID:** {invite.channel.id} \n> **Expires:** {f'yes ({(invite.expires_at.replace(tzinfo=None))})' if invite.expires_at else 'no'} \n> **Uses:** {invite.uses or 'None'}")
         embed.add_field(name="Server:", value = f"> **Name:** {invite.guild.name} \n> **Members:** {invite.approximate_member_count: ,} \n> **Created:** {discord.utils.format_dt(invite.created_at, style='R') if invite.created_at else 'N/A'} \n> **Boosts:** {invite.guild.premium_subscription_count:,}")
         embed.set_thumbnail(url= invite.guild.icon.url)
         return await ctx.send(embed=embed)
