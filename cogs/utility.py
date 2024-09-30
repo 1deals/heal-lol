@@ -247,7 +247,7 @@ class Utility(commands.Cog):
         return await ctx.approve(f"You're now **AFK**: **{status}**")
 
     TIKTOK_URL_PATTERN = re.compile(
-        r"(https?://)?(www\.)?(vm\.tiktok\.com|t\.tiktok\.com|www\.tiktok\.com/@[A-Za-z0-9_.-]+/video|www\.tiktok\.com/t)/[A-Za-z0-9_/]+"
+        r"\<?((?:https?://(?:vt|vm|www)\.tiktok\.com/(?:t/)?[a-zA-Z\d]+\/?|https?://(?:www\.)?tiktok\.com/[@\w.]+/video/\d+))(?:\/\?.*\>?)?\>?"
     )
 
     @commands.Cog.listener()
