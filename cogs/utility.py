@@ -921,7 +921,40 @@ class Utility(commands.Cog):
                     await ctx.paginate(embeds)
                 else:
                     await ctx.warn("Failed to retrieve data from Urban Dictionary.")
-                        
+    
+    @command(
+        name = "ocr",
+        description = "Get plain text from an image."
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def ocr(self, ctx: Context, *, image: str = None):
+        if ctx.message.attachments:
+            image_url = ctx.message.attachments[0].url
+        elif image:
+            image_url = image
+        else:
+            return await ctx.warn("Please provide an image URL or upload an image.")
+
+        url = "https://api.fulcrum.lol/ocr"
+        params = {
+            "url": image_url
+            }
+        headers = {
+            "Authorization": api.luma
+            } 
+
+        await ctx.typing()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, headers=headers) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    text = data.get("text")
+                    return await ctx.send(f"{text}")
+
+
+        
 
 
 async def setup(bot: Heal):
