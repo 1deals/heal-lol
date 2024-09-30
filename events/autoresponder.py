@@ -21,7 +21,9 @@ class autoresponder(Cog):
 
     @commands.Cog.listener()
     @ratelimit(key="{message.author}", limit=3, duration=10, retry=False)
-    async def on_message(self, message: discord.Message, flag: ScriptFlags = None) -> Message:
+    async def on_message(
+        self, message: discord.Message, flag: ScriptFlags = None
+    ) -> Message:
         if message.author.bot or not message.guild:
             return
 
@@ -33,21 +35,23 @@ class autoresponder(Cog):
             trigger = entry["trigger"]
             response = entry["response"]
             strict = entry["strict"]
-            
-            processed_message = EmbedBuilder.embed_replacement(
-                message.author, response
-            )
+
+            processed_message = EmbedBuilder.embed_replacement(message.author, response)
             content, embed, view = await EmbedBuilder.to_object(processed_message)
-            
+
             if strict and message.content.lower().startswith(trigger.lower()):
                 if content or embed:
-                    return await message.channel.send(content=content, embed=embed, view=view)
+                    return await message.channel.send(
+                        content=content, embed=embed, view=view
+                    )
                 else:
                     return await message.channel.send(content=processed_message)
 
             if not strict and trigger.lower() in message.content.lower():
                 if content or embed:
-                    return await message.channel.send(content=content, embed=embed, view=view)
+                    return await message.channel.send(
+                        content=content, embed=embed, view=view
+                    )
                 else:
                     return await message.channel.send(content=processed_message)
 

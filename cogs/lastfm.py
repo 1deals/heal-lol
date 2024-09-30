@@ -97,7 +97,9 @@ class LastFM(Cog):
         headers = {"api-key": APIKEY}
 
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user={lastfm_username}&api_key={api.lastfm}&format=json") as response:
+            async with session.get(
+                f"http://ws.audioscrobbler.com/2.0/?method=user.getinfo&user={lastfm_username}&api_key={api.lastfm}&format=json"
+            ) as response:
                 if response.status == 200:
                     data = await response.json()
                     playcount = data["user"]["playcount"]
@@ -112,9 +114,15 @@ class LastFM(Cog):
                     album_art = data["tracks"][0]["image"]
                     album_name = data["tracks"][0]["album"]
 
-            embed = discord.Embed(color=Colors.BASE_COLOR, description = f"**[{track}]({url})**")
-            embed.add_field(name="", value=f"**{artist}** | *{album_name}*", inline=False)
-            embed.set_author(name=f"Now playing - {lastfm_username}", icon_url= user.avatar.url)
+            embed = discord.Embed(
+                color=Colors.BASE_COLOR, description=f"**[{track}]({url})**"
+            )
+            embed.add_field(
+                name="", value=f"**{artist}** | *{album_name}*", inline=False
+            )
+            embed.set_author(
+                name=f"Now playing - {lastfm_username}", icon_url=user.avatar.url
+            )
             if album_art:
                 embed.set_thumbnail(url=album_art)
 

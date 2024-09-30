@@ -825,10 +825,10 @@ class Utility(commands.Cog):
         await ctx.message.add_reaction(f"<:approve:1276192812127359081>")
 
     @hybrid_group(
-        name = "timezone",
-        aliases = ["tz"],
-        description = "View your current time or somebody elses.",
-        invoke_without_command = True
+        name="timezone",
+        aliases=["tz"],
+        description="View your current time or somebody elses.",
+        invoke_without_command=True,
     )
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
@@ -836,69 +836,87 @@ class Utility(commands.Cog):
     async def timezone(self, ctx: Context, *, user: discord.Member = None):
         if user is None:
             user = ctx.author
-        user_data = await self.bot.pool.fetchrow("SELECT timezone FROM timezones WHERE user_id = $1", user.id)
+        user_data = await self.bot.pool.fetchrow(
+            "SELECT timezone FROM timezones WHERE user_id = $1", user.id
+        )
         if user_data is None:
-                return await ctx.warn(f"You have not set your timezone yet. Use `{ctx.prefix}timezone set <timezone>` to set it.")
-        timezone = user_data['timezone']
+            return await ctx.warn(
+                f"You have not set your timezone yet. Use `{ctx.prefix}timezone set <timezone>` to set it."
+            )
+        timezone = user_data["timezone"]
         tz = pytz.timezone(timezone)
         current_time = datetime.datetime.now(tz)
-        formatted_time = current_time.strftime('%I:%M %p')
+        formatted_time = current_time.strftime("%I:%M %p")
 
         if user is ctx.author:
-            return await ctx.neutral(f"{ctx.author.mention}: Your local time is: **{formatted_time}**. ")
+            return await ctx.neutral(
+                f"{ctx.author.mention}: Your local time is: **{formatted_time}**. "
+            )
         else:
-            return await ctx.neutral(f"{ctx.author.mention}: {user.mention}'s local time is **{formatted_time}**.")
-                
-        
-    @timezone.command(
-        name = "set",
-        description = "Set your timezone."
-    )
+            return await ctx.neutral(
+                f"{ctx.author.mention}: {user.mention}'s local time is **{formatted_time}**."
+            )
+
+    @timezone.command(name="set", description="Set your timezone.")
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def timezone_set(self, ctx: Context, *, timezone: str = None):
         if timezone not in TIMEZONE_MAPPING:
-            return await ctx.warn(f"The **timezone** `{timezone}` is not a valid timezone.")
+            return await ctx.warn(
+                f"The **timezone** `{timezone}` is not a valid timezone."
+            )
         if timezone in TIMEZONE_MAPPING:
             timezone = TIMEZONE_MAPPING[timezone]
 
-        await self.bot.pool.execute("INSERT INTO timezones (user_id, timezone) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET timezone = $2", ctx.author.id, timezone)
+        await self.bot.pool.execute(
+            "INSERT INTO timezones (user_id, timezone) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET timezone = $2",
+            ctx.author.id,
+            timezone,
+        )
         return await ctx.approve(f"Set your timezone to `{timezone}`.")
 
-    @timezone.command(
-        name = "view",
-        description = "View yours or somebody elses timezone."
-    )
+    @timezone.command(name="view", description="View yours or somebody elses timezone.")
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def timezone_view(self, ctx: Context, *, user: Union[discord.Member, discord.User] = None):
+    async def timezone_view(
+        self, ctx: Context, *, user: Union[discord.Member, discord.User] = None
+    ):
         if user is None:
             user = ctx.author
-        user_data = await self.bot.pool.fetchrow("SELECT timezone FROM timezones WHERE user_id = $1", user.id)
+        user_data = await self.bot.pool.fetchrow(
+            "SELECT timezone FROM timezones WHERE user_id = $1", user.id
+        )
         if user_data is None:
-                return await ctx.warn(f"You have not set your timezone yet. Use `{ctx.prefix}timezone set <timezone>` to set it.")
-        timezone = user_data['timezone']
+            return await ctx.warn(
+                f"You have not set your timezone yet. Use `{ctx.prefix}timezone set <timezone>` to set it."
+            )
+        timezone = user_data["timezone"]
         tz = pytz.timezone(timezone)
         current_time = datetime.datetime.now(tz)
-        formatted_time = current_time.strftime('%I:%M %p')
+        formatted_time = current_time.strftime("%I:%M %p")
 
         if user is ctx.author:
-            return await ctx.neutral(f"{ctx.author.mention}: Your local time is: **{formatted_time}**. ")
+            return await ctx.neutral(
+                f"{ctx.author.mention}: Your local time is: **{formatted_time}**. "
+            )
         else:
-            return await ctx.neutral(f"{ctx.author.mention}: {user.mention}'s local time is **{formatted_time}**.")
+            return await ctx.neutral(
+                f"{ctx.author.mention}: {user.mention}'s local time is **{formatted_time}**."
+            )
 
     @hybrid_command(
-        name = "urban",
-        description = "Lookup a meaning of a word on urban dictionary."
+        name="urban", description="Lookup a meaning of a word on urban dictionary."
     )
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def urban(self, ctx: Context, *, word: str):
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"http://api.urbandictionary.com/v0/define?term={word}") as response:
+            async with session.get(
+                f"http://api.urbandictionary.com/v0/define?term={word}"
+            ) as response:
                 if response.status == 200:
                     data = await response.json()
                     definitions = data.get("list", [])
@@ -907,25 +925,26 @@ class Utility(commands.Cog):
                     for definition in definitions:
                         embed = discord.Embed(
                             title=f"{word}",
-                            description=definition.get("definition", "No definition found."),
-                            color=Colors.BASE_COLOR
+                            description=definition.get(
+                                "definition", "No definition found."
+                            ),
+                            color=Colors.BASE_COLOR,
                         )
                         embed.add_field(
                             name="Example",
                             value=definition.get("example", "No example found."),
-                            inline=False
+                            inline=False,
                         )
-                        embed.set_footer(text=f"👍 {definition.get('thumbs_up', 0)} | 👎 {definition.get('thumbs_down', 0)}")
+                        embed.set_footer(
+                            text=f"👍 {definition.get('thumbs_up', 0)} | 👎 {definition.get('thumbs_down', 0)}"
+                        )
                         embeds.append(embed)
-                    
+
                     await ctx.paginate(embeds)
                 else:
                     await ctx.warn("Failed to retrieve data from Urban Dictionary.")
-    
-    @command(
-        name = "ocr",
-        description = "Get plain text from an image."
-    )
+
+    @hybrid_command(name="ocr", description="Get plain text from an image.")
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -938,12 +957,8 @@ class Utility(commands.Cog):
             return await ctx.warn("Please provide an image URL or upload an image.")
 
         url = "https://api.fulcrum.lol/ocr"
-        params = {
-            "url": image_url
-            }
-        headers = {
-            "Authorization": api.luma
-            } 
+        params = {"url": image_url}
+        headers = {"Authorization": api.luma}
 
         await ctx.typing()
         async with aiohttp.ClientSession() as session:
@@ -953,8 +968,8 @@ class Utility(commands.Cog):
                     text = data.get("text")
                     return await ctx.send(f"{text}")
 
-
-        
+                if response.status == 422:
+                    return await ctx.warn(f"The api return a 422: {data.get('detail')}")
 
 
 async def setup(bot: Heal):

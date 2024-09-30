@@ -16,6 +16,7 @@ from tools.managers.cache import Cache
 from uwuipy import uwuipy
 from tools.managers.flags import ScriptFlags
 
+
 async def uwuthing(bot, text: str) -> str:
     uwu = uwuipy.Uwuipy()
     return uwu.uwuify(text)
@@ -351,9 +352,12 @@ class Server(Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def autoresponder(self, ctx: Context):
         return await ctx.send_help(ctx.command)
-    
+
     @autoresponder.command(
-        name="add", aliases=["set"], description="Setup an autoresponder", flag=ScriptFlags,
+        name="add",
+        aliases=["set"],
+        description="Setup an autoresponder",
+        flag=ScriptFlags,
     )
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -378,9 +382,11 @@ class Server(Cog):
                 trigger,
                 response,
                 randomid,
-                not flag.not_strict
+                not flag.not_strict,
             )
-        return await ctx.approve(f"I will respond to **{trigger}** with **{response}** (strict: {not ctx.flag.not_strict})")
+        return await ctx.approve(
+            f"I will respond to **{trigger}** with **{response}** (strict: {not ctx.flag.not_strict})"
+        )
 
     @autoresponder.command(
         name="remove", aliases=["delete"], description="Removes an autoresponder."

@@ -51,9 +51,9 @@ class Information(commands.Cog):
 
     def format_size(self, bytes):
         """Convert bytes to a human-readable format."""
-        if bytes >= 1024 ** 3:  # GB
+        if bytes >= 1024**3:  # GB
             return f"{bytes / (1024 ** 3):.2f} GB"
-        elif bytes >= 1024 ** 2:  # MB
+        elif bytes >= 1024**2:  # MB
             return f"{bytes / (1024 ** 2):.2f} MB"
         elif bytes >= 1024:  # KB
             return f"{bytes / 1024:.2f} KB"
@@ -70,16 +70,14 @@ class Information(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def botinfo(self, ctx: Context):
         description = f"{self.bot.user.name} is serving **{len(self.bot.guilds): ,}** guilds with **{len(self.bot.users): ,}** users."
-        embed = discord.Embed(
-            description=description
-        )
+        embed = discord.Embed(description=description)
         embed.add_field(
             name="Statistics",
             value=f"> Commands: **{len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}** \n> Uptime: **{self.bot.uptime}** \n> Latency: **{round(self.bot.latency * 1000)}ms**",
         )
         embed.add_field(
-            name = "Usage",
-            value = f"> Memory: **{self.format_size(self.process.memory_info().rss)}** \n> Virtual Mem: **{self.format_size(self.process.memory_info().vms)}** \n> CPU: **{self.process.cpu_percent()}%** \n> Lines: **{self.bot.linecount: ,}**"
+            name="Usage",
+            value=f"> Memory: **{self.format_size(self.process.memory_info().rss)}** \n> Virtual Mem: **{self.format_size(self.process.memory_info().vms)}** \n> CPU: **{self.process.cpu_percent()}%** \n> Lines: **{self.bot.linecount: ,}**",
         )
         embed.set_author(name=f"{ctx.author.name}", icon_url=f"{ctx.author.avatar.url}")
         embed.set_thumbnail(url=self.bot.user.avatar.url)
@@ -96,12 +94,12 @@ class Information(commands.Cog):
         """
         View the bot's latency
         """
-        #start = time.time()
-        #latency_ms = int(self.bot.latency * 1000)
-        #message = await ctx.send(content="ping...")
-        #finished = time.time() - start
-        #edit_ms = round(finished * 1000, 1)
-        #return await message.edit(content=f"... `{latency_ms}ms` (edit: `{edit_ms}ms`)")
+        # start = time.time()
+        # latency_ms = int(self.bot.latency * 1000)
+        # message = await ctx.send(content="ping...")
+        # finished = time.time() - start
+        # edit_ms = round(finished * 1000, 1)
+        # return await message.edit(content=f"... `{latency_ms}ms` (edit: `{edit_ms}ms`)")
         return await ctx.reply(f"*...* `{round(self.bot.latency * 1000)}ms`")
 
     @hybrid_command(name="invite", aliases=["inv"], usage="invite")
@@ -984,9 +982,9 @@ class Information(commands.Cog):
         await ctx.paginate(embeds)
 
     @hybrid_command(
-        name = "inviteinfo",
-        aliases = ["ii"],
-        description = "View information about a server."
+        name="inviteinfo",
+        aliases=["ii"],
+        description="View information about a server.",
     )
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
@@ -995,12 +993,20 @@ class Information(commands.Cog):
         if invite is None:
             return await ctx.send_help(ctx.command)
 
-        embed = discord.Embed(title = f"Invite code: {invite.code}", description = f"{invite.guild.description}")
-        embed.add_field(name=f"Invite:", value = f"> **Channel:** {invite.channel.name} \n> **ID:** {invite.channel.id} \n> **Expires:** {f'yes ({(invite.expires_at.replace(tzinfo=None))})' if invite.expires_at else 'no'} \n> **Uses:** {invite.uses or 'None'}")
-        embed.add_field(name="Server:", value = f"> **Name:** {invite.guild.name} \n> **Members:** {invite.approximate_member_count: ,} \n> **Created:** {discord.utils.format_dt(invite.created_at, style='R') if invite.created_at else 'N/A'} \n> **Boosts:** {invite.guild.premium_subscription_count:,}")
-        embed.set_thumbnail(url= invite.guild.icon.url)
+        embed = discord.Embed(
+            title=f"Invite code: {invite.code}",
+            description=f"{invite.guild.description}",
+        )
+        embed.add_field(
+            name=f"Invite:",
+            value=f"> **Channel:** {invite.channel.name} \n> **ID:** {invite.channel.id} \n> **Expires:** {f'yes ({(invite.expires_at.replace(tzinfo=None))})' if invite.expires_at else 'no'} \n> **Uses:** {invite.uses or 'None'}",
+        )
+        embed.add_field(
+            name="Server:",
+            value=f"> **Name:** {invite.guild.name} \n> **Members:** {invite.approximate_member_count: ,} \n> **Created:** {discord.utils.format_dt(invite.created_at, style='R') if invite.created_at else 'N/A'} \n> **Boosts:** {invite.guild.premium_subscription_count:,}",
+        )
+        embed.set_thumbnail(url=invite.guild.icon.url)
         return await ctx.send(embed=embed)
-    
 
 
 async def setup(bot: Heal):

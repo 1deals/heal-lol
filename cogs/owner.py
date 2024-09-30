@@ -447,12 +447,9 @@ class Owner(Cog):
                 "category": command.cog_name or "Uncategorized",
                 "permissions": ["N/A"],  # Placeholder for permissions
                 "parameters": [
-                    {
-                        "name": param.name,
-                        "optional": param.default != param.empty
-                    }
+                    {"name": param.name, "optional": param.default != param.empty}
                     for param in command.clean_params.values()
-                ]
+                ],
             }
 
         # Iterate over all commands, including group commands
@@ -463,7 +460,7 @@ class Owner(Cog):
                     "group_name": command.name,
                     "description": command.description or "",
                     "category": command.cog_name or "Uncategorized",
-                    "subcommands": []
+                    "subcommands": [],
                 }
                 for subcommand in command.commands:  # Loop through subcommands
                     subcommand_info = get_command_info(subcommand)
