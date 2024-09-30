@@ -784,6 +784,34 @@ class Server(Cog):
                 await ctx.channel.send(content=content, embed=embed, view=view)
             else:
                 await ctx.channel.send(content=processed_message)
+    
+    @invoke.command(name="softban", description="Change the softban command response.")
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(manage_guild=True)
+    async def invoke_softban(self, ctx: Context, *, message: str = None):
+        if message is None:
+            await self.bot.pool.execute(
+                "DELETE FROM invoke WHERE guild_id = $1 AND type = $2",
+                ctx.guild.id,
+                "softban",
+            )
+            return await ctx.approve(f"Reset the **invoke softban** message to default.")
+        else:
+            await self.bot.pool.execute(
+                "INSERT INTO invoke (guild_id, type, message) VALUES ($1, $2, $3) "
+                "ON CONFLICT (guild_id, type) DO UPDATE SET message = EXCLUDED.message",
+                ctx.guild.id,
+                "softban",
+                message,
+            )
+            processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+            await ctx.approve("Set the **invoke softban** message to:")
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
 
     @invoke.command(name="unban", description="Change the unban command response.")
     @commands.cooldown(1, 5, commands.BucketType.user)

@@ -178,7 +178,6 @@ class Moderation(commands.Cog):
     ):
 
         reason += f" | executed by {ctx.author}"
-        await ctx.typing()
 
         if isinstance(user, discord.Member):
             if user == ctx.guild.owner:
@@ -842,6 +841,60 @@ class Moderation(commands.Cog):
                     )
                     return await ctx.approve(f"Enabled the filter for invites.")
             return await ctx.warn("The automod rule was not found")
+
+    @command(
+        name = "softban",
+        aliases = ["sb"],
+        description = "Softbans a user."
+    )
+    @commands.cooldown(1, 5, BucketType.user)
+    @has_permissions(ban_members=True)
+    async def softban(
+        self,
+        ctx: Context,
+        user: Union[discord.Member, discord.User] = None,
+        *,
+        reason: str = f"softbanned",
+    ):
+        if user is None:
+            return await ctx.send_help(ctx.command)
+        reason += f" | executed by {ctx.author}"
+
+        if isinstance(user, discord.Member):
+            if user == ctx.guild.owner:
+                return await ctx.warn(f"You're unable to softban the **server owner**.")
+            if user == ctx.author:
+                return await ctx.warn(f"You're unable to softban **yourself**.")
+            if ctx.author.top_role.position <= user.top_role.position:
+                return await ctx.warn(
+                    f"You're unable to softban a user with a **higher role** than **yourself**."
+                )
+
+        await ctx.guild.ban(user, reason=reason, delete_message_days=7)
+        await ctx.guild.unban(user, reason = f"User was softbanned.")
+
+        data = await self.bot.pool.fetchrow(
+            "SELECT * FROM invoke WHERE guild_id = $1 AND type = $2",
+            ctx.guild.id,
+            "softban",
+        )
+
+        if data and data["message"]:
+            message = data["message"]
+            processed_message = EmbedBuilder.embed_replacement(user, message)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+            if content or embed:
+                await ctx.channel.send(content=content, embed=embed, view=view)
+            else:
+                await ctx.channel.send(content=processed_message)
+
+        if data is None:
+            await ctx.approve(
+                f'Successfully softbanned {user.mention} for {reason.split(" |")[0]}'
+            )
+
+        await send_modlog(self.bot, "softban", ctx.author, user, reason)
 
 
 class Confirm(discord.ui.View):
