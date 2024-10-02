@@ -784,7 +784,7 @@ class Server(Cog):
                 await ctx.channel.send(content=content, embed=embed, view=view)
             else:
                 await ctx.channel.send(content=processed_message)
-    
+
     @invoke.command(name="softban", description="Change the softban command response.")
     @commands.cooldown(1, 5, commands.BucketType.user)
     @commands.has_permissions(manage_guild=True)
@@ -795,7 +795,9 @@ class Server(Cog):
                 ctx.guild.id,
                 "softban",
             )
-            return await ctx.approve(f"Reset the **invoke softban** message to default.")
+            return await ctx.approve(
+                f"Reset the **invoke softban** message to default."
+            )
         else:
             await self.bot.pool.execute(
                 "INSERT INTO invoke (guild_id, type, message) VALUES ($1, $2, $3) "

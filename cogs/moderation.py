@@ -24,6 +24,7 @@ import typing
 import json
 from humanfriendly import format_timespan
 import os
+import emoji
 
 
 async def send_modlog(
@@ -399,18 +400,136 @@ class Moderation(commands.Cog):
             if check:
                 return await before.edit(nick=check["name"])
 
-    @commands.command(name="purge", description="Purge messages.")
+    @commands.group(
+        name="purge", description="Purge messages.", invoke_without_command=True
+    )
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def purge(self, ctx: Context, *, amount: int):
+    async def purge(self, ctx: Context, *, amount: int = 15):
         await ctx.message.delete()
-        await ctx.channel.purge(limit=amount)
+        await ctx.channel.purge(
+            limit=amount,
+            bulk=True,
+            check=lambda m: not m.pinned,
+            reason=f"Purged by {ctx.author.name}",
+        )
         await send_modlog(
             self.bot, "purge", ctx.author, vict=ctx.author, reason="purged"
         )
         purgemsg = await ctx.approve(f"**Successfully** purged {amount} messages.")
         await asyncio.sleep(2)
         await purgemsg.delete()
+
+    @purge.command(
+        name="user",
+        description="Purge messages sent by a certain user.",
+        aliases=["member"],
+    )
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def purge_user(self, ctx: Context, user: discord.Member, amount: int = 15):
+        await ctx.channel.purge(
+            limit=amount,
+            bulk=True,
+            reason=f"Purged by {ctx.author.name}",
+            check=lambda m: m.author == user and not m.pinned,
+        )
+        await send_modlog(
+            self.bot, "purged user", ctx.author, vict=ctx.author, reason="purged"
+        )
+        await ctx.message.add_reaction("👍")
+
+    @purge.command(name="bots", description="Purge messages sent by bots")
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def purge_bots(self, ctx: Context, amount: int = 15):
+        await ctx.channel.purge(
+            limit=amount,
+            bulk=True,
+            reason=f"Purged by {ctx.author.name}",
+            check=lambda m: m.author.bot and not m.pinned,
+        )
+        await ctx.message.add_reaction("👍")
+
+    @purge.command(name="links", description="Purges messages containing links.")
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def purge_links(self, ctx: Context, amount: int = 15):
+        def links(message: discord.Message):
+            match = re.search(
+                r"(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])",
+                message.content,
+            )
+
+            return message.embeds or match
+
+        await ctx.channel.purge(
+            limit=amount,
+            bulk=True,
+            reason=f"Purged by {ctx.author.name}",
+            check=links,
+        )
+        await ctx.message.add_reaction("👍")
+
+    @purge.command(
+        name="attachments",
+        description="Purge messages containing attachments.",
+        aliases=["images", "pictures", "files"],
+    )
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def purge_attachments(self, ctx: Context, amount: int = 15):
+        await ctx.channel.purge(
+            limit=amount,
+            bulk=True,
+            reason=f"Purged by {ctx.author.name}",
+            check=lambda m: m.attachments,
+        )
+        await ctx.message.add_reaction("👍")
+
+    @purge.command(
+        name="humans",
+        description="Purges messages sent by humans.",
+        aliases=["members"],
+    )
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def purge_humans(self, ctx: Context, amount: int = 15):
+        await ctx.channel.purge(
+            limit=amount,
+            bulk=True,
+            reason=f"Purged by {ctx.author.name}",
+            check=lambda m: not m.author.bot,
+        )
+        await ctx.message.add_reaction("👍")
+
+    @purge.command(
+        name="stickers",
+        description="Purges messages containing stickers",
+        aliases=["sticker"],
+    )
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def purge_stickers(self, ctx: Context, amount: int = 15):
+        await ctx.channel.purge(
+            limit=amount,
+            bulk=True,
+            reason=f"Purged by {ctx.author.name}",
+            check=lambda m: m.stickers,
+        )
+        await ctx.message.add_reaction("👍")
+
+    @purge.command(name="mentions", description="Purges messages containing mentions.")
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def purge_mentions(self, ctx: Context, amount: int = 15):
+        await ctx.channel.purge(
+            limit=amount,
+            bulk=True,
+            reason=f"Purged by {ctx.author.name}",
+            check=lambda m: m.mentions,
+        )
+        await ctx.message.add_reaction("👍")
 
     @group(
         name="role",
@@ -842,11 +961,7 @@ class Moderation(commands.Cog):
                     return await ctx.approve(f"Enabled the filter for invites.")
             return await ctx.warn("The automod rule was not found")
 
-    @command(
-        name = "softban",
-        aliases = ["sb"],
-        description = "Softbans a user."
-    )
+    @command(name="softban", aliases=["sb"], description="Softbans a user.")
     @commands.cooldown(1, 5, BucketType.user)
     @has_permissions(ban_members=True)
     async def softban(
@@ -871,7 +986,7 @@ class Moderation(commands.Cog):
                 )
 
         await ctx.guild.ban(user, reason=reason, delete_message_days=7)
-        await ctx.guild.unban(user, reason = f"User was softbanned.")
+        await ctx.guild.unban(user, reason=f"User was softbanned.")
 
         data = await self.bot.pool.fetchrow(
             "SELECT * FROM invoke WHERE guild_id = $1 AND type = $2",
