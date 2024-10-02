@@ -136,105 +136,40 @@ class Information(commands.Cog):
         else:
             user = user or ctx.author
 
-        APIKEY = api.heal
-        api_url = "http://localhost:1999/dominantcolor"
 
-        params = {"source": user.avatar.url}
-        headers = {"api-key": APIKEY}
+        description = ""
+        title = f"{user.name}"
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(api_url, params=params, headers=headers) as response:
-                if response.status == 200:
-                    data = await response.json()
+        if user.desktop_status == discord.Status.online:
+            title += " <:status_computer_online:1291119653095080058>"
+        if user.desktop_status == discord.Status.idle:
+            title += " <:status_computer_idle:1291124408034922587>"
+        if user.desktop_status == discord.Status.dnd:
+            title += " <:status_computer_dnd:1291124598271774723>"
+        if user.mobile_status == discord.Status.online:
+            title += " <:status_phone_online:1291120307863687249>"
+        if user.mobile_status == discord.Status.idle:
+            title += " <:status_phone_idle:1291124866858090548>"
+        if user.mobile_status == discord.Status.dnd:
+            title += " <:status_phone_dnd:1291124989495607407>"
+        if user.web_status == discord.Status.online:
+            title += " <:status_web_online:1291120457872838700>"
+        if user.web_status == discord.Status.dnd:
+            title += " <:status_web_dnd:1291125457412165755>"
+        if user.web_status == discord.Status.idle:
+            title += " <:status_web_idle:1291125639235113111>"
+        if user.status == discord.Status.invisible:
+            title += " <:status_z_offline_invisible:1291125818118115330>"
 
-                    color = data.get("color")
+        if user.premium_since is not None:
+            title += " <:boosterbadge:1253988282455556146> "
+
+        if user.id == 1083131355984044082:
+            title += " <:6_ss3:1291127800538988604>"
 
         data = await self.bot.pool.fetchrow(
             "SELECT * FROM lastfm WHERE user_id = $1", user.id
         )
-
-        title = f"{user.name}"
-        description = ""
-
-        if isinstance(user, discord.Member):
-            if user.voice:
-                deaf = (
-                    "<:deafend:1281696524098736159>"
-                    if user.voice.self_deaf or user.voice.deaf
-                    else "<:undeafend:1281696645356196023>"
-                )
-                mute = (
-                    "<:mute:1281696050142384270>"
-                    if user.voice.self_mute or user.voice.mute
-                    else "<:unmute:1281696136134131823>"
-                )
-                channel = user.voice.channel
-                description += (
-                    f"> {deaf} {mute} **In a voicechannel:** {channel.mention} \n"
-                )
-
-        if user.id == 187747524646404105:  # me
-            title += " <:owner:1277914467270922320> <:staff:1277914880808063007> <:dev:1277915125482786816> "
-        if user.id == 392300135323009024:  # xur
-            title += " <:staff:1277914880808063007> <:dev:1277915125482786816>"
-        if user.id == 461914901624127489:  # logan
-            title += " <:zzmilklove2:1270873236841693267> <:staff:1277914880808063007> <:dev:1277915125482786816>"
-        if user.id == 1261756025275547719:  # neca
-            title += " <:staff:1277914880808063007>"
-        if user.id == 809975522867412994:  # blahja
-            title += " <:staff:1277914880808063007> <:Boykisser:1278453222754877503>"
-        if user.id == 1250382435632418816:  # lina
-            title += (
-                " <:staff:1277914880808063007> <:mlp_fatflutter:1278453716818854021>"
-            )
-        if user.id == 1035497951591673917:  # qilla
-            title += (
-                " <:staff:1277914880808063007> <a:menacemonkey:1271184769836912680>"
-            )
-        if user.id == 1140301345711206510:  # qilla
-            title += (
-                " <:staff:1277914880808063007> <a:menacemonkey:1271184769836912680>"
-            )
-
-        prem = await self.bot.pool.fetchval(
-            "SELECT * FROM premium WHERE user_id = $1", user.id
-        )
-        if prem:
-            title += " <:earlysupporter:1278698352736997428>"
-
-        embed = discord.Embed(title=title, color=color)
-
-        embed.add_field(
-            name="Created", value=format_dt(user.created_at, style="f"), inline=True
-        )
-
-        if isinstance(user, discord.Member) and user.joined_at:
-            all_members = sorted(ctx.guild.members, key=lambda m: m.joined_at)
-            position = all_members.index(user) + 1
-
-            if len(user.roles) > 5:
-                roles_list = (
-                    ", ".join(
-                        [role.mention for role in list(reversed(user.roles[1:]))[:5]]
-                    )
-                    + f" + {len(user.roles) - 5} more"
-                )
-            else:
-                roles_list = ", ".join(
-                    [role.mention for role in list(reversed(user.roles[1:]))[:5]]
-                    + ["@everyone"]
-                )
-
-            join_position_ordinal = get_ordinal(position)
-            embed.add_field(
-                name=f"Joined {join_position_ordinal}",
-                value=f"{format_dt(user.joined_at, style='f')}",
-                inline=True,
-            )
-            embed.add_field(name="Roles", value=roles_list, inline=False)
-
-        embed.set_thumbnail(url=user.avatar.url)
-
         if data:
             lastfm_username = data["lfuser"]
             async with aiohttp.ClientSession() as session:
@@ -260,8 +195,46 @@ class Information(commands.Cog):
                                 artist_name = track_info["artist"]["#text"]
                                 track_url = track_info["url"]
                                 description += f"> {Emojis.LASTFM} **Listening to [{track_name}]({track_url}) by {artist_name}**"
-                                embed.description = description
 
+        if not data:
+            if user.activities:
+                for activity in user.activities:
+                    if isinstance(activity, discord.Spotify):
+                        description += f"<:spotify:1291106261705818123> Listening to **[{activity.title}]({activity.track_url})** by **`{activity.artist}`**"
+
+        embed = discord.Embed(title=title, description=description)
+        if isinstance(user, discord.Member):
+            embed.add_field(
+                name="Joined:",
+                value=f"{discord.utils.format_dt(user.joined_at, style= 'f')}",
+                inline=True,
+            )
+            if user.premium_since is not None:
+                embed.add_field(
+                    name="Boosted:",
+                    value=f"{discord.utils.format_dt(user.premium_since, style='f')}",
+                    inline=True,
+                )
+        embed.add_field(
+            name="Created:",
+            value=f"{discord.utils.format_dt(user.created_at, style = 'f')}",
+            inline=True,
+        )
+        if isinstance(user, discord.Member):
+            if len(user.roles) > 5:
+                roles_list = (
+                    ", ".join(
+                        [role.mention for role in list(reversed(user.roles[1:]))[:5]]
+                    )
+                    + f" + {len(user.roles) - 5} more"
+                )
+            else:
+                roles_list = ", ".join(
+                    [role.mention for role in list(reversed(user.roles[1:]))[:5]]
+                )
+            embed.add_field(name="Roles", value=roles_list, inline=False)
+
+        embed.set_thumbnail(url=user.avatar.url)
         await ctx.send(embed=embed)
 
     @hybrid_command(

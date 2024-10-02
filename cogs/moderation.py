@@ -401,7 +401,7 @@ class Moderation(commands.Cog):
                 return await before.edit(nick=check["name"])
 
     @commands.group(
-        name="purge", description="Purge messages.", invoke_without_command=True
+        name="purge", description="Purge messages.", aliases = ["c"] ,invoke_without_command=True
     )
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
