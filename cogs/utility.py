@@ -11,6 +11,7 @@ from discord.ext.commands import (
     has_permissions,
     hybrid_command,
     hybrid_group,
+    BadArgument
 )
 from tools.configuration import Emojis, Colors
 from tools.paginator import Paginator
@@ -24,7 +25,7 @@ import humanize
 import datetime
 import requests
 import io, re
-from discord import Message
+from discord import Message, File
 import shazamio
 from shazamio import Shazam, Serialize
 from PIL import Image, ImageDraw, ImageFont
@@ -526,51 +527,21 @@ class Utility(commands.Cog):
                 else:
                     await ctx.send("Failed to retrieve the image.")
 
-    @hybrid_command(
-        name="screenshot", aliases=["ss"], description="Screenshot a website."
-    )
-    @commands.cooldown(1, 5, commands.BucketType.user)
+    @hybrid_command(name="screenshot", aliases=["ss"], description="Take a screenshot")
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
-    async def screenshot(self, ctx: Context, url: str, *, timeout: int = None):
-        APIKEY = api.heal
-        api_url = "http://localhost:1999/screenshot"
-
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def screenshot(self, ctx: Context, *, url: str = None):
+        if url is None:
+            return await ctx.warn(f"You need to add a url.")
         if not url.startswith(("http://", "https://")):
             url = "https://" + url
-
-        if timeout is None:
-            timeout = 1
-
-        params = {"url": url, "timeout": timeout}
-        headers = {"api-key": APIKEY}
-
         async with ctx.typing():
-
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    api_url, params=params, headers=headers
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json()
-
-                        screenshot_url = data.get("screenshot_url")
-
-                        async with session.get(screenshot_url) as image_response:
-                            if image_response.status == 200:
-                                image_data = await image_response.read()
-
-                                file = discord.File(
-                                    io.BytesIO(image_data), filename="screenshot.png"
-                                )
-
-                                await ctx.send(file=file)
-                            else:
-                                await ctx.deny(
-                                    "Failed to download screenshot image. Try again later."
-                                )
-                            if image_response.status == 403:
-                                return await ctx.warn(f"{data['detail']}")
+            try:
+                ss = await self.bot.screenshot(url)
+                return await ctx.send(file=ss)
+            except BadArgument:
+                return await ctx.warn("This website cannot be screenshotted")
 
     @command(
         aliases=["createembed", "ce", "script"],

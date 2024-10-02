@@ -28,7 +28,9 @@ from tools.managers.context import Context
 from tools.managers.lastfm import FMHandler
 from tools.configuration import Colors, Emojis
 from discord.ext import commands
-from discord import Message, Embed
+from discord import Message, Embed, File
+from pyppeteer import launch
+from nudenet import NudeDetector
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -41,6 +43,8 @@ class Heal(commands.AutoShardedBot):
         self.cache = Cache()
         self.errors = Dict[str, commands.CommandError]
         self._uptime = time.time()
+        self.proxy_password = "7sqgncj8hiz3"
+        self.proxy_username = "oxwlfyfl"
 
         super().__init__(
             command_prefix=";",
@@ -59,6 +63,7 @@ class Heal(commands.AutoShardedBot):
         self.message_cache = defaultdict(list)
         self.cache_expiry_seconds = 30
         self.add_check(self.disabled_command)
+        self.browser = None
 
     async def load_modules(self, directory: str) -> None:
         for module in glob.glob(f"{directory}/**/*.py", recursive=True):
@@ -383,3 +388,69 @@ class Heal(commands.AutoShardedBot):
             await ctx.warn(f"The command **{cmd.name}** is **disabled** in this guild")
 
         return check is None
+
+    async def screenshot(
+            self, url: str
+        ):
+        filename = f"{url.replace('https://', '').replace('/', '')}.png"
+        directory = "./screenshots/"
+        path = os.path.join(directory, filename)
+
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        if os.path.exists(path):
+            return File(path)
+
+        if not self.browser:
+            self.browser = await launch(
+                headless=True,
+                args=["--no-sandbox"],
+                defaultViewport={"width": 1980, "height": 1080},
+            )
+
+        page = await self.browser.newPage()
+        await page.authenticate(
+            credentials=[
+                {"username": self.proxy_username, "password": self.proxy_password}
+            ]
+        )
+        keywords = ["pussy", "tits", "porn", "cock", "dick"]
+        try:
+            p = await page.goto(url, load=True, timeout=5000)
+        except:
+            await page.close()
+            raise BadArgument("I'm unable to screenshot this page.")
+
+        if not p:
+            await page.close()
+            raise BadArgument("This page didn't send a response.")
+
+        if content_type := p.headers.get("content-type"):
+            if not any((i in content_type for i in ("text/html", "application/json"))):
+                await page.close()
+                raise BadArgument("This page contains content I cannot screenshot.")
+        content = await page.content()
+
+        if any(
+            re.search(r"\b{}\b".format(keyword), content, re.IGNORECASE)
+            for keyword in keywords
+        ):
+            await page.close()
+            raise BadArgument("This website contains explicit content.")
+
+        await page.screenshot(path=path)
+
+        filters = [
+            "BUTTOCKS_EXPOSED",
+            "FEMALE_BREAST_EXPOSED",
+            "ANUS_EXPOSED",
+            "FEMALE_GENITALIA_EXPOSED",
+            "MALE_GENITALIA_EXPOSED",
+        ]
+        detections = NudeDetector().detect(path)
+        if any([prediction["class"] in filters for prediction in detections]):
+            raise BadArgument("This website contains explicit content.")
+
+        await page.close()
+        return File(path)
