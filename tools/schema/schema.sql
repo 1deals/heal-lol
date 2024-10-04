@@ -256,3 +256,9 @@ CREATE TABLE IF NOT EXISTS timezones (
     user_id BIGINT PRIMARY KEY,
     timezone TEXT
 );
+
+CREATE TABLE IF NOT EXISTS joindm (
+    guild_id BIGINT NOT NULL, 
+    message TEXT NOT NULL,
+    PRIMARY KEY (guild_id)
+);
