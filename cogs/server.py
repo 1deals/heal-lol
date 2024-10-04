@@ -88,6 +88,85 @@ class Server(Cog):
     async def welcome(self, ctx: Context):
         return await ctx.send_help(ctx.command)
 
+    @welcome.command(
+            name = "dm", 
+            description = "Set the welcome dm message."
+    )
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def welcome_dm(self, ctx: Context, *, message: str= None):
+        if message is None:
+            return await ctx.send_help(ctx.command)
+
+        await self.bot.pool.execute(
+            """
+                INSERT INTO joindm (guild_id, message)
+                VALUES ($1,$2)
+                ON CONFLICT (guild_id)
+                DO UPDATE SET message = $2
+                """,
+            ctx.guild.id,
+            message,
+        )
+
+        processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+        content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+        await ctx.approve(f"Set the **welcome dm** message to:")
+        if content or embed:
+            await ctx.send(content=content, embed=embed, view=view)
+        else:
+            await ctx.send(content=processed_message)
+
+    @group(
+            name = "joindm",
+            description = "Configure joindm for your guild.",
+            invoke_without_command = True
+    )
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def joindm(self, ctx: Context, *, message: str= None):
+        if message is None:
+            return await ctx.send_help(ctx.command)
+
+        await self.bot.pool.execute(
+            """
+                INSERT INTO joindm (guild_id, message)
+                VALUES ($1,$2)
+                ON CONFLICT (guild_id)
+                DO UPDATE SET message = $2
+                """,
+            ctx.guild.id,
+            message,
+        )
+
+        processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
+        content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+        await ctx.approve(f"Set the **welcome dm** message to:")
+        if content or embed:
+            await ctx.send(content=content, embed=embed, view=view)
+        else:
+            await ctx.send(content=processed_message)
+    
+    @joindm.command(
+            name = "remove",
+            aliases = ["delete", "del"],
+            description= "Delete the joindm setup."
+    )
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def joindm_remove(self, ctx: Context):
+        data = await self.bot.pool.fetchrow(
+            "SELECT * FROM joindm WHERE guild_id = $1", ctx.guild.id
+        )
+        if data:
+            message = data["message"]
+            await self.bot.pool.execute(
+                "DELETE FROM joindm WHERE guild_id = $1", ctx.guild.id
+            )
+        return await ctx.approve("Disabled the **joindm** setup for this server.")
+
     @welcome.command(name="channel", description="Set a welcome channel for the guild.")
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -219,6 +298,19 @@ class Server(Cog):
                 await channel.send(content=content, embed=embed, view=view)
             else:
                 await channel.send(content=processed_message)
+        
+        res2 = await self.bot.pool.fetchrow(
+            "SELECT * FROM joindm WHERE guild_id = $1", member.guild.id
+        )
+        if res2:
+            message2 = res2["message"]
+            processed_message = EmbedBuilder.embed_replacement(member, message2)
+            content, embed, view = await EmbedBuilder.to_object(processed_message)
+
+            if content or embed:
+                await member.send(content=content, embed=embed, view=view)
+            else:
+                await member.send(content=processed_message)
 
         data = await self.bot.pool.fetch(
             "SELECT channel_id FROM joinping WHERE guild_id = $1", member.guild.id
