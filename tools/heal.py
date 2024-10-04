@@ -21,6 +21,8 @@ import pathlib
 from asyncpg import Pool
 from typing import Dict, Set
 from collections import defaultdict
+from loguru import logger
+from discord.ext.commands import BadArgument
 
 from tools.managers.help import HealHelp
 from tools.managers.cache import Cache
@@ -71,11 +73,11 @@ class Heal(commands.AutoShardedBot):
                 continue
             try:
                 await self.load_extension(module.replace("/", ".").replace(".py", ""))
-                log.info(f"Loaded module: {module}")
+                logger.info(f"Loaded module: {module}")
             except commands.ExtensionFailed:
-                log.warning(f"Extension failed to load: {module}")
+                logger.warning(f"Extension failed to load: {module}")
             except Exception as e:
-                log.error(f"Error loading module {module}: {e}")
+                logger.error(f"Error loading module {module}: {e}")
 
     async def load_patches(self) -> None:
         for module in glob.glob("tools/patches/**/*.py", recursive=True):
@@ -104,20 +106,20 @@ class Heal(commands.AutoShardedBot):
                 max_size=30,
                 min_size=10,
             )
-            log.info("Database connection established")
+            logger.info("Database connection established")
 
             with open("tools/schema/schema.sql", "r") as file:
                 schema = file.read()
                 if schema.strip():  # Check if schema is not empty
                     await pool.execute(schema)
-                    log.info("Database schema loaded")
+                    logger.info("Database schema loaded")
                 else:
                     log.warning("Database schema file is empty")
                 file.close()
 
             return pool
         except Exception as e:
-            log.error(f"Error loading database: {e}")
+            logger.error(f"Error loading database: {e}")
             raise e
 
     async def get_prefix(self, message: Message) -> tuple:
@@ -148,14 +150,14 @@ class Heal(commands.AutoShardedBot):
         return (self_prefix or guild_prefix, guild_prefix)
 
     async def on_ready(self) -> None:
-        log.info(
+        logger.info(
             f"Logged in as {self.user.name}#{self.user.discriminator} ({self.user.id})"
         )
-        log.info(f"Connected to {len(self.guilds)} guilds")
-        log.info(f"Connected to {len(self.users)} users")
+        logger.info(f"Connected to {len(self.guilds)} guilds")
+        logger.info(f"Connected to {len(self.users)} users")
 
         await self.cogs["Music"].start_nodes()
-        log.info("Lavalink Nodes Loaded.")
+        logger.info("Lavalink Nodes Loaded.")
 
     async def setup_hook(self) -> None:
         self.pool = await self._load_database()
@@ -454,3 +456,10 @@ class Heal(commands.AutoShardedBot):
 
         await page.close()
         return File(path)
+
+    async def on_command(
+            self: "Heal", ctx
+        ) -> None:
+        logger.info(
+            f"{ctx.author} ({ctx.author.id}) executed {ctx.command} in {ctx.guild} ({ctx.guild.id})."
+        )
