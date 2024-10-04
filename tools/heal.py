@@ -391,9 +391,7 @@ class Heal(commands.AutoShardedBot):
 
         return check is None
 
-    async def screenshot(
-            self, url: str
-        ):
+    async def screenshot(self, url: str):
         filename = f"{url.replace('https://', '').replace('/', '')}.png"
         directory = "./screenshots/"
         path = os.path.join(directory, filename)
@@ -457,9 +455,7 @@ class Heal(commands.AutoShardedBot):
         await page.close()
         return File(path)
 
-    async def on_command(
-            self: "Heal", ctx
-        ) -> None:
+    async def on_command(self: "Heal", ctx) -> None:
         logger.info(
             f"{ctx.author} ({ctx.author.id}) executed {ctx.command} in {ctx.guild} ({ctx.guild.id})."
         )

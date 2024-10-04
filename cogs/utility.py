@@ -11,7 +11,7 @@ from discord.ext.commands import (
     has_permissions,
     hybrid_command,
     hybrid_group,
-    BadArgument
+    BadArgument,
 )
 from tools.configuration import Emojis, Colors
 from tools.paginator import Paginator
@@ -943,15 +943,15 @@ class Utility(commands.Cog):
                     return await ctx.warn(f"The api return a 422: {data.get('detail')}")
 
     @hybrid_command(
-        name = "cashapp", description = "Get someones cashapp qr.", aliases = ["ca"]
+        name="cashapp", description="Get someones cashapp qr.", aliases=["ca"]
     )
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def cashapp(self, ctx: Context, *, cashapp: str= None):
+    async def cashapp(self, ctx: Context, *, cashapp: str = None):
         if cashapp is None:
             return await ctx.warn(f"You need to enter a cashapp user.")
-        
+
         url = "https://api.fulcrum.lol/cashapp"
         params = {"username": cashapp}
         headers = {"Authorization": api.luma}
@@ -964,10 +964,9 @@ class Utility(commands.Cog):
                     qr = data.get("qr_url")
                     url = data.get("url")
 
-                    embed = discord.Embed(title = f"{cashapp}", url = url)
+                    embed = discord.Embed(title=f"{cashapp}", url=url)
                     embed.set_image(url=qr)
                     return await ctx.reply(embed=embed)
-
 
 
 async def setup(bot: Heal):

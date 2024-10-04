@@ -88,13 +88,10 @@ class Server(Cog):
     async def welcome(self, ctx: Context):
         return await ctx.send_help(ctx.command)
 
-    @welcome.command(
-            name = "dm", 
-            description = "Set the welcome dm message."
-    )
+    @welcome.command(name="dm", description="Set the welcome dm message.")
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_dm(self, ctx: Context, *, message: str= None):
+    async def welcome_dm(self, ctx: Context, *, message: str = None):
         if message is None:
             return await ctx.send_help(ctx.command)
 
@@ -119,13 +116,13 @@ class Server(Cog):
             await ctx.send(content=processed_message)
 
     @group(
-            name = "joindm",
-            description = "Configure joindm for your guild.",
-            invoke_without_command = True
+        name="joindm",
+        description="Configure joindm for your guild.",
+        invoke_without_command=True,
     )
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def joindm(self, ctx: Context, *, message: str= None):
+    async def joindm(self, ctx: Context, *, message: str = None):
         if message is None:
             return await ctx.send_help(ctx.command)
 
@@ -148,11 +145,9 @@ class Server(Cog):
             await ctx.send(content=content, embed=embed, view=view)
         else:
             await ctx.send(content=processed_message)
-    
+
     @joindm.command(
-            name = "remove",
-            aliases = ["delete", "del"],
-            description= "Delete the joindm setup."
+        name="remove", aliases=["delete", "del"], description="Delete the joindm setup."
     )
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
@@ -298,7 +293,7 @@ class Server(Cog):
                 await channel.send(content=content, embed=embed, view=view)
             else:
                 await channel.send(content=processed_message)
-        
+
         res2 = await self.bot.pool.fetchrow(
             "SELECT * FROM joindm WHERE guild_id = $1", member.guild.id
         )

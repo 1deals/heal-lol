@@ -136,7 +136,6 @@ class Information(commands.Cog):
         else:
             user = user or ctx.author
 
-
         description = ""
         title = f"{user.name}"
 
