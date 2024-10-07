@@ -86,9 +86,9 @@ class Music(commands.Cog):
 
         await self.pomice.create_node(
             bot=self.bot,
-            host="lavalink-v4.huntools-bot.xyz",
+            host="lavalinkv3-id.serenetia.com",
             port=443,
-            password="youshallnotpass",
+            password="BatuManaBisa",
             secure= True,
             spotify_client_id="3f6b4c43339342bd83ac665b447da650",
             spotify_client_secret="b1d1c1a22289433186bb0941d02499d2",
