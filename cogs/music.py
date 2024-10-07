@@ -123,10 +123,8 @@ class Music(commands.Cog):
         if ctx.author.voice is None:
             return
 
-        if ctx.voice_client is None:
-            return
-        else:
-            await ctx.voice_client.disconnect()
+        await ctx.approve(f"Stopped the player.")
+        await ctx.voice_client.disconnect()
 
     @commands.hybrid_command(name="shuffle")
     async def shuffle(self, ctx: Context):
