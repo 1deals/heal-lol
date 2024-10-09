@@ -15,6 +15,18 @@ import string
 from tools.managers.cache import Cache
 from uwuipy import uwuipy
 from tools.managers.flags import ScriptFlags
+import google.generativeai as genai
+from tools.managers.ratelimit import ratelimit
+
+api_keys = [
+    "AIzaSyARqu0-ecLbA5gTpcCi8R8n8DQnM_y5SCc",
+    "AIzaSyD6kJ3BEfJ9MoyiqkGQqmKwCH41rSAI7OY",
+    "AIzaSyB5M5n1Y6FbzJn8ArixxWBCfwBRMkJReNw",
+]
+key = random.choice(api_keys)
+genai.configure(api_key=key)
+
+model = genai.GenerativeModel("gemini-pro")
 
 
 async def uwuthing(bot, text: str) -> str:
@@ -1055,6 +1067,70 @@ class Server(Cog):
             return await ctx.approve("Modlogs have been **disabled**")
         if data is None:
             return await ctx.deny("Modlogs aren't setup in this guild.")
+
+    @commands.command(
+        name="chatbot",
+        description="Enable the chatbot for a specific channel."
+    )
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    @commands.has_permissions(administrator=True)
+    async def chatbot(self, ctx: Context, *, channel: discord.TextChannel = None):
+        if channel is None:
+            return await ctx.send_help(ctx.command)
+        
+        if (
+            await self.bot.pool.fetchrow(
+                """
+                SELECT channel_id FROM chatbot WHERE guild_id = $1 AND channel_id = $2
+                """,
+                ctx.guild.id, channel.id,
+            )
+        ):
+            await self.bot.pool.execute(
+                """
+                DELETE FROM chatbot
+                WHERE guild_id = $1 AND channel_id = $2
+                """,
+                ctx.guild.id, channel.id
+            )
+            return await ctx.approve(f"Disabled the chatbot in {channel.mention}.")
+        
+        await self.bot.pool.execute(
+            """
+            INSERT INTO chatbot (guild_id, channel_id)
+            VALUES ($1, $2)
+            ON CONFLICT (guild_id)
+            DO UPDATE SET channel_id = EXCLUDED.channel_id
+            """,
+            ctx.guild.id, channel.id
+        )
+        return await ctx.approve(f"Enabled the chatbot in {channel.mention}.")
+
+    @Cog.listener("on_message")
+    @ratelimit(key="{message.guild}", limit=3, duration=10, retry=False)
+    async def chatbot_listener(self, message: discord.Message) -> None:
+        if message.author.bot:
+            return
+        
+        if (
+            await self.bot.pool.fetchrow(
+                """
+                SELECT * FROM chatbot 
+                WHERE guild_id = $1
+                """,
+                message.guild.id
+            )
+        ):
+            ctx = await self.bot.get_context(message)
+            
+            async with ctx.typing():
+                response = model.generate_content(message.clean_content)
+                
+                if response and response.candidates:
+                    response_text = response.candidates[0].content.parts[0].text
+                    await message.channel.send(response_text)
+                else:
+                    await message.channel.send("Sorry, I couldn't generate a response.")
 
 
 async def setup(bot: Heal) -> None:

@@ -262,3 +262,8 @@ CREATE TABLE IF NOT EXISTS joindm (
     message TEXT NOT NULL,
     PRIMARY KEY (guild_id)
 );
+
+CREATE TABLE IF NOT EXISTS chatbot (
+    guild_id BIGINT PRIMARY KEY,
+    channel_id BIGINT
+);
