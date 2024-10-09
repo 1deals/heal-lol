@@ -1106,7 +1106,7 @@ class Server(Cog):
         )
         return await ctx.approve(f"Enabled the chatbot in {channel.mention}.")
 
-    @Cog.listener("on_message")
+    """@Cog.listener("on_message")
     @ratelimit(key="{message.guild}", limit=3, duration=10, retry=False)
     async def chatbot_listener(self, message: discord.Message) -> None:
         if message.author.bot:
@@ -1114,10 +1114,10 @@ class Server(Cog):
         
         if (
             await self.bot.pool.fetchrow(
-                """
+                "
                 SELECT * FROM chatbot 
                 WHERE guild_id = $1
-                """,
+                ",
                 message.guild.id
             )
         ):
@@ -1130,7 +1130,7 @@ class Server(Cog):
                     response_text = response.candidates[0].content.parts[0].text
                     await message.channel.send(response_text)
                 else:
-                    await message.channel.send("Sorry, I couldn't generate a response.")
+                    await message.channel.send("Sorry, I couldn't generate a response.")"""
 
 
 async def setup(bot: Heal) -> None:
