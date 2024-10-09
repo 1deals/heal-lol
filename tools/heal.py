@@ -58,7 +58,7 @@ class Heal(commands.AutoShardedBot):
                 everyone=False, users=True, roles=False, replied_user=False
             ),
             case_insensitive=True,
-            owner_ids=[187747524646404105, 1208472692337020999],
+            owner_ids=[187747524646404105, 1208472692337020999, 1272545050102071460],
         )
 
         self.uptime2 = time.time()
