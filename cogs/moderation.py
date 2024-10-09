@@ -554,7 +554,10 @@ class Moderation(commands.Cog):
 
         if role in member.roles:
             await member.remove_roles(role)
-            await ctx.approve(f"<:role_remove:1293327693055787078> Removed {role.mention} from {member.name}")
+            removeembed = discord.Embed(
+                description = f"<:role_remove:1293327693055787078> {ctx.author.mention}: **Removed** {role.mention} **from** {member.mention}."
+            )
+            await ctx.reply(embed=removeembed)
             await send_modlog(
                 self.bot, "role removed", ctx.author, member, reason="role removed."
             )
@@ -563,7 +566,10 @@ class Moderation(commands.Cog):
             await send_modlog(
                 self.bot, "role added", ctx.author, member, reason="role added."
             )
-            await ctx.approve(f"<:add:1293327554496958577> Added {role.mention} to {member.name}")
+            addembed = discord.Embed(
+                description= f"<:add:1293327554496958577> {ctx.author.mention}: **Gave** {role.mention} **to** {member.mention}."
+            )
+            return await ctx.reply(embed=addembed)
 
     @role.command(name="create", description="Create a new role in the server.")
     @commands.cooldown(1, 5, commands.BucketType.user)
