@@ -325,7 +325,7 @@ class Heal(commands.AutoShardedBot):
             return await ctx.warn(f"**Invalid Input Given**: \n`{exception}`")
         elif isinstance(exception, commands.CommandOnCooldown):
             return await ctx.neutral(
-                f"Please wait **{exception.retry_after:.2f} seconds** before using this command again."
+                f"<:cooldown:1293327736219111508> Please wait **{exception.retry_after:.2f} seconds** before using this command again."
             )
         if isinstance(exception, commands.errors.NotOwner):
             return await ctx.deny(f"You are not an owner of {self.user.mention}.")

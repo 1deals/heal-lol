@@ -554,7 +554,7 @@ class Moderation(commands.Cog):
 
         if role in member.roles:
             await member.remove_roles(role)
-            await ctx.approve(f"Removed {role.mention} from {member.name}")
+            await ctx.approve(f"<:role_remove:1293327693055787078> Removed {role.mention} from {member.name}")
             await send_modlog(
                 self.bot, "role removed", ctx.author, member, reason="role removed."
             )
@@ -563,7 +563,7 @@ class Moderation(commands.Cog):
             await send_modlog(
                 self.bot, "role added", ctx.author, member, reason="role added."
             )
-            await ctx.approve(f"Added {role.mention} to {member.name}")
+            await ctx.approve(f"<:add:1293327554496958577> Added {role.mention} to {member.name}")
 
     @role.command(name="create", description="Create a new role in the server.")
     @commands.cooldown(1, 5, commands.BucketType.user)
