@@ -54,7 +54,7 @@ api_keys = [
 key = random.choice(api_keys)
 genai.configure(api_key=key)
 
-model = genai.GenerativeModel("gemini-pro")
+model = genai.GenerativeModel("gemini-1.5-flash-8b")
 
 
 class Utility(commands.Cog):
