@@ -405,7 +405,7 @@ class Heal(commands.AutoShardedBot):
         if not self.browser:
             self.browser = await launch(
                 headless=True,
-                args=["--no-sandbox"],
+                args=["--no-sandbox", "--force-dark-mode"],
                 defaultViewport={"width": 1980, "height": 1080},
             )
 
