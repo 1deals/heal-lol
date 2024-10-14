@@ -459,3 +459,21 @@ class Heal(commands.AutoShardedBot):
         logger.info(
             f"{ctx.author} ({ctx.author.id}) executed {ctx.command} in {ctx.guild} ({ctx.guild.id})."
         )
+
+    async def on_shard_resumed(self, shard_id: int) -> None:
+        channelid = 1275776609944862850
+        channel = self.get_channel(channelid)
+
+        shard_guild_count = len([guild for guild in self.guilds if guild.shard_id == shard_id])
+        shard_user_count = len([user for guild in self.guilds for user in guild.members if guild.shard_id == shard_id])
+
+        embed = Embed(
+            description= f"Shard {shard_id} has resumed, serving **{shard_guild_count}** guilds and **{shard_user_count}** users.",
+        )
+        logger.info(
+            f"Shard {shard_id} has resumed."
+        )
+        try:
+            await channel.send(embed=embed)
+        except:
+            return
