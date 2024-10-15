@@ -136,35 +136,41 @@ class Information(commands.Cog):
         else:
             user = user or ctx.author
 
+        if isinstance(user, discord.User):
+            guild = ctx.guild
+            if guild:
+                member = guild.get_member(user.id)
+                if member:
+                    user = member
+
         description = ""
         title = f"{user.name}"
 
-        if user.desktop_status == discord.Status.online:
-            title += " <:status_computer_online:1291119653095080058>"
-        if user.desktop_status == discord.Status.idle:
-            title += " <:status_computer_idle:1291124408034922587>"
-        if user.desktop_status == discord.Status.dnd:
-            title += " <:status_computer_dnd:1291124598271774723>"
-        if user.mobile_status == discord.Status.online:
-            title += " <:status_phone_online:1291120307863687249>"
-        if user.mobile_status == discord.Status.idle:
-            title += " <:status_phone_idle:1291124866858090548>"
-        if user.mobile_status == discord.Status.dnd:
-            title += " <:status_phone_dnd:1291124989495607407>"
-        if user.web_status == discord.Status.online:
-            title += " <:status_web_online:1291120457872838700>"
-        if user.web_status == discord.Status.dnd:
-            title += " <:status_web_dnd:1291125457412165755>"
-        if user.web_status == discord.Status.idle:
-            title += " <:status_web_idle:1291125639235113111>"
-        if user.status == discord.Status.invisible:
-            title += " <:status_z_offline_invisible:1291125818118115330>"
+        if isinstance(user, discord.Member):
+            if user.desktop_status == discord.Status.online:
+                title += " <:status_computer_online:1291119653095080058>"
+            if user.desktop_status == discord.Status.idle:
+                title += " <:status_computer_idle:1291124408034922587>"
+            if user.desktop_status == discord.Status.dnd:
+                title += " <:status_computer_dnd:1291124598271774723>"
+            if user.mobile_status == discord.Status.online:
+                title += " <:status_phone_online:1291120307863687249>"
+            if user.mobile_status == discord.Status.idle:
+                title += " <:status_phone_idle:1291124866858090548>"
+            if user.mobile_status == discord.Status.dnd:
+                title += " <:status_phone_dnd:1291124989495607407>"
+            if user.web_status == discord.Status.online:
+                title += " <:status_web_online:1291120457872838700>"
+            if user.web_status == discord.Status.dnd:
+                title += " <:status_web_dnd:1291125457412165755>"
+            if user.web_status == discord.Status.idle:
+                title += " <:status_web_idle:1291125639235113111>"
+            if user.status == discord.Status.invisible:
+                title += " <:status_z_offline_invisible:1291125818118115330>"
 
-        if user.premium_since is not None:
-            title += " <:boosterbadge:1253988282455556146> "
+            if user.premium_since is not None:
+                title += " <:boosterbadge:1253988282455556146> "
 
-        if user.id == 1083131355984044082:
-            title += " <:6_ss3:1291127800538988604>"
 
         data = await self.bot.pool.fetchrow(
             "SELECT * FROM lastfm WHERE user_id = $1", user.id
