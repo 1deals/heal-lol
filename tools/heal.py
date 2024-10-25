@@ -172,12 +172,6 @@ class Heal(commands.AutoShardedBot):
 
         return await super().setup_hook()
 
-    async def start(self, token: str, *, reconnect: bool = True) -> None:
-        self._connection.http.connector = aiohttp.TCPConnector(
-            limit=0, family=socket.AF_INET, local_addr=("216.105.170.101", 0)
-        )
-        return await super().start(token, reconnect=reconnect)
-
     async def get_context(self, message: Message, *, cls=Context):
         return await super().get_context(message, cls=cls)
 
