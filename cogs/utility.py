@@ -420,6 +420,80 @@ class Utility(commands.Cog):
     async def tiktok(self, ctx: Context):
         await ctx.send_help(ctx.command)
 
+    def humanize_number(self, number: int) -> str:
+        suffixes = ["", "k", "m", "b", "t"]
+        magnitude = min(len(suffixes) - 1, (len(str(abs(number))) - 1) // 3)
+        formatted_number = (
+            "{:.1f}".format(number / 10 ** (3 * magnitude)).rstrip("0").rstrip(".")
+        )
+        return "{}{}".format(formatted_number, suffixes[magnitude])
+
+    @tiktok.command(
+            name = "user",
+            aliases = ["userinfo", "ui"],
+            description = "Get information about a tiktok user."
+    )
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def tiktok_user(self, ctx: Context, *, user: str = None):
+        if user is None:
+            return await ctx.warn(f"Missing parameter: `user`.")
+
+        url = "https://api.fulcrum.lol/tiktok"
+        params = {"username": user}
+
+        async with ctx.typing():
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    url, params=params
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        username = data.get("username")
+                        tt_url = data.get("url")
+                        nick = data.get("nickname")
+                        bio = data.get("bio", "None set.")
+                        followers = data.get("followers")
+                        following = data.get("following")
+                        private = data.get("private", True)
+                        verified = data.get("verified", True)
+                        likes = data.get("hearts")
+                        videos = data.get("videos")
+                        avatar = data.get("avatar")
+
+                        human_likes = self.humanize_number(likes)
+
+                        title = f"{username}"
+
+                        if private:
+                            title += " :lock:"
+                        
+                        if verified:
+                            title += " <:verified_tt:1299304464129331252>"
+
+                        embed = discord.Embed(
+                            title = title,
+                            url = f"{tt_url}",
+                            description = f"{bio}",
+                            color = Colors.BASE_COLOR
+                        )
+                        embed.add_field(name = "Followers:", value = followers, inline = True)
+                        embed.add_field(name = "Following:", value = following, inline = True)
+                        embed.add_field(name = "Likes:", value = human_likes, inline = True)
+                        embed.add_field(name = "Videos:", value = videos, inline = True)
+
+                        if avatar:
+                            embed.set_thumbnail(url = avatar)
+                    
+
+                        await ctx.send(embed=embed)
+
+
+
+        
+
+
     @tiktok.command(name="reposter", description="Repost a tiktok video")
     async def tiktok_reposter(self, ctx: Context, *, url: str):
         if self.TIKTOK_URL_PATTERN.match(url):
