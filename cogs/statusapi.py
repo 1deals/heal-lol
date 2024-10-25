@@ -89,7 +89,7 @@ class Network(Cog):
         )
 
     async def cog_load(self: "Network") -> None:
-        host = "216.105.170.98"
+        host = "23.160.168.99"
         port = 9118
         self.bot.loop.create_task(
             web._run_app(
