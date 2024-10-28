@@ -420,13 +420,12 @@ class Utility(commands.Cog):
     async def tiktok(self, ctx: Context):
         await ctx.send_help(ctx.command)
 
-    def humanize_number(self, number: int) -> str:
-        suffixes = ["", "k", "m", "b", "t"]
-        magnitude = min(len(suffixes) - 1, (len(str(abs(number))) - 1) // 3)
-        formatted_number = (
-            "{:.1f}".format(number / 10 ** (3 * magnitude)).rstrip("0").rstrip(".")
-        )
-        return "{}{}".format(formatted_number, suffixes[magnitude])
+    def humanize_number(self, value: int) -> str:
+            if value >= 1_000_000:
+                return f"{value / 1_000_000:.1f}M"
+            elif value >= 1_000:
+                return f"{value / 1_000:.1f}K"
+            return str(value)
 
     @tiktok.command(
             name = "user",
@@ -463,6 +462,7 @@ class Utility(commands.Cog):
                         avatar = data.get("avatar")
 
                         human_likes = self.humanize_number(likes)
+                        human_follows = self.humanize_number(followers)
 
                         title = f"{username}"
 
@@ -478,7 +478,7 @@ class Utility(commands.Cog):
                             description = f"{bio}",
                             color = Colors.BASE_COLOR
                         )
-                        embed.add_field(name = "Followers:", value = followers, inline = True)
+                        embed.add_field(name = "Followers:", value = human_follows, inline = True)
                         embed.add_field(name = "Following:", value = following, inline = True)
                         embed.add_field(name = "Likes:", value = human_likes, inline = True)
                         embed.add_field(name = "Videos:", value = videos, inline = True)

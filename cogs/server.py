@@ -174,94 +174,90 @@ class Server(Cog):
             )
         return await ctx.approve("Disabled the **joindm** setup for this server.")
 
-    @welcome.command(name="channel", description="Set a welcome channel for the guild.")
+    @welcome.command(name = "add", description = "Add a welcome message to a channel.")
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_channel(
-        self, ctx: Context, *, channel: discord.TextChannel = None
-    ):
-        if channel is None:
-            return await ctx.send_help(ctx.command)
-
-        await self.bot.pool.execute(
-            """
-            INSERT INTO welcome (guild_id, channel_id)
-            VALUES ($1, $2)
-            ON CONFLICT (guild_id)
-            DO UPDATE SET channel_id = $2
-            """,
-            ctx.guild.id,
-            channel.id,
-        )
-        await ctx.approve(f"Set the **welcome channel** to {channel.mention}")
-
-    @welcome.command(name="message", description="Set a welcome message for the guild.")
-    @commands.has_permissions(manage_messages=True)
-    @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_message(self, ctx: Context, *, message: str = None):
-        if message is None:
-            return await ctx.send_help(ctx.command)
-
-        await self.bot.pool.execute(
-            """
-                INSERT INTO welcome (guild_id, message)
-                VALUES ($1,$2)
-                ON CONFLICT (guild_id)
-                DO UPDATE SET message = $2
-                """,
-            ctx.guild.id,
-            message,
-        )
+    async def welcome_add(self, ctx: Context, channel: discord.TextChannel = None, *, message: str = None):
+        if not channel:
+            return await ctx.warn(f"Invalid input: `Channel` is a missing argument.")
+        if not message:
+            return await ctx.warn(f"Invalid input: `Message` is a missing argument.")
 
         processed_message = EmbedBuilder.embed_replacement(ctx.author, message)
         content, embed, view = await EmbedBuilder.to_object(processed_message)
 
-        await ctx.approve(f"Set the **welcome** message to:")
-        if content or embed:
-            await ctx.send(content=content, embed=embed, view=view)
-        else:
-            await ctx.send(content=processed_message)
+        check = await self.bot.pool.fetchrow(
+            """
+            SELECT * FROM welcome WHERE channel_id = $1
+            """,
+            channel.id
+        )
+        if check:
+            await self.bot.pool.execute(
+                """
+                UPDATE welcome
+                SET message = $1 
+                WHERE channel_id = $2
+                """,
+                message, channel.id
+            )
+            await ctx.approve(f"Edited {channel.mention}'s welcome message to:")
+            if content or embed:
+                return await ctx.send(content=content, embed=embed, view=view)
+            else:
+                return await ctx.send(content=processed_message)
 
-    @welcome.command(
-        name="remove",
-        aliases=["delete", "del"],
-        description="Delete a welcome message from a channel.",
-    )
+        if ctx.guild:
+            await self.bot.pool.execute(
+                """
+                INSERT INTO welcome 
+                VALUES ($1, $2, $3) 
+                """,
+                ctx.guild.id, channel.id, message
+            )
+            await ctx.approve(f"Added a welcome message in {channel.mention}.")
+            if content or embed:
+                return await ctx.send(content=content, embed=embed, view=view)
+            else:
+                return await ctx.send(content=processed_message)
+
+    @welcome.command(name = "remove", aliases = ["delete", "del"], description = "Remove a welcome message from a channel")
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def welcome_remove(self, ctx: Context, *, channel: discord.TextChannel):
-
-        data = await self.bot.pool.fetchrow(
-            "SELECT * FROM welcome WHERE guild_id = $1 AND channel_id = $2",
-            ctx.guild.id,
-            channel.id,
-        )
-
-        if data:
-            message = data["message"]
-
-            await self.bot.pool.execute(
-                """
-                DELETE FROM welcome
-                WHERE guild_id = $1 AND channel_id = $2
-                """,
+        if ctx.guild:
+            data = await self.bot.pool.fetchrow(
+                "SELECT * FROM welcome WHERE guild_id = $1 AND channel_id = $2",
                 ctx.guild.id,
                 channel.id,
             )
-            await ctx.approve(
-                f"Removed the **welcome settings** from {channel.mention}!"
-            )
-        else:
-            return await ctx.warn(
-                f"There are no **welcome settings** saved for {channel.mention}."
-            )
+
+            if data:
+                message = data["message"]
+
+                await self.bot.pool.execute(
+                    """
+                    DELETE FROM welcome
+                    WHERE guild_id = $1 AND channel_id = $2
+                    """,
+                    ctx.guild.id,
+                    channel.id,
+                )
+                await ctx.approve(
+                    f"Removed the **welcome settings** from {channel.mention}!"
+                )
+            else:
+                return await ctx.warn(
+                    f"There are no **welcome settings** saved for {channel.mention}."
+                )
+
 
     @welcome.command(name="test", description="Test your set welcome message.")
     @commands.has_permissions(manage_messages=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def welcome_test(self, ctx: Context):
+    async def welcome_test(self, ctx: Context, channel: discord.TextChannel):
         res = await self.bot.pool.fetchrow(
-            "SELECT * from welcome WHERE guild_id = $1", ctx.guild.id
+            "SELECT * from welcome WHERE guild_id = $1 AND channel_id = $2", ctx.guild.id, channel.id
         )
 
         if res:
@@ -284,27 +280,64 @@ class Server(Cog):
         else:
             return
 
+    @welcome.command(name = "list", description = "Lists the welcome configurations.")
+    @commands.has_permissions(manage_messages=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def welcome_list(self, ctx: Context):
+        if ctx.guild:
+            res = await self.bot.pool.fetch(
+                """
+                SELECT channel_id, message FROM welcome WHERE guild_id = $1
+                """,
+                ctx.guild.id
+            )
+            
+            if not res:
+                return await ctx.warn("There are no welcome messages set up in this guild.")
+            
+            entries = [
+                f"` {i} `  **Channel:** {self.bot.get_channel(entry['channel_id']).mention if self.bot.get_channel(entry['channel_id']) else 'Channel ID: ' + str(entry['channel_id'])} \n<:icons_hyphen:1300119095563260065> **Message:** {entry['message']}"
+                for i, entry in enumerate(res, start=1)
+            ]
+            
+            embeds = []
+            embed = discord.Embed(
+                color=Colors.BASE_COLOR, 
+                title=f"Welcome messages ({len(entries)})", 
+                description=""
+            )
+            
+            count = 0
+            for entry in entries:
+                embed.description += f"{entry}\n"
+                count += 1
+
+                if count == 5: 
+                    embeds.append(embed)
+                    embed = discord.Embed(
+                        color=Colors.BASE_COLOR,
+                        title=f"Welcome Configurations ({len(entries)})",
+                        description=""
+                    )
+                    count = 0
+
+            if count > 0:
+                embeds.append(embed)
+
+            await ctx.paginate(embeds)
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        res = await self.bot.pool.fetchrow(
-            "SELECT * from welcome WHERE guild_id = $1", member.guild.id
+        res = await self.bot.pool.fetch(
+            "SELECT * FROM welcome WHERE guild_id = $1", member.guild.id
         )
-
-        if res:
-            channel_id = res["channel_id"]
-            channel = member.guild.get_channel(channel_id)
-
-            if channel is None:
-                return
-
-            message = res["message"]
-            processed_message = EmbedBuilder.embed_replacement(member, message)
-            content, embed, view = await EmbedBuilder.to_object(processed_message)
-
-            if content or embed:
-                await channel.send(content=content, embed=embed, view=view)
-            else:
-                await channel.send(content=processed_message)
+        for result in res:
+            channel = self.bot.get_channel(result["channel_id"])
+            if channel:
+                processed_message = EmbedBuilder.embed_replacement(member, result["message"])
+                content, embed, view = await EmbedBuilder.to_object(processed_message)
+                await channel.send(processed_message)
+                await asyncio.sleep(0.4)
 
         res2 = await self.bot.pool.fetchrow(
             "SELECT * FROM joindm WHERE guild_id = $1", member.guild.id
@@ -326,7 +359,7 @@ class Server(Cog):
             channel = member.guild.get_channel(data[0])
             if channel:
                 message = await channel.send(f"<@{member.id}>")
-                await asyncio.sleep(1)
+                await asyncio.sleep(0.4)
                 await message.delete()
 
     @commands.group(

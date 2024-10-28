@@ -168,13 +168,10 @@ class Fun(commands.Cog):
     async def howgay(self, ctx: Context, member: discord.Member = None):
         if member is None:
             member = ctx.author
-        min = 0
-        max = 100
-        value = random.randint(min, max)
-        if member.id == 187747524646404105:
-            value = ":infinity:"
 
-        await ctx.neutral(f":rainbow_flag: {member.mention} is **{value}%** gay.")
+        await ctx.neutral(
+            f":rainbow_flag: {member.mention} is **{random.randint(1,100)}%** gay."
+        )
 
     @hybrid_command(name="howlesbian", aliases=["lesbianrate", "lesbian"])
     @discord.app_commands.allowed_installs(guilds=True, users=True)
@@ -183,14 +180,9 @@ class Fun(commands.Cog):
     async def howlesbian(self, ctx: Context, member: discord.Member = None):
         if member is None:
             member = ctx.author
-        min = 0
-        max = 100
-        value = random.randint(min, max)
-        if member.id == 1035497951591673917:
-            value = 500000
 
         await ctx.neutral(
-            f"<:lesbian:1271068282652463144> {member.mention} is **{value}%** lesbian."
+            f"<:lesbian:1271068282652463144> {member.mention} is **{random.randint(1,100)}%** lesbian."
         )
 
     @commands.command(name="bible", aliases=["verse"])
@@ -283,7 +275,7 @@ class Fun(commands.Cog):
         hits = data["hits"] or 0
         flavor = data["flavor"]
 
-        if data is None:
+        if not data:
             return await ctx.deny(
                 f"You don't have a **vape**. Use `{ctx.clean_prefix}vape flavor <flavor> to get a vape."
             )
@@ -402,13 +394,7 @@ class Fun(commands.Cog):
             "Yes",
             "Signs point to yes",
         ]
-        embed = discord.Embed(
-            title=f"{question}",
-            description=f"{choice(responses)}",
-            color=Colors.BASE_COLOR,
-        )
-        embed.set_author(name=f"{ctx.author}", icon_url=ctx.author.avatar.url)
-        return await ctx.reply(embed=embed)
+        return await ctx.reply(f"{choice(responses)}")
 
 
 async def setup(bot: Heal):
