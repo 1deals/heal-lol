@@ -439,6 +439,54 @@ class Fun(commands.Cog):
                             .set_image(url=dog)
                         )
 
+    @hybrid_command(name = "randomfact", aliases = ["uselessfact"])
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def randomfact(self, ctx: Context):
+        async with aiohttp.ClientSession() as cs:
+                async with cs.get(
+                    "https://uselessfacts.jsph.pl/api/v2/facts/random?language=en"
+                ) as r:
+                    if r.status == 200:
+                        data = await r.json()
+                        fact = data.get("text")
+
+                        return await ctx.reply(
+                            embed = Embed(
+                                description = fact,
+                                color = 0x729BB0
+                            )
+                        )
+
+    @hybrid_command(name = "ship")
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def ship(self, ctx: Context, *, user: Union[discord.Member, discord.User]):
+        """
+        Ship yourself with another user.
+        """
+
+        return await ctx.reply(
+            embed = Embed(
+                description = f"{ctx.author.mention} 💞 {user.mention} = `{random.randint(1,100)}%`"
+            )
+        )
+
+    @hybrid_command(name = "pack")
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def pack(self, ctx: Context, *, user: Union[discord.Member, discord.User]):
+        packs = './tools/data/packs.txt'
+        with open(packs, 'r') as f:
+            lines = f.readlines()
+            randomPack = random.choice(lines).strip()
+            str = f"{user.mention} " + randomPack
+            if ctx.guild:
+                await ctx.message.delete()
+            return await ctx.send(str, delete_after=4)
 
 
 async def setup(bot: Heal):

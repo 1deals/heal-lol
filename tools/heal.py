@@ -316,7 +316,7 @@ class Heal(commands.AutoShardedBot):
         elif isinstance(exception, commands.BadInviteArgument):
             return await ctx.warn(f"Invalid **invite code** given")
         elif isinstance(exception, commands.UserInputError):
-            return await ctx.warn(f"**Invalid Input Given**: \n`{exception}`")
+            return await ctx.send_help(ctx.command)
         elif isinstance(exception, commands.CommandOnCooldown):
             return await ctx.neutral(
                 f"<:cooldown:1293327736219111508> Please wait **{exception.retry_after:.2f} seconds** before using this command again."
