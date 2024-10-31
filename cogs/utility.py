@@ -40,6 +40,11 @@ from tools.managers.flags import ScriptFlags
 from discord import AllowedMentions
 import pytz
 from pytz import timezone
+from geopy.geocoders import Nominatim
+from timezonefinder import TimezoneFinder
+
+geolocator = Nominatim(user_agent="timezone_bot")
+tf = TimezoneFinder()
 
 all_timezones = pytz.all_timezones
 
@@ -907,19 +912,26 @@ class Utility(commands.Cog):
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def timezone_set(self, ctx: Context, *, timezone: str = None):
-        if timezone not in TIMEZONE_MAPPING:
-            return await ctx.warn(
-                f"The **timezone** `{timezone}` is not a valid timezone."
-            )
-        if timezone in TIMEZONE_MAPPING:
-            timezone = TIMEZONE_MAPPING[timezone]
+        if not timezone:
+            return await ctx.warn("Please provide a city name.")
+    
+        try:
+            location = geolocator.geocode(timezone)
+            if not location:
+                return await ctx.warn(f"Could not find the location `{timezone}`.")
+            
+            timezone_str = tf.timezone_at(lng=location.longitude, lat=location.latitude)
+            if not timezone_str or timezone_str not in pytz.all_timezones:
+                return await ctx.warn(f"Could not determine a valid timezone for `{timezone}`.")
 
-        await self.bot.pool.execute(
-            "INSERT INTO timezones (user_id, timezone) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET timezone = $2",
-            ctx.author.id,
-            timezone,
-        )
-        return await ctx.approve(f"Set your timezone to `{timezone}`.")
+            await self.bot.pool.execute(
+                "INSERT INTO timezones (user_id, timezone) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET timezone = $2",
+                ctx.author.id,
+                timezone_str,
+            )
+            return await ctx.approve(f"Set your timezone to `{timezone_str}`.")
+        except Exception as e:
+            return await ctx.warn(f"An error occured: `{e}`")
 
     @timezone.command(name="view", description="View yours or somebody elses timezone.")
     @discord.app_commands.allowed_installs(guilds=True, users=True)
