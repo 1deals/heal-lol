@@ -13,9 +13,9 @@ from discord.ext.commands import (
     cooldown,
     has_permissions,
     hybrid_command,
-    hybrid_group,
+    hybrid_group
 )
-
+from discord import Embed
 from tools.managers.context import Context, Colors
 from tools.heal import Heal
 from typing import Union
@@ -395,6 +395,50 @@ class Fun(commands.Cog):
             "Signs point to yes",
         ]
         return await ctx.reply(f"{choice(responses)}")
+
+    @hybrid_command(name = "bird")
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def bird(self, ctx: Context):
+        """
+        Get a random image of a bird.
+        """
+        async with aiohttp.ClientSession() as cs:
+                async with cs.get(
+                    "https://api.alexflipnote.dev/birb"
+                ) as r:
+                    if r.status == 200:
+                        data = await r.json()
+                        bird = data.get("file")
+
+                        return await ctx.reply(
+                            embed = Embed(
+
+                            )
+                            .set_image(url=bird)
+                        )
+
+    @hybrid_command(name = "dog")
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def dog(self, ctx: Context):
+        async with aiohttp.ClientSession() as cs:
+                async with cs.get(
+                    "https://random.dog/woof.json"
+                ) as r:
+                    if r.status == 200:
+                        data = await r.json()
+                        dog = data.get("url")
+
+                        return await ctx.reply(
+                            embed = Embed(
+
+                            )
+                            .set_image(url=dog)
+                        )
+
 
 
 async def setup(bot: Heal):
