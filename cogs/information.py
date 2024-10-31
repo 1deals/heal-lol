@@ -70,14 +70,14 @@ class Information(commands.Cog):
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def botinfo(self, ctx: Context):
         description = f"> {self.bot.user.name} is serving **{len(self.bot.guilds): ,}** guilds with **{len(self.bot.users): ,}** users."
-        embed = discord.Embed(description=description, color = 0x729BB0)
+        embed = discord.Embed(description=description, color = Colors.BASE_COLOR)
         embed.add_field(
             name="Statistics",
             value=f"> **Commands:** `{len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}` \n> **Uptime:** `{self.bot.uptime}` \n> **Latency:** `{round(self.bot.latency * 1000)}ms`",
         )
         embed.add_field(
             name="Usage",
-            value=f"> **Memory:** `{self.format_size(self.process.memory_info().rss)}` \n> **Virtual Mem:** `{self.format_size(self.process.memory_info().vms)}` \n> **CPU:**`{self.process.cpu_percent()}%` \n> **Lines:**`{self.bot.linecount: ,}`",
+            value=f"> **Memory:** `{self.format_size(self.process.memory_info().rss)}` \n> **Virtual Mem:** `{self.format_size(self.process.memory_info().vms)}` \n> **CPU:** `{self.process.cpu_percent()}%` \n> **Lines:**`{self.bot.linecount: ,}`",
         )
         embed.set_author(name=f"{ctx.author.name}", icon_url=f"{ctx.author.avatar.url}")
         embed.set_thumbnail(url=self.bot.user.avatar.url)
