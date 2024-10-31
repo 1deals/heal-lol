@@ -336,7 +336,10 @@ class Server(Cog):
             if channel:
                 processed_message = EmbedBuilder.embed_replacement(member, result["message"])
                 content, embed, view = await EmbedBuilder.to_object(processed_message)
-                await channel.send(processed_message)
+                if content or embed:
+                    await channel.send(content=content, embed=embed, view=view)
+                else:
+                    await channel.send(content=processed_message)
                 await asyncio.sleep(0.4)
 
         res2 = await self.bot.pool.fetchrow(
