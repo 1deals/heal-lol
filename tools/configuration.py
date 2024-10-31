@@ -25,7 +25,7 @@ class Emojis:
 
 
 class Colors:
-    BASE_COLOR = 0x729BB0
+    BASE_COLOR = 0x708bb8
     LAST_FM = 0xD3222A
     APPROVE = 0xA4E577
     WARN = 0xF9D162
