@@ -8,6 +8,7 @@ from discord import (
     AutoModRuleTriggerType,
     AutoModRuleAction,
     AutoModRuleEventType,
+    Embed,
 )
 from tools.managers.context import Context
 from discord.ext.commands import command, group, BucketType, has_permissions
@@ -618,17 +619,77 @@ class Moderation(commands.Cog):
         self,
         ctx: Context,
         emoji: Union[discord.Emoji, discord.PartialEmoji] = None,
-        *,
-        name: str = None,
     ):
         if not emoji:
             return await ctx.send_help(ctx.command)
-        if not name:
-            name = emoji.name
-            emoji = await ctx.guild.create_custom_emoji(
-                image=await emoji.read(), name=name
+        name = emoji.name
+        emoji = await ctx.guild.create_custom_emoji(
+            image=await emoji.read(), name=emoji.name
+        )
+        return await ctx.approve(f"added {emoji} as `{name}`")
+
+    @group(name = "emoji", invoke_without_command = True)
+    @commands.has_permissions(manage_expressions=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def emoji(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+    
+    @emoji.command(name = "add", aliases = ["steal"],)
+    @commands.has_permissions(manage_expressions=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def emoji_add(self, ctx: Context, *, emoji: Union[discord.Emoji, discord.PartialEmoji]):
+        """
+        Steal an emoji.
+        """
+        name = emoji.name
+        emoji = await ctx.guild.create_custom_emoji(
+            image=await emoji.read(), name=emoji.name
+        )
+        return await ctx.approve(f"added {emoji} as `{name}`")
+
+    @emoji.command(name = "enlarge", aliases = ["large"])
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def emoji_enlarge(self, ctx: Context, *, emoji: Union[discord.PartialEmoji, str]):
+        """
+        Enlarge an emoji.
+        """
+        if isinstance(emoji, discord.PartialEmoji):
+            return await ctx.reply(
+                file=await emoji.to_file(
+                    filename=f"{emoji.name}{'.gif' if emoji.animated else '.png'}"
+                )
             )
-            return await ctx.approve(f"added {emoji} as `{name}`")
+
+    @group(name = "sticker", invoke_without_command = True)
+    @commands.has_permissions(manage_expressions=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def sticker(self, ctx: Context):
+        return await ctx.send_help(ctx.command)
+
+    @sticker.command(name = "tag")
+    @commands.has_permissions(manage_expressions=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def sticker_tag(self, ctx: Context):
+        if not ctx.guild.vanity_url:
+            return await ctx.warn(f"There is no **vanity url** set")
+        if ctx.guild:
+            msg = await ctx.approve(f"Adding `.gg/{ctx.guild.vanity_url_code}` to `{len(ctx.guild.stickers)}` stickers...")
+            for sticker in ctx.guild.stickers:
+                if not sticker.name.endswith(f".gg/{ctx.guild.vanity_url_code}"):
+                    try:
+                        await sticker.edit(
+                            name=f"{sticker.name} .gg/{ctx.guild.vanity_url_code}"
+                        )
+                        await asyncio.sleep(1.5)
+                    except:
+                        pass
+            
+            await msg.edit(embed = Embed(
+                description = f"{Emojis.APPROVE} {ctx.author.mention}: Sucessfully added `.gg/{ctx.guild.vanity_url_code}` to all `{len(ctx.guild.stickers)}` stickers."
+            ))
+
+
+
 
     @commands.command(name="pin", description="Pins the message you reply to.")
     @commands.cooldown(1, 5, commands.BucketType.user)

@@ -13,6 +13,7 @@ from discord.ext.commands import (
     hybrid_group,
     BadArgument,
 )
+from discord import Embed
 from tools.configuration import Emojis, Colors
 from tools.paginator import Paginator
 from discord.utils import format_dt
@@ -1053,6 +1054,18 @@ class Utility(commands.Cog):
                     embed = discord.Embed(title=f"{cashapp}", url=url)
                     embed.set_image(url=qr)
                     return await ctx.reply(embed=embed)
+    
+    @hybrid_command(name = "invites")
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def invites(self, ctx: Context, member: discord.Member = commands.Author):
+        invites = await ctx.guild.invites()
+        return await ctx.reply(
+            embed = Embed(
+                description = f"{member.mention} has `{sum(invite.uses for invite in invites if invite.inviter == member)}` invites." if member.id != ctx.author.id else f"You have `{sum(invite.uses for invite in invites if invite.inviter == member)}` invites."
+            )
+        )
+
+
 
 
 async def setup(bot: Heal):
