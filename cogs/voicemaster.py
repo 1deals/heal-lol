@@ -126,6 +126,7 @@ class VoiceMaster(Cog):
                         await channel.delete()
                     if category:
                         await category.delete()
+                        await self.bot.pool.execute("DELETE FROM voicemaster.channels WHERE guild_id = $1", ctx.guild.id)
                     return await ctx.approve(
                         "Finished removing the **VoiceMaster** server configuration."
                     )

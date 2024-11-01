@@ -6,9 +6,9 @@ class Emojis:
     CANCEL_PAGINATOR = "<:emoji_7:1286620035036614717>"
 
     # embeds
-    APPROVE = "<:approve:1276192812127359081>"
-    DENY = "<:deny:1249312052640743446>"
-    WARN = "<:warning:1280197831273087053>"
+    APPROVE = "<:approve:1301982351433404506>"
+    DENY = "<:deny:1301982500452569228>"
+    WARN = "<:warning:1301983486063673445>"
     LASTFM = "<:LastFM:1272980316079788063>"
 
     # voice master
@@ -27,9 +27,9 @@ class Emojis:
 class Colors:
     BASE_COLOR = 0x708bb8
     LAST_FM = 0xD3222A
-    APPROVE = 0xA4E577
-    WARN = 0xF9D162
-    DENY = 0xFF3735
+    APPROVE = 0x708bb8
+    WARN = 0x708bb8
+    DENY = 0x708bb8
 
 
 class api:
