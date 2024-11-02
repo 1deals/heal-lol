@@ -16,6 +16,7 @@ from discord.ext.commands import (
     hybrid_command,
     hybrid_group,
 )
+from discord import Embed
 from tools.configuration import Emojis, Colors
 from tools.paginator import Paginator
 from discord.utils import format_dt
@@ -32,6 +33,7 @@ from discord.ui import View, Button
 import googletrans
 from googletrans import Translator, LANGUAGES
 import humanize
+from datetime import datetime, timedelta
 
 
 def get_ordinal(number):
@@ -62,25 +64,22 @@ class Information(commands.Cog):
 
     @hybrid_command(
         name="botinfo",
-        aliases=["info", "bot", "bi"],
+        aliases=["info", "bot", "bi", "about"],
         description="Get information about the bot.",
     )
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def botinfo(self, ctx: Context):
-        description = f"> {self.bot.user.name} is serving **{len(self.bot.guilds): ,}** guilds with **{len(self.bot.users): ,}** users."
-        embed = discord.Embed(description=description, color = Colors.BASE_COLOR)
-        embed.add_field(
-            name="Statistics",
-            value=f"> **Commands:** `{len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}` \n> **Uptime:** `{self.bot.uptime}` \n> **Latency:** `{round(self.bot.latency * 1000)}ms`",
+        start_time = datetime.now() - timedelta(seconds=self.bot._uptime)
+        formatted_uptime = format_dt(start_time, "R")
+        embed = Embed(
+            description = f"A **free** multipurpose bot, aimed to make your communities thrive.",
+            color = Colors.BASE_COLOR
         )
-        embed.add_field(
-            name="Usage",
-            value=f"> **Memory:** `{self.format_size(self.process.memory_info().rss)}` \n> **Virtual Mem:** `{self.format_size(self.process.memory_info().vms)}` \n> **CPU:** `{self.process.cpu_percent()}%` \n> **Lines:**`{self.bot.linecount: ,}`",
-        )
-        embed.set_author(name=f"{ctx.author.name}", icon_url=f"{ctx.author.avatar.url}")
-        embed.set_thumbnail(url=self.bot.user.avatar.url)
+        embed.add_field(name = "System:", value = f"> **Memory:** `{self.format_size(self.process.memory_info().rss)}` \n> **CPU:** `{self.process.cpu_percent()}%` \n> **Booted:** `{self.bot.uptime} ago`", inline = True)
+        embed.add_field(name = "Bot:", value = f"> **Users:** `{len(self.bot.users): ,}` \n> **Guilds:** `{len(self.bot.guilds): ,}` \n> **Commands:** `{len([cmd for cmd in self.bot.walk_commands() if cmd.cog_name != 'Jishaku'])}`", inline = True)
+        embed.set_thumbnail(url= self.bot.user.avatar.url)
         return await ctx.reply(embed=embed)
 
     @hybrid_command(

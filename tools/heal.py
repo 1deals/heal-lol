@@ -33,6 +33,7 @@ from discord.ext import commands
 from discord import Message, Embed, File
 from pyppeteer import launch
 from nudenet import NudeDetector
+from datetime import datetime, timedelta, timezone
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -61,7 +62,7 @@ class Heal(commands.AutoShardedBot):
             owner_ids=[187747524646404105, 1208472692337020999, 1272545050102071460, 813040116183597127],
         )
 
-        self.uptime2 = time.time()
+        self.start_time = time.time()
         self.message_cache = defaultdict(list)
         self.cache_expiry_seconds = 30
         self.add_check(self.disabled_command)
@@ -206,6 +207,12 @@ class Heal(commands.AutoShardedBot):
     @property
     def uptime(self) -> str:
         return self.humanize_time(self._uptime)
+
+    def uptime2(self):
+        current_time = time.time()
+        uptime_seconds = int(current_time - self.start_time)
+        uptime_datetime = datetime.fromtimestamp(self.start_time, timezone.utc)
+        return uptime_datetime
 
     @property
     def linecount(self) -> int:
