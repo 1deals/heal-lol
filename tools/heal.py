@@ -408,14 +408,10 @@ class Heal(commands.AutoShardedBot):
                 headless=True,
                 args=["--no-sandbox", "--force-dark-mode"],
                 defaultViewport={"width": 1980, "height": 1080},
+                proxy={'server': 'http://127.0.0.1:40000/'},
             )
 
         page = await self.browser.newPage()
-        await page.authenticate(
-            credentials=[
-                {"username": self.proxy_username, "password": self.proxy_password}
-            ]
-        )
         keywords = ["pussy", "tits", "porn", "cock", "dick"]
         try:
             p = await page.goto(url, load=True, timeout=5000)
