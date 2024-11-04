@@ -31,9 +31,16 @@ from tools.managers.lastfm import FMHandler
 from tools.configuration import Colors, Emojis
 from discord.ext import commands
 from discord import Message, Embed, File
-from pyppeteer import launch
 from nudenet import NudeDetector
 from datetime import datetime, timedelta, timezone
+from playwright.async_api import (
+    Browser,
+    BrowserContext,
+    Page,
+    Playwright,
+    async_playwright,
+)
+from tools.managers.browser import BrowserHandler
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -66,7 +73,7 @@ class Heal(commands.AutoShardedBot):
         self.message_cache = defaultdict(list)
         self.cache_expiry_seconds = 30
         self.add_check(self.disabled_command)
-        self.browser = None
+        self.browser_handler = BrowserHandler()
 
     async def load_modules(self, directory: str) -> None:
         for module in glob.glob(f"{directory}/**/*.py", recursive=True):
@@ -163,6 +170,8 @@ class Heal(commands.AutoShardedBot):
     async def setup_hook(self) -> None:
         self.pool = await self._load_database()
         self.session = aiohttp.ClientSession()
+        await self.browser_handler.init()
+        self.browser = self.browser_handler
         await self.load_modules("cogs")
         await self.load_modules("events")
         await self.load_extension("jishaku")
@@ -390,67 +399,7 @@ class Heal(commands.AutoShardedBot):
         if check:
             await ctx.warn(f"The command **{cmd.name}** is **disabled** in this guild")
 
-        return check is None
-
-    async def screenshot(self, url: str):
-        filename = f"{url.replace('https://', '').replace('/', '')}.png"
-        directory = "./screenshots/"
-        path = os.path.join(directory, filename)
-
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-        if os.path.exists(path):
-            return File(path)
-
-        if not self.browser:
-            self.browser = await launch(
-                headless=True,
-                args=["--no-sandbox", "--force-dark-mode"],
-                defaultViewport={"width": 1980, "height": 1080},
-                proxy={'server': 'http://127.0.0.1:40000/'},
-            )
-
-        page = await self.browser.newPage()
-        keywords = ["pussy", "tits", "porn", "cock", "dick"]
-        try:
-            p = await page.goto(url, load=True, timeout=5000)
-        except:
-            await page.close()
-            raise BadArgument("I'm unable to screenshot this page.")
-
-        if not p:
-            await page.close()
-            raise BadArgument("This page didn't send a response.")
-
-        if content_type := p.headers.get("content-type"):
-            if not any((i in content_type for i in ("text/html", "application/json"))):
-                await page.close()
-                raise BadArgument("This page contains content I cannot screenshot.")
-        content = await page.content()
-
-        if any(
-            re.search(r"\b{}\b".format(keyword), content, re.IGNORECASE)
-            for keyword in keywords
-        ):
-            await page.close()
-            raise BadArgument("This website contains explicit content.")
-
-        await page.screenshot(path=path)
-
-        filters = [
-            "BUTTOCKS_EXPOSED",
-            "FEMALE_BREAST_EXPOSED",
-            "ANUS_EXPOSED",
-            "FEMALE_GENITALIA_EXPOSED",
-            "MALE_GENITALIA_EXPOSED",
-        ]
-        detections = NudeDetector().detect(path)
-        if any([prediction["class"] in filters for prediction in detections]):
-            raise BadArgument("This website contains explicit content.")
-
-        await page.close()
-        return File(path)
+        return check is None    
 
     async def on_command(self: "Heal", ctx) -> None:
         logger.info(

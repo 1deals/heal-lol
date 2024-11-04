@@ -43,6 +43,14 @@ import pytz
 from pytz import timezone
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
+from playwright.async_api import (
+    Browser,
+    BrowserContext,
+    Page,
+    Playwright,
+    async_playwright,
+)
+from tools.managers.browser import BrowserHandler
 
 geolocator = Nominatim(user_agent="timezone_bot")
 tf = TimezoneFinder()
@@ -607,21 +615,32 @@ class Utility(commands.Cog):
                 else:
                     await ctx.send("Failed to retrieve the image.")
 
-    @hybrid_command(name="screenshot", aliases=["ss"], description="Take a screenshot")
+    @commands.hybrid_command(name="screenshot", aliases=["ss"], description="Take a screenshot")
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
     async def screenshot(self, ctx: Context, *, url: str = None):
         if url is None:
-            return await ctx.warn(f"You need to add a url.")
+            return await ctx.send("You need to add a URL.")
+
         if not url.startswith(("http://", "https://")):
             url = "https://" + url
+
         async with ctx.typing():
             try:
-                ss = await self.bot.screenshot(url)
-                return await ctx.send(file=ss)
-            except BadArgument:
-                return await ctx.warn("This website cannot be screenshotted")
+                async with ctx.bot.browser.borrow_page() as page:
+                    await page.emulate_media(color_scheme="dark")
+                    await page.goto(url, wait_until="networkidle", timeout=30000)
+
+                    screenshot = await page.screenshot(type="png")
+
+                screenshot_buffer = io.BytesIO(screenshot)
+                screenshot_buffer.seek(0)
+
+                await ctx.reply(file=discord.File(screenshot_buffer, filename="screenshot.png"))
+            except Exception as e:
+                await ctx.send(f"Failed to get screenshot: `{e}`")
+            
 
     @command(
         aliases=["createembed", "ce", "script"],

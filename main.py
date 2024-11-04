@@ -6,4 +6,4 @@ dotenv.load_dotenv()
 
 if __name__ == "__main__":
     bot = Heal()
-    bot.run("MTIzMjc3ODUwODQyNjgwOTM2NQ.G8BB0a.nsVwt5rApztFTUavwUbii0gNxc7VCawJlO6TBY")
+    bot.run("MTIzMjc3ODUwODQyNjgwOTM2NQ.GdVCXH.s-fl_dnEm1YYAfDF0RpU87zNTQA2h5jnFpi8dg")
