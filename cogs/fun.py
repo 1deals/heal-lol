@@ -165,7 +165,7 @@ class Fun(commands.Cog):
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def howgay(self, ctx: Context, member: discord.Member = None):
+    async def howgay(self, ctx: Context, member: Union[discord.Member, discord.User] = None):
         if member is None:
             member = ctx.author
 
@@ -173,11 +173,23 @@ class Fun(commands.Cog):
             f":rainbow_flag: {member.mention} is **{random.randint(1,100)}%** gay."
         )
 
+    @hybrid_command(name="howfat", aliases=["fatrate", "fat"])
+    @discord.app_commands.allowed_installs(guilds=True, users=True)
+    @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+    @commands.cooldown(1, 5, commands.BucketType.user)
+    async def howfat(self, ctx: Context, member: Union[discord.Member, discord.User] = None):
+        if member is None:
+            member = ctx.author
+
+        await ctx.neutral(
+            f"{member.mention} is **{random.randint(1,999)}kg**."
+        )
+
     @hybrid_command(name="howlesbian", aliases=["lesbianrate", "lesbian"])
     @discord.app_commands.allowed_installs(guilds=True, users=True)
     @discord.app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
     @commands.cooldown(1, 5, commands.BucketType.user)
-    async def howlesbian(self, ctx: Context, member: discord.Member = None):
+    async def howlesbian(self, ctx: Context, member: Union[discord.Member, discord.User] = None):
         if member is None:
             member = ctx.author
 
